@@ -90,7 +90,7 @@ namespace IdentityService.Controllers
         /// <summary>
         /// Resets the user password after clicking the link from the forgot-password email.
         /// </summary>
-        [HttpPost("reset-password/{token:token}")]
+        [HttpPost("reset-password/{token}")]
         public async Task<IActionResult> ResetPassword(string token, [FromBody] string newPassword)
         {
             await _authService.ResetPasswordAsync(token, newPassword);
