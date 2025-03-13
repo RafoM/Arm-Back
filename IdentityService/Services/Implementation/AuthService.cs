@@ -1,0 +1,302 @@
+﻿using Google.Apis.Auth;
+using IdentityService.Data;
+using IdentityService.Data.Entity;
+using IdentityService.Models.ConfigModels;
+using IdentityService.Models.RequestModels;
+using IdentityService.Services.Interface;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+
+namespace IdentityService.Services.Implementation
+{
+    public class AuthService : IAuthService
+    {
+        private readonly IdentityDbContext _dbContext;
+        private readonly ITokenService _tokenService;
+        private readonly IConfiguration _configuration;
+        private readonly JwtSettingsConfigModel _jwtSettings;
+        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration)
+        {
+            _dbContext = dbContext;
+            _tokenService = tokenService;
+            _configuration = configuration;
+            _jwtSettings = jwtSettings.Value;
+        }
+
+        public async Task<(string accessToken, string refreshToken)> RegisterAsync(RegisterRequestModel request)
+        {
+            if (await _dbContext.Users.AnyAsync(u => u.Email == request.Email))
+                throw new Exception("Email already in use.");
+
+            if (request.Password != request.ConfirmPassword)
+                throw new Exception("Passwords do not match.");
+
+            var userRole = await _dbContext.Roles.Where(r => r.Name == "User").FirstOrDefaultAsync();
+
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+            var newUser = new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                PasswordHash = passwordHash,
+                Country = request.Country,
+                PhoneNumber = request.PhoneNumber,
+                TelegramUserName = request.TelegramUserName,
+                ReferralCode = request.ReferralCode,
+                RoleId = userRole.Id,
+                CreatedDate = DateTime.UtcNow
+            };
+
+            _dbContext.Users.Add(newUser);
+            await _dbContext.SaveChangesAsync();
+
+            var accessToken = _tokenService.GenerateAccessToken(newUser);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            var refreshTokenEntity = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = newUser.Id,
+                Token = refreshToken,
+                ExpireDate = DateTime.UtcNow.AddDays(7),
+                CreatedDate = DateTime.UtcNow
+            };
+            _dbContext.RefreshTokens.Add(refreshTokenEntity);
+            await _dbContext.SaveChangesAsync();
+
+            return (accessToken, refreshToken);
+        }
+
+        public async Task<(string accessToken, string refreshToken)> LoginAsync(LoginRequestModel request)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (user == null)
+                throw new Exception("Invalid credentials.");
+
+            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                throw new Exception("Invalid credentials.");
+
+            var accessToken = _tokenService.GenerateAccessToken(user);
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+            var refreshTokenEntity = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Token = newRefreshToken,
+                ExpireDate = DateTime.UtcNow.AddDays(7),
+                CreatedDate = DateTime.UtcNow
+            };
+
+            _dbContext.RefreshTokens.Add(refreshTokenEntity);
+            await _dbContext.SaveChangesAsync();
+
+            return (accessToken, newRefreshToken);
+        }
+
+        public async Task<(string accessToken, string refreshToken)> GoogleRegistrationAsync(string idToken)
+        {
+            var payload = await ValidateGoogleToken(idToken);
+
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == payload.Email);
+            if (user != null)
+            {
+                return await GoogleLoginAsync(idToken);
+            }
+
+            var newUser = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = payload.Email,
+                FirstName = payload.GivenName,
+                LastName = payload.FamilyName,
+                IsGmailAccount = true,
+                PasswordHash = null,
+                RoleId = 2, 
+                CreatedDate = DateTime.UtcNow
+            };
+
+            _dbContext.Users.Add(newUser);
+            await _dbContext.SaveChangesAsync();
+
+            var (accessToken, refreshToken) = await GenerateTokenPairForUser(newUser);
+            return (accessToken, refreshToken);
+        }
+
+        public async Task<(string accessToken, string refreshToken)> GoogleLoginAsync(string idToken)
+        {
+            var payload = await ValidateGoogleToken(idToken);
+
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == payload.Email);
+            if (user == null)
+            {
+                throw new Exception("User with this Google account does not exist. Please register first.");
+            }
+
+            return await GenerateTokenPairForUser(user);
+        }
+
+        private async Task<GoogleJsonWebSignature.Payload> ValidateGoogleToken(string idToken)
+        {
+            try
+            {
+                return await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings());
+            }
+            catch (InvalidJwtException)
+            {
+                throw new Exception("Invalid or expired Google token.");
+            }
+        }
+
+        private async Task<(string accessToken, string refreshToken)> GenerateTokenPairForUser(User user)
+        {
+            var accessToken = _tokenService.GenerateAccessToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            var refreshTokenEntity = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Token = refreshToken,
+                ExpireDate = DateTime.UtcNow.AddDays(7),
+                CreatedDate = DateTime.UtcNow
+            };
+            _dbContext.RefreshTokens.Add(refreshTokenEntity);
+
+            await _dbContext.SaveChangesAsync();
+            return (accessToken, refreshToken);
+        }
+
+        public async Task<(string accessToken, string refreshToken)> RefreshTokenAsync(string token)
+        {
+            var refreshToken = await _dbContext.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == token && !rt.IsRevoked);
+
+            if (refreshToken == null || refreshToken.ExpireDate < DateTime.UtcNow)
+                throw new Exception("Invalid or expired refresh token.");
+
+            refreshToken.IsRevoked = true;
+            _dbContext.RefreshTokens.Update(refreshToken);
+
+            var user = refreshToken.User;
+            var newAccessToken = _tokenService.GenerateAccessToken(user);
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+            var refreshTokenEntity = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Token = newRefreshToken,
+                ExpireDate = DateTime.UtcNow.AddDays(7),
+                CreatedDate = DateTime.UtcNow
+            };
+            _dbContext.RefreshTokens.Add(refreshTokenEntity);
+
+            await _dbContext.SaveChangesAsync();
+
+            return (newAccessToken, newRefreshToken);
+        }
+
+        public async Task LogoutAsync(string refreshToken)
+        {
+            // Revoke the provided refresh token
+            var token = await _dbContext.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+            if (token == null) return;
+
+            token.IsRevoked = true;
+            _dbContext.RefreshTokens.Update(token);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task ForgotPasswordAsync(string email)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return;
+
+            var resetPasswordBaseUrl = _configuration["JwtSettings:ResetPasswordBaseUrl"];
+
+            var resetLink = new StringBuilder(resetPasswordBaseUrl);
+            var rawToken = GeneratePasswordResetToken(user);
+            resetLink.Append(rawToken);
+
+            // Send the reset link via email
+        }
+
+        public async Task ResetPasswordAsync(string jwtResetToken, string newPassword)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(jwtResetToken, new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true, 
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                }, out SecurityToken validatedToken);
+
+                var hasResetClaim = principal.Claims.Any(c => c.Type == "ResetPassword" && c.Value == "true");
+                if (!hasResetClaim)
+                {
+                    throw new SecurityTokenException("Invalid reset token (missing claim).");
+                }
+
+                var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
+                if (userIdClaim == null) throw new Exception("Token missing user ID.");
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var user = await _dbContext.Users.FindAsync(userId);
+                if (user == null) throw new Exception("User not found.");
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                _dbContext.Users.Update(user);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (SecurityTokenException ex)
+            {
+                throw new Exception("Invalid or expired reset token.");
+            }
+        }
+
+
+        private string GeneratePasswordResetToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+
+            var claims = new[]
+            {
+                new Claim("ResetPassword", "true"),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+            };
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature
+                )
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+    }
+}
