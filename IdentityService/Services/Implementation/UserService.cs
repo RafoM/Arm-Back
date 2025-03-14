@@ -14,12 +14,14 @@ namespace IdentityService.Services.Implementation
         private readonly IdentityDbContext _dbContext;
         private readonly IAmazonS3 _s3Client;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public UserService(IdentityDbContext dbContext, IAmazonS3 s3Client, IConfiguration configuration)
+        public UserService(IdentityDbContext dbContext, IAmazonS3 s3Client, IConfiguration configuration, IEmailService emailService)
         {
             _dbContext = dbContext;
             _s3Client = s3Client;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -44,9 +46,56 @@ namespace IdentityService.Services.Implementation
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<bool> IsEmailVerifiedAsync(Guid userId)
+        {
+            return await _dbContext.Users.Where(y => y.Id == userId)
+                                         .Select(x => x.IsEmailVerified)
+                                         .FirstOrDefaultAsync();
+        }
+
+        public async Task SendVerificationEmailAsync(Guid userId)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            var token = Guid.NewGuid().ToString();
+            user.VerificationToken = token;
+            user.VerificationTokenExpiry = DateTime.UtcNow.AddHours(24);
+            user.IsEmailVerified = false;
+
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+
+            var baseUrl = _configuration["AppSettings:BaseUrl"];
+            var verificationUrl = $"{baseUrl}/api/user/verify?token={token}";
+
+            var subject = "Please verify your email address";
+            var htmlContent = $"<p>Please verify your email by clicking <a href='{verificationUrl}'>here</a>.</p>";
+
+            await _emailService.SendEmailAsync(user.Email, subject, htmlContent);
+        }
+
+        public async Task<bool> VerifyEmailAsync(string token)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.VerificationToken == token
+                                                                    && u.VerificationTokenExpiry > DateTime.UtcNow);
+            if (user == null) return false;
+
+            user.IsEmailVerified = true;
+            user.VerificationToken = null;
+            user.VerificationTokenExpiry = null;
+
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<UserInfoResponseModel> GetUserInfoAsync(Guid userId)
         {
             var userInfo = await _dbContext.Users
+                                           .Where(x => x.Id == userId)
                                            .Select(u => new UserInfoResponseModel
                                            {
                                                Id = u.Id,
@@ -59,7 +108,7 @@ namespace IdentityService.Services.Implementation
                                                ProfileImageUrl = u.ProfileImageUrl,
                                                RoleName = u.Role != null ? u.Role.Name : null
                                            })
-                                           .FirstOrDefaultAsync(x => x.Id == userId);
+                                           .FirstOrDefaultAsync();
 
             if (userInfo == null) throw new Exception("User not found.");
 

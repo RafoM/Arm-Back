@@ -20,12 +20,14 @@ namespace IdentityService.Services.Implementation
         private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
         private readonly JwtSettingsConfigModel _jwtSettings;
-        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration)
+        private readonly IEmailService _emailService;
+        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration, IEmailService emailService)
         {
             _dbContext = dbContext;
             _tokenService = tokenService;
             _configuration = configuration;
             _jwtSettings = jwtSettings.Value;
+            _emailService = emailService;
         }
 
         public async Task<(string accessToken, string refreshToken)> RegisterAsync(RegisterRequestModel request)
@@ -52,7 +54,9 @@ namespace IdentityService.Services.Implementation
                 TelegramUserName = request.TelegramUserName,
                 ReferralCode = request.ReferralCode,
                 RoleId = userRole.Id,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                IsEmailVerified = false,
+                IsGmailAccount = false
             };
 
             _dbContext.Users.Add(newUser);
@@ -120,8 +124,9 @@ namespace IdentityService.Services.Implementation
                 LastName = payload.FamilyName,
                 IsGmailAccount = true,
                 PasswordHash = null,
-                RoleId = 2, 
-                CreatedDate = DateTime.UtcNow
+                RoleId = 2,
+                CreatedDate = DateTime.UtcNow,
+                IsEmailVerified = true
             };
 
             _dbContext.Users.Add(newUser);
@@ -230,8 +235,17 @@ namespace IdentityService.Services.Implementation
             var rawToken = GeneratePasswordResetToken(user);
             resetLink.Append(rawToken);
 
-            // Send the reset link via email
+            string subject = "Reset Your Password";
+            string htmlContent = $@"<p>Hello {user.FirstName},</p>
+                                    <p>We received a request to reset your password. Please click the link below to reset your password:</p>
+                                    <p><a href='{resetLink}'>Reset Password</a></p>
+                                    <p>If you did not request a password reset, please ignore this email.</p>
+                                    <p>Thanks,</p>
+                                    <p>Your Support Team</p>";
+
+            await _emailService.SendEmailAsync(user.Email, subject, htmlContent);
         }
+        
 
         public async Task ResetPasswordAsync(string jwtResetToken, string newPassword)
         {
@@ -244,7 +258,7 @@ namespace IdentityService.Services.Implementation
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ValidateLifetime = true, 
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 }, out SecurityToken validatedToken);

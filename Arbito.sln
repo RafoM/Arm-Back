@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService", "Identity
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService.Tests", "IdentityService.Tests\IdentityService.Tests.csproj", "{3B5CAAE8-9A23-47CF-A4A5-8F3D3A542A1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{77C11D9F-1C4E-4B02-98BD-E159341BFF02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3B5CAAE8-9A23-47CF-A4A5-8F3D3A542A1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B5CAAE8-9A23-47CF-A4A5-8F3D3A542A1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B5CAAE8-9A23-47CF-A4A5-8F3D3A542A1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77C11D9F-1C4E-4B02-98BD-E159341BFF02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77C11D9F-1C4E-4B02-98BD-E159341BFF02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77C11D9F-1C4E-4B02-98BD-E159341BFF02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77C11D9F-1C4E-4B02-98BD-E159341BFF02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

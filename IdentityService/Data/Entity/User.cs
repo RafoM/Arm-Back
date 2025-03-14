@@ -18,5 +18,9 @@
         public bool IsGmailAccount { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+
+        public bool IsEmailVerified { get; set; }
+        public string? VerificationToken { get; set; }
+        public DateTime? VerificationTokenExpiry { get; set; }
     }
 }
