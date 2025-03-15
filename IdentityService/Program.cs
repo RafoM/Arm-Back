@@ -1,4 +1,5 @@
 using Amazon.S3;
+using Google.Cloud.Storage.V1;
 using IdentityService.Data;
 using IdentityService.Models.ConfigModels;
 using IdentityService.Services.Implementation;
@@ -27,14 +28,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
-builder.Services.AddAWSService<IAmazonS3>();
-
-//var awsAccessKey = builder.Configuration["AWS:AccessKeyId"];
-//var awsSecretKey = builder.Configuration["AWS:SecretAccessKey"];
-//var region = RegionEndpoint.GetBySystemName(builder.Configuration["AWS:Region"]);
-
-//builder.Services.AddSingleton<IAmazonS3>(sp =>
-//    new AmazonS3Client(awsAccessKey, awsSecretKey, region));
+builder.Services.AddSingleton(StorageClient.Create());
 
 var jwtSecretKey = builder.Configuration["JwtSettings:SecretKey"] ?? "placeholder-secret";
 var keyBytes = Encoding.UTF8.GetBytes(jwtSecretKey);

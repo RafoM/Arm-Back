@@ -1,5 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
+using Google.Cloud.Storage.V1;
 using IdentityService.Data;
 using IdentityService.Data.Entity;
 using IdentityService.Models.RequestModels;
@@ -15,13 +16,16 @@ namespace IdentityService.Services.Implementation
         private readonly IAmazonS3 _s3Client;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly StorageClient _storageClient;
 
-        public UserService(IdentityDbContext dbContext, IAmazonS3 s3Client, IConfiguration configuration, IEmailService emailService)
+
+        public UserService(IdentityDbContext dbContext, IAmazonS3 s3Client, IConfiguration configuration, IEmailService emailService, StorageClient storageClient)
         {
             _dbContext = dbContext;
             _s3Client = s3Client;
             _configuration = configuration;
             _emailService = emailService;
+            _storageClient = storageClient;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -134,43 +138,42 @@ namespace IdentityService.Services.Implementation
 
         public async Task<string> UpdateUserProfileImageAsync(Guid userId, IFormFile imageFile)
         {
-            var bucketName = _configuration["S3:BucketName"];
+            var bucketName = _configuration["GCS:BucketName"];
 
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-
             if (user == null) throw new Exception("User not found.");
             if (imageFile == null || imageFile.Length == 0) throw new Exception("Invalid image file.");
-            if (string.IsNullOrWhiteSpace(bucketName)) throw new Exception("S3 bucket name is not configured.");
-            if (user.ProfileImageUrl != null) await _s3Client.DeleteObjectAsync(bucketName, user.ProfileImageUrl.Replace($"https://{bucketName}.s3.amazonaws.com/", ""));
+            if (string.IsNullOrWhiteSpace(bucketName)) throw new Exception("GCS bucket name is not configured.");
+
+
 
             var fileExtension = Path.GetExtension(imageFile.FileName);
             var objectKey = $"profile-images/{userId}/{Guid.NewGuid()}{fileExtension}";
 
             using (var stream = imageFile.OpenReadStream())
             {
-                var putRequest = new PutObjectRequest
-                {
-                    BucketName = bucketName,
-                    Key = objectKey,
-                    InputStream = stream,
-                    ContentType = imageFile.ContentType
-                };
-
-                // putRequest.CannedACL = S3CannedACL.PublicRead;
-
-                var response = await _s3Client.PutObjectAsync(putRequest);
-
-                if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
-                    throw new Exception("Failed to upload image to S3.");
+                await _storageClient.UploadObjectAsync(
+                    bucket: bucketName,
+                    objectName: objectKey,
+                    contentType: imageFile.ContentType,
+                    source: stream
+                );
             }
 
-            var s3Url = $"https://{bucketName}.s3.amazonaws.com/{objectKey}";
+            if (user.ProfileImageUrl != null)
+            {
+                var prefix = $"https://storage.googleapis.com/{bucketName}/";
+                var existingObjectKey = user.ProfileImageUrl.Replace(prefix, "");
+                await _storageClient.DeleteObjectAsync(bucketName, existingObjectKey);
+            }
 
-            user.ProfileImageUrl = s3Url;
+            var gcsUrl = $"https://storage.googleapis.com/{bucketName}/{objectKey}";
+
+            user.ProfileImageUrl = gcsUrl;
             _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
 
-            return s3Url;
+            return gcsUrl;
         }
     }
 }
