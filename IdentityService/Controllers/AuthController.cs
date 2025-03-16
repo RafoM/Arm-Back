@@ -21,6 +21,9 @@ namespace IdentityService.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestModel request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (accessToken, refreshToken) = await _authService.RegisterAsync(request);
             return Ok(new { accessToken, refreshToken });
         }
@@ -91,9 +94,9 @@ namespace IdentityService.Controllers
         /// Resets the user password after clicking the link from the forgot-password email.
         /// </summary>
         [HttpPost("reset-password/{token}")]
-        public async Task<IActionResult> ResetPassword(string token, [FromBody] string newPassword)
+        public async Task<IActionResult> ResetPassword(string token, [FromBody] ResetPasswordRequestModel requestModel)
         {
-            await _authService.ResetPasswordAsync(token, newPassword);
+            await _authService.ResetPasswordAsync(token, requestModel);
             return Ok(new { message = "Password has been reset." });
         }
     }

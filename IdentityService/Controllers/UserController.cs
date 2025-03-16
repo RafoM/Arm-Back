@@ -85,6 +85,28 @@ namespace IdentityService.Controllers
         }
 
         /// <summary>
+        /// Updates the password for the currently authenticated user.
+        /// </summary>
+        /// <param name="request">Contains the current and new password.</param>
+        /// <returns>A confirmation message.</returns>
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _userService.ChangePasswordAsync(UserId, request);
+                return Ok(new { message = "Password changed successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Endpoint to verify an email using a token.
         /// </summary>
         [HttpGet("verify")]

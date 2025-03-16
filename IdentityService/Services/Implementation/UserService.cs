@@ -119,6 +119,31 @@ namespace IdentityService.Services.Implementation
             return userInfo;
         }
 
+        public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequestModel requestModel)
+        {
+            if (requestModel.NewPassword != requestModel.ConfirmPassword)
+            {
+                throw new Exception("New password and confirm password do not match.");
+            }
+
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            if (!BCrypt.Net.BCrypt.Verify(requestModel.CurrentPassword, user.PasswordHash))
+                throw new Exception("Current password is incorrect.");
+
+            if (string.IsNullOrWhiteSpace(requestModel.NewPassword) || requestModel.NewPassword.Length < 8)
+                throw new Exception("New password must be at least 8 characters long.");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(requestModel.NewPassword);
+            user.UpdatedDate = DateTime.UtcNow;
+
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+        }
+
+
         public async Task<User> UpdateUserRoleAsync(Guid userId, int newRoleId)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);

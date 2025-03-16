@@ -13,6 +13,7 @@ namespace IdentityService.Services.Interface
         Task<string> UpdateUserProfileImageAsync(Guid userId, IFormFile imageFile);
         Task<bool> IsEmailVerifiedAsync(Guid userId);
         Task SendVerificationEmailAsync(Guid userId);
+        Task ChangePasswordAsync(Guid userId, ChangePasswordRequestModel requestModel);
         Task<bool> VerifyEmailAsync(string token);
     }
 }

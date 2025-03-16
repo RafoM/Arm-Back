@@ -1,4 +1,5 @@
-﻿using Google.Apis.Auth;
+﻿using Azure.Core;
+using Google.Apis.Auth;
 using IdentityService.Data;
 using IdentityService.Data.Entity;
 using IdentityService.Models.ConfigModels;
@@ -247,8 +248,17 @@ namespace IdentityService.Services.Implementation
         }
         
 
-        public async Task ResetPasswordAsync(string jwtResetToken, string newPassword)
+        public async Task ResetPasswordAsync(string jwtResetToken, ResetPasswordRequestModel request)
         {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (user == null)
+                throw new Exception("Invalid credentials.");
+
+            if (request.NewPassword != request.ConfirmPassword)
+            {
+                throw new Exception("New password and confirm password do not match.");
+            }
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
 
@@ -272,11 +282,7 @@ namespace IdentityService.Services.Implementation
                 var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
                 if (userIdClaim == null) throw new Exception("Token missing user ID.");
 
-                var userId = Guid.Parse(userIdClaim.Value);
-                var user = await _dbContext.Users.FindAsync(userId);
-                if (user == null) throw new Exception("User not found.");
-
-                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
                 _dbContext.Users.Update(user);
                 await _dbContext.SaveChangesAsync();
             }
