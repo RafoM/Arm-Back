@@ -6,35 +6,33 @@
 	  <NoWarn>$(NoWarn);1591</NoWarn>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>258e2118-c5fb-4b3b-9752-df4f856a61cd</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\ResponceModels\**" />
-    <Content Remove="Models\ResponceModels\**" />
-    <EmbeddedResource Remove="Models\ResponceModels\**" />
-    <None Remove="Models\ResponceModels\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
-    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Entity\" />
+    <Folder Include="Models\ResponseModels\" />
+    <Folder Include="Models\RequestModels\" />
+    <Folder Include="Services\Implementation\" />
+    <Folder Include="Services\Interface\" />
   </ItemGroup>
 
 </Project>

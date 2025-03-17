@@ -1,4 +1,3 @@
-using Amazon.S3;
 using Google.Cloud.Storage.V1;
 using IdentityService.Data;
 using IdentityService.Models.ConfigModels;

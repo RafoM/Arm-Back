@@ -1,6 +1,4 @@
-﻿using Amazon.S3;
-using Amazon.S3.Model;
-using Google.Cloud.Storage.V1;
+﻿using Google.Cloud.Storage.V1;
 using IdentityService.Data;
 using IdentityService.Data.Entity;
 using IdentityService.Models.RequestModels;
@@ -13,16 +11,14 @@ namespace IdentityService.Services.Implementation
     public class UserService : IUserService
     {
         private readonly IdentityDbContext _dbContext;
-        private readonly IAmazonS3 _s3Client;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
         private readonly StorageClient _storageClient;
 
 
-        public UserService(IdentityDbContext dbContext, IAmazonS3 s3Client, IConfiguration configuration, IEmailService emailService, StorageClient storageClient)
+        public UserService(IdentityDbContext dbContext, IConfiguration configuration, IEmailService emailService, StorageClient storageClient)
         {
             _dbContext = dbContext;
-            _s3Client = s3Client;
             _configuration = configuration;
             _emailService = emailService;
             _storageClient = storageClient;
