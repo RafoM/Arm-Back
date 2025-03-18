@@ -1,4 +1,5 @@
-﻿using Google.Apis.Auth;
+﻿using Azure.Core;
+using Google.Apis.Auth;
 using IdentityService.Data;
 using IdentityService.Data.Entity;
 using IdentityService.Models.ConfigModels;
@@ -20,12 +21,14 @@ namespace IdentityService.Services.Implementation
         private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
         private readonly JwtSettingsConfigModel _jwtSettings;
-        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration)
+        private readonly IEmailService _emailService;
+        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration, IEmailService emailService)
         {
             _dbContext = dbContext;
             _tokenService = tokenService;
             _configuration = configuration;
             _jwtSettings = jwtSettings.Value;
+            _emailService = emailService;
         }
 
         public async Task<(string accessToken, string refreshToken)> RegisterAsync(RegisterRequestModel request)
@@ -52,7 +55,9 @@ namespace IdentityService.Services.Implementation
                 TelegramUserName = request.TelegramUserName,
                 ReferralCode = request.ReferralCode,
                 RoleId = userRole.Id,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                IsEmailVerified = false,
+                IsGmailAccount = false
             };
 
             _dbContext.Users.Add(newUser);
@@ -120,8 +125,9 @@ namespace IdentityService.Services.Implementation
                 LastName = payload.FamilyName,
                 IsGmailAccount = true,
                 PasswordHash = null,
-                RoleId = 2, 
-                CreatedDate = DateTime.UtcNow
+                RoleId = 2,
+                CreatedDate = DateTime.UtcNow,
+                IsEmailVerified = true
             };
 
             _dbContext.Users.Add(newUser);
@@ -230,11 +236,29 @@ namespace IdentityService.Services.Implementation
             var rawToken = GeneratePasswordResetToken(user);
             resetLink.Append(rawToken);
 
-            // Send the reset link via email
-        }
+            string subject = "Reset Your Password";
+            string htmlContent = $@"<p>Hello {user.FirstName},</p>
+                                    <p>We received a request to reset your password. Please click the link below to reset your password:</p>
+                                    <p><a href='{resetLink}'>Reset Password</a></p>
+                                    <p>If you did not request a password reset, please ignore this email.</p>
+                                    <p>Thanks,</p>
+                                    <p>Your Support Team</p>";
 
-        public async Task ResetPasswordAsync(string jwtResetToken, string newPassword)
+            await _emailService.SendEmailAsync(user.Email, subject, htmlContent);
+        }
+        
+
+        public async Task ResetPasswordAsync(string jwtResetToken, ResetPasswordRequestModel request)
         {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (user == null)
+                throw new Exception("Invalid credentials.");
+
+            if (request.NewPassword != request.ConfirmPassword)
+            {
+                throw new Exception("New password and confirm password do not match.");
+            }
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
 
@@ -244,7 +268,7 @@ namespace IdentityService.Services.Implementation
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ValidateLifetime = true, 
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 }, out SecurityToken validatedToken);
@@ -258,11 +282,7 @@ namespace IdentityService.Services.Implementation
                 var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
                 if (userIdClaim == null) throw new Exception("Token missing user ID.");
 
-                var userId = Guid.Parse(userIdClaim.Value);
-                var user = await _dbContext.Users.FindAsync(userId);
-                if (user == null) throw new Exception("User not found.");
-
-                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
                 _dbContext.Users.Update(user);
                 await _dbContext.SaveChangesAsync();
             }

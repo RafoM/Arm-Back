@@ -12,6 +12,6 @@ namespace IdentityService.Services.Interface
         Task<(string accessToken, string refreshToken)> RefreshTokenAsync(string token);
         Task LogoutAsync(string refreshToken);
         Task ForgotPasswordAsync(string email);
-        Task ResetPasswordAsync(string jwtResetToken, string newPassword);
+        Task ResetPasswordAsync(string jwtResetToken, ResetPasswordRequestModel requestModel);
     }
 }

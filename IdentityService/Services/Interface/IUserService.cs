@@ -11,5 +11,9 @@ namespace IdentityService.Services.Interface
         Task<User> UpdateUserRoleAsync(Guid userId, int newRoleId);
         Task UpdateUserInfoAsync(Guid userId, UserInfoUpdateRequestModel request);
         Task<string> UpdateUserProfileImageAsync(Guid userId, IFormFile imageFile);
+        Task<bool> IsEmailVerifiedAsync(Guid userId);
+        Task SendVerificationEmailAsync(Guid userId);
+        Task ChangePasswordAsync(Guid userId, ChangePasswordRequestModel requestModel);
+        Task<bool> VerifyEmailAsync(string token);
     }
 }
