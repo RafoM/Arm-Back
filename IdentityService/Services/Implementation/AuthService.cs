@@ -60,11 +60,11 @@ namespace IdentityService.Services.Implementation
                 IsGmailAccount = false
             };
 
-            _dbContext.Users.Add(newUser);
-            await _dbContext.SaveChangesAsync();
-
             var accessToken = _tokenService.GenerateAccessToken(newUser);
             var refreshToken = _tokenService.GenerateRefreshToken();
+
+            _dbContext.Users.Add(newUser);
+            await _dbContext.SaveChangesAsync();
 
             var refreshTokenEntity = new RefreshToken
             {

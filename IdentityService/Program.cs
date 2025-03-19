@@ -16,7 +16,10 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -26,7 +29,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddSingleton(StorageClient.Create());
+//builder.Services.AddSingleton(StorageClient.Create());
 
 var jwtSecretKey = builder.Configuration["JwtSettings:SecretKey"] ?? "placeholder-secret";
 var keyBytes = Encoding.UTF8.GetBytes(jwtSecretKey);

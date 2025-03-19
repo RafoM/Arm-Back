@@ -2,16 +2,19 @@
 using LanguageService.Data;
 using Microsoft.EntityFrameworkCore;
 using LanguageService.Services.Interface;
+using ContentService.Services.Interface;
 
 namespace LanguageService.Services.Implementation
 {
     public class LanguageService : ILanguageService
     {
-        private readonly LocalizationDbContext _dbContext;
+        private readonly ContentDbContext _dbContext;
+        private readonly IFileStorageService _fileStorageService;
 
-        public LanguageService(LocalizationDbContext dbContext)
+        public LanguageService(ContentDbContext dbContext, IFileStorageService fileStorageService)
         {
             _dbContext = dbContext;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<IEnumerable<Language>> GetAllLanguagesAsync()
@@ -35,7 +38,6 @@ namespace LanguageService.Services.Implementation
         {
             if (id != language.Id)
                 throw new Exception("ID mismatch");
-
             _dbContext.Entry(language).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
         }
@@ -45,9 +47,27 @@ namespace LanguageService.Services.Implementation
             var language = await _dbContext.Languages.FindAsync(id);
             if (language == null)
                 throw new Exception("Language not found");
-
             _dbContext.Languages.Remove(language);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<string> UploadFlagAsync(int languageId, IFormFile flagFile)
+        {
+            var language = await _dbContext.Languages.FindAsync(languageId);
+            if (language == null)
+                throw new Exception("Language not found.");
+
+            if (flagFile == null || flagFile.Length == 0)
+                throw new Exception("Invalid flag file.");
+
+           
+            var flagUrl = await _fileStorageService.UploadFileAsync(flagFile, "language-flags");
+
+            language.Flag = flagUrl;
+            _dbContext.Languages.Update(language);
+            await _dbContext.SaveChangesAsync();
+
+            return flagUrl;
         }
     }
 }

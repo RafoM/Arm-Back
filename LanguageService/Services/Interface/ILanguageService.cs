@@ -9,5 +9,6 @@ namespace LanguageService.Services.Interface
         Task<Language> CreateLanguageAsync(Language language);
         Task UpdateLanguageAsync(int id, Language language);
         Task DeleteLanguageAsync(int id);
+        Task<string> UploadFlagAsync(int languageId, IFormFile flagFile);
     }
 }

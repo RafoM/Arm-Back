@@ -15,9 +15,8 @@ namespace LanguageService.Controllers
         }
 
         /// <summary>
-        /// Retrieves all languages.
+        /// Retrieves all available languages.
         /// </summary>
-        /// <returns>A list of all available languages.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Language>>> GetLanguages()
         {
@@ -28,23 +27,18 @@ namespace LanguageService.Controllers
         /// <summary>
         /// Retrieves a specific language by its ID.
         /// </summary>
-        /// <param name="id">The ID of the language.</param>
-        /// <returns>The language with the specified ID.</returns>
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Language>> GetLanguage(int id)
         {
             var language = await _languageService.GetLanguageByIdAsync(id);
             if (language == null)
                 return NotFound();
-
             return Ok(language);
         }
 
         /// <summary>
         /// Creates a new language.
         /// </summary>
-        /// <param name="language">The language data to create.</param>
-        /// <returns>The newly created language.</returns>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Language>> CreateLanguage([FromBody] Language language)
@@ -56,9 +50,6 @@ namespace LanguageService.Controllers
         /// <summary>
         /// Updates an existing language.
         /// </summary>
-        /// <param name="id">The ID of the language to update.</param>
-        /// <param name="language">The updated language data.</param>
-        /// <returns>No content if update is successful.</returns>
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateLanguage(int id, [FromBody] Language language)
@@ -68,16 +59,25 @@ namespace LanguageService.Controllers
         }
 
         /// <summary>
-        /// Deletes an existing language.
+        /// Deletes/deactivates a language.
         /// </summary>
-        /// <param name="id">The ID of the language to delete.</param>
-        /// <returns>No content if deletion is successful.</returns>
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteLanguage(int id)
         {
             await _languageService.DeleteLanguageAsync(id);
             return NoContent();
+        }
+
+        /// <summary>
+        /// Uploads a flag image for a language.
+        /// </summary>
+        [HttpPost("{id:int}/upload-flag")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UploadFlag(int id, IFormFile flagFile)
+        {
+            var flagUrl = await _languageService.UploadFlagAsync(id, flagFile);
+            return Ok(new { FlagUrl = flagUrl });
         }
     }
 }

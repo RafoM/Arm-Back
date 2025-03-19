@@ -19,7 +19,7 @@ if (string.IsNullOrEmpty(connectionString))
 }
 
 
-builder.Services.AddDbContext<LocalizationDbContext>(options =>
+builder.Services.AddDbContext<ContentDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -62,7 +62,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 
 builder.Services.AddControllers();
-
+builder.Services.AddMemoryCache();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -92,7 +92,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 if (builder.Configuration.GetValue<bool>("ApplyMigrations"))
 {
     using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<LocalizationDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ContentDbContext>();
     if (dbContext.Database.GetPendingMigrations().Any())
     {
         dbContext.Database.Migrate();
@@ -105,6 +105,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseResponseCaching();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

@@ -13,15 +13,16 @@ namespace IdentityService.Services.Implementation
         private readonly IdentityDbContext _dbContext;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
-        private readonly StorageClient _storageClient;
+        //private readonly StorageClient _storageClient;
 
+        //, StorageClient storageClient
 
-        public UserService(IdentityDbContext dbContext, IConfiguration configuration, IEmailService emailService, StorageClient storageClient)
+        public UserService(IdentityDbContext dbContext, IConfiguration configuration, IEmailService emailService)
         {
             _dbContext = dbContext;
             _configuration = configuration;
             _emailService = emailService;
-            _storageClient = storageClient;
+           // _storageClient = storageClient;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -159,42 +160,43 @@ namespace IdentityService.Services.Implementation
 
         public async Task<string> UpdateUserProfileImageAsync(Guid userId, IFormFile imageFile)
         {
-            var bucketName = _configuration["GCS:BucketName"];
+            //var bucketName = _configuration["GCS:BucketName"];
 
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null) throw new Exception("User not found.");
-            if (imageFile == null || imageFile.Length == 0) throw new Exception("Invalid image file.");
-            if (string.IsNullOrWhiteSpace(bucketName)) throw new Exception("GCS bucket name is not configured.");
+            //var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            //if (user == null) throw new Exception("User not found.");
+            //if (imageFile == null || imageFile.Length == 0) throw new Exception("Invalid image file.");
+            //if (string.IsNullOrWhiteSpace(bucketName)) throw new Exception("GCS bucket name is not configured.");
 
 
 
-            var fileExtension = Path.GetExtension(imageFile.FileName);
-            var objectKey = $"profile-images/{userId}/{Guid.NewGuid()}{fileExtension}";
+            //var fileExtension = Path.GetExtension(imageFile.FileName);
+            //var objectKey = $"profile-images/{userId}/{Guid.NewGuid()}{fileExtension}";
 
-            using (var stream = imageFile.OpenReadStream())
-            {
-                await _storageClient.UploadObjectAsync(
-                    bucket: bucketName,
-                    objectName: objectKey,
-                    contentType: imageFile.ContentType,
-                    source: stream
-                );
-            }
+            //using (var stream = imageFile.OpenReadStream())
+            //{
+            //    await _storageClient.UploadObjectAsync(
+            //        bucket: bucketName,
+            //        objectName: objectKey,
+            //        contentType: imageFile.ContentType,
+            //        source: stream
+            //    );
+            //}
 
-            if (user.ProfileImageUrl != null)
-            {
-                var prefix = $"https://storage.googleapis.com/{bucketName}/";
-                var existingObjectKey = user.ProfileImageUrl.Replace(prefix, "");
-                await _storageClient.DeleteObjectAsync(bucketName, existingObjectKey);
-            }
+            //if (user.ProfileImageUrl != null)
+            //{
+            //    var prefix = $"https://storage.googleapis.com/{bucketName}/";
+            //    var existingObjectKey = user.ProfileImageUrl.Replace(prefix, "");
+            //    await _storageClient.DeleteObjectAsync(bucketName, existingObjectKey);
+            //}
 
-            var gcsUrl = $"https://storage.googleapis.com/{bucketName}/{objectKey}";
+            //var gcsUrl = $"https://storage.googleapis.com/{bucketName}/{objectKey}";
 
-            user.ProfileImageUrl = gcsUrl;
-            _dbContext.Users.Update(user);
-            await _dbContext.SaveChangesAsync();
+            //user.ProfileImageUrl = gcsUrl;
+            //_dbContext.Users.Update(user);
+            //await _dbContext.SaveChangesAsync();
 
-            return gcsUrl;
+            //return gcsUrl;
+            return "";
         }
     }
 }

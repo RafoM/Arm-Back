@@ -13,6 +13,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
@@ -28,11 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Entity\" />
     <Folder Include="Models\ResponseModels\" />
     <Folder Include="Models\RequestModels\" />
-    <Folder Include="Services\Implementation\" />
-    <Folder Include="Services\Interface\" />
   </ItemGroup>
 
 </Project>
