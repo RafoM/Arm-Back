@@ -7,7 +7,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-
+builder.Services.AddControllers();
 var jwtSecret = builder.Configuration["JwtSettings:SecretKey"];
 if (string.IsNullOrEmpty(jwtSecret))
 {
@@ -34,6 +34,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
     };
 });
+
 builder.Services.AddOcelot(builder.Configuration);
 builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
