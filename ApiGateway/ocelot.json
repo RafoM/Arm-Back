@@ -6,11 +6,13 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5001
+          "Port": 44350
         }
       ],
       "UpstreamPathTemplate": "/auth/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "identity"
+
     },
     {
       "DownstreamPathTemplate": "/api/user/{everything}",
@@ -18,11 +20,12 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5001
+          "Port": 44350
         }
       ],
       "UpstreamPathTemplate": "/user/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "identity",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -34,11 +37,12 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5001
+          "Port": 44350
         }
       ],
       "UpstreamPathTemplate": "/role/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "identity",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -53,14 +57,79 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5001
+          "Port": 44350
         }
       ],
       "UpstreamPathTemplate": "/admin/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "identity",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/translations/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44369
+        }
+      ],
+      "UpstreamPathTemplate": "/translations/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/translations/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44369
+        }
+      ],
+      "UpstreamPathTemplate": "/translations/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/languages/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44369
+        }
+      ],
+      "UpstreamPathTemplate": "/languages/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/languages/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44369
+        }
+      ],
+      "UpstreamPathTemplate": "/languages/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
       },
       "RouteClaimsRequirement": {
         "role": "Admin"
@@ -70,12 +139,26 @@
   "SwaggerEndPoints": [
     {
       "Key": "identity",
-      "Name": "Identity Service",
-      "Version": "v1",
-      "Url": "http://localhost:5001/swagger/v1/swagger.json"
+      "Config": [
+        {
+          "Name": "IdentityService",
+          "Version": "v1",
+          "Url": "https://localhost:44350/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "content",
+      "Config": [
+        {
+          "Name": "ContentService",
+          "Version": "v1",
+          "Url": "https://localhost:44369/swagger/v1/swagger.json"
+        }
+      ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5000"
+    "BaseUrl": "http://localhost:9488"
   }
 }

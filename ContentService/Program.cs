@@ -1,44 +1,34 @@
+using ContentService.Data;
+using ContentService.Services.Implementation;
+using ContentService.Services.Interface;
 using Google.Cloud.Storage.V1;
-using IdentityService.Data;
-using IdentityService.Models.ConfigModels;
-using IdentityService.Services.Implementation;
-using IdentityService.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 builder.Configuration.AddEnvironmentVariables();
-builder.Services.AddControllers();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    .AddEnvironmentVariables();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<IdentityDbContext>(options =>
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new Exception("Connection string 'DefaultConnection' is missing.");
+}
+
+
+builder.Services.AddDbContext<ContentDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.Configure<JwtSettingsConfigModel>(builder.Configuration.GetSection("JwtSettings"));
 
-//builder.Services.AddSingleton(StorageClient.Create());
 
-var jwtSecretKey = builder.Configuration["JwtSettings:SecretKey"] ?? "placeholder-secret";
-var keyBytes = Encoding.UTF8.GetBytes(jwtSecretKey);
-var signingKey = new SymmetricSecurityKey(keyBytes);
-var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsConfigModel>();
-builder.Services.Configure<SmtpSettingsConfigModel>(builder.Configuration.GetSection("SmtpSettings"));
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"];
+var issuer = jwtSettings["Issuer"];
 
 builder.Services.AddAuthentication(options =>
 {
@@ -47,21 +37,32 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false;
+    options.RequireHttpsMetadata = true;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,
+        ValidateIssuer = true,
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
+        ValidIssuer = issuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
 });
 
 
+builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<ITranslationService, TranslationService>();
+builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+//builder.Services.AddSingleton(StorageClient.Create());
+
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -98,27 +99,47 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+var supportedCultures = new List<CultureInfo>
+{
+    new CultureInfo("en-US"),
+    new CultureInfo("es-ES"),
+    new CultureInfo("fr-FR")
+};
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en-US"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
+
+
 if (builder.Configuration.GetValue<bool>("ApplyMigrations"))
 {
     using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ContentDbContext>();
     if (dbContext.Database.GetPendingMigrations().Any())
     {
         dbContext.Database.Migrate();
     }
 }
 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.RoutePrefix = string.Empty;
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+    });
 }
 
+app.UseResponseCaching();
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

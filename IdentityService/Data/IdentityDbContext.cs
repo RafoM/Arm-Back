@@ -11,8 +11,6 @@ namespace IdentityService.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(entity =>
@@ -36,11 +34,6 @@ namespace IdentityService.Data
                       .HasForeignKey(x => x.UserId);
             });
 
-            modelBuilder.Entity<PasswordResetToken>(entity =>
-            {
-                entity.HasKey(x => x.Id);
-                entity.Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            });
 
             modelBuilder.Entity<Role>(entity =>
             {

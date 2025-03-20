@@ -19,10 +19,10 @@ namespace IdentityService.Controllers
         /// <summary>
         /// Get a user's info by ID
         /// </summary>
-        [HttpGet("{userId:guid}")]
-        public async Task<IActionResult> GetUserInfo(Guid userId)
+        [HttpGet("info")]
+        public async Task<IActionResult> GetUserInfo()
         {
-            var user = await _userService.GetUserInfoAsync(userId);
+            var user = await _userService.GetUserInfoAsync(UserId);
             return Ok(user);
         }
 
