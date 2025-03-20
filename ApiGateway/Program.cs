@@ -2,14 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using MMLib.SwaggerForOcelot;
-using System.Reflection;
 using System.Text;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.OpenApi.Models;
-using Ocelot.Values;
-using MMLib.SwaggerForOcelot.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,14 +49,15 @@ app.UseEndpoints(endpoints =>
 
 if (app.Environment.IsDevelopment())
 {
-       app.UseSwaggerForOcelotUI(options =>
-      {
-          options.PathToSwaggerGenerator = "/swagger/docs";
-          options.DownstreamSwaggerHeaders = new[] { new KeyValuePair<string, string>("Auth-Key", "AuthValue") };
-      },
-      uiOpt => {
-          uiOpt.DocumentTitle = "Gateway documentation";
-      }).UseOcelot().Wait();
+    app.UseSwaggerForOcelotUI(options =>
+   {
+       options.PathToSwaggerGenerator = "/swagger/docs";
+       options.DownstreamSwaggerHeaders = new[] { new KeyValuePair<string, string>("Auth-Key", "AuthValue") };
+   },
+   uiOpt =>
+   {
+       uiOpt.DocumentTitle = "Gateway documentation";
+   }).UseOcelot().Wait();
 }
 
 
