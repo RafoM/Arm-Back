@@ -2,7 +2,7 @@
   "Routes": [
     {
       "DownstreamPathTemplate": "/api/auth/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "identityservice-959167850798.europe-west4.run.app",
@@ -16,7 +16,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/user/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "identityservice-959167850798.europe-west4.run.app",
@@ -33,7 +33,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/role/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "identityservice-959167850798.europe-west4.run.app",
@@ -53,7 +53,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/admin/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "identityservice-959167850798.europe-west4.run.app",
@@ -73,7 +73,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/translations/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
@@ -86,7 +86,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/translations/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
@@ -105,7 +105,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/languages/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
@@ -118,7 +118,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/languages/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
