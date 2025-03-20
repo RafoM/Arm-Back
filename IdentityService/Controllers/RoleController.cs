@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers
 {
+
     [Authorize(Roles = "Admin")]
     public class RoleController : BaseController
     {

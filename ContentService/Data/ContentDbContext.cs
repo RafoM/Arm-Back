@@ -1,10 +1,7 @@
 ﻿using ContentService.Data.Entity;
-using LanguageService.Data.Entity;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
-namespace LanguageService.Data
+namespace ContentService.Data
 {
     public class ContentDbContext : DbContext
     {

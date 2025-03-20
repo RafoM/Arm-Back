@@ -5,12 +5,14 @@ namespace ContentService.Services.Implementation
 {
     public class FileStorageService : IFileStorageService
     {
-        private readonly StorageClient _storageClient;
+       // private readonly StorageClient _storageClient;
         private readonly string _bucketName;
 
-        public FileStorageService(StorageClient storageClient, IConfiguration configuration)
+        //StorageClient storageClient,
+
+        public FileStorageService( IConfiguration configuration)
         {
-            _storageClient = storageClient;
+           // _storageClient = storageClient;
             _bucketName = configuration["GCS:BucketName"];
             if (string.IsNullOrWhiteSpace(_bucketName))
             {
@@ -28,12 +30,12 @@ namespace ContentService.Services.Implementation
 
             using (var stream = file.OpenReadStream())
             {
-                await _storageClient.UploadObjectAsync(
-                    bucket: _bucketName,
-                    objectName: objectKey,
-                    contentType: file.ContentType,
-                    source: stream
-                );
+                //await _storageClient.UploadObjectAsync(
+                //    bucket: _bucketName,
+                //    objectName: objectKey,
+                //    contentType: file.ContentType,
+                //    source: stream
+                //);
             }
 
             var publicUrl = $"https://storage.googleapis.com/{_bucketName}/{objectKey}";
@@ -50,7 +52,7 @@ namespace ContentService.Services.Implementation
                 throw new Exception("Invalid file URL.");
 
             var objectKey = fileUrl.Substring(prefix.Length);
-            await _storageClient.DeleteObjectAsync(_bucketName, objectKey);
+            //await _storageClient.DeleteObjectAsync(_bucketName, objectKey);
         }
     }
 }

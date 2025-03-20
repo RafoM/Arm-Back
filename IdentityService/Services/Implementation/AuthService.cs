@@ -82,7 +82,7 @@ namespace IdentityService.Services.Implementation
 
         public async Task<(string accessToken, string refreshToken)> LoginAsync(LoginRequestModel request)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var user = await _dbContext.Users.Include(x => x.Role).FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
                 throw new Exception("Invalid credentials.");
 
@@ -214,7 +214,6 @@ namespace IdentityService.Services.Implementation
 
         public async Task LogoutAsync(string refreshToken)
         {
-            // Revoke the provided refresh token
             var token = await _dbContext.RefreshTokens
                 .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
 

@@ -1,4 +1,4 @@
-﻿namespace LanguageService.Data.Entity
+﻿namespace ContentService.Data.Entity
 {
     public class Translation
     {

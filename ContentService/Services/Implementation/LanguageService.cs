@@ -1,10 +1,10 @@
-﻿using LanguageService.Data.Entity;
-using LanguageService.Data;
+﻿using ContentService.Data.Entity;
+using ContentService.Data;
 using Microsoft.EntityFrameworkCore;
-using LanguageService.Services.Interface;
 using ContentService.Services.Interface;
+using ContentService.Models.RequestModels;
 
-namespace LanguageService.Services.Implementation
+namespace ContentService.Services.Implementation
 {
     public class LanguageService : ILanguageService
     {
@@ -27,18 +27,43 @@ namespace LanguageService.Services.Implementation
             return await _dbContext.Languages.FindAsync(id);
         }
 
-        public async Task<Language> CreateLanguageAsync(Language language)
+        public async Task<Language> CreateLanguageAsync(LanguageRequestModel request)
         {
+            var language = new Language
+            {
+                Code = request.Code,
+                Name = request.Name,
+                IsActive = request.IsActive,
+                Flag = request.Flag,
+                Translations = request.Translations?.Select(t => new Translation
+                {
+                    EntityName = t.EntityName,
+                    EntityId = t.EntityId,
+                    FieldName = t.FieldName,
+                    LanguageCode = t.LanguageCode,
+                    Value = t.Value,
+                    Group = t.Group
+                }).ToList()
+            };
+
             _dbContext.Languages.Add(language);
             await _dbContext.SaveChangesAsync();
             return language;
         }
 
-        public async Task UpdateLanguageAsync(int id, Language language)
+        public async Task UpdateLanguageAsync(int id, LanguageRequestModel request)
         {
-            if (id != language.Id)
-                throw new Exception("ID mismatch");
-            _dbContext.Entry(language).State = EntityState.Modified;
+            var language = await _dbContext.Languages.FindAsync(id);
+            if (language == null)
+                throw new Exception("Language not found.");
+
+            language.Code = request.Code;
+            language.Name = request.Name;
+            language.IsActive = request.IsActive;
+            language.Flag = request.Flag;
+
+
+            _dbContext.Languages.Update(language);
             await _dbContext.SaveChangesAsync();
         }
 

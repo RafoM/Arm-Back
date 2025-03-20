@@ -1,7 +1,9 @@
 ﻿using IdentityService.Data;
 using IdentityService.Data.Entity;
+using IdentityService.Models.ConfigModels;
 using IdentityService.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -9,24 +11,16 @@ using System.Text;
 
 public class TokenService : ITokenService
 {
-    private readonly string _secretKey;
-    private readonly int _accessTokenLifetimeMinutes;
-
-    public TokenService(IdentityDbContext dbContext, IConfiguration configuration)
+    private readonly JwtSettingsConfigModel _jwtSettings;
+    public TokenService(IOptions<JwtSettingsConfigModel> jwtSettings)
     {
-        _secretKey = configuration["JwtSettings:SecretKey"]
-            ?? throw new ArgumentNullException("JwtSettings:SecretKey is not configured.");
-
-        var lifetimeString = configuration["JwtSettings:AccessTokenLifetimeMinutes"];
-        _accessTokenLifetimeMinutes = string.IsNullOrEmpty(lifetimeString)
-            ? 15
-            : int.Parse(lifetimeString);
+        _jwtSettings = jwtSettings.Value;
     }
 
     public string GenerateAccessToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_secretKey);
+        var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
 
         var roleName = user.Role?.Name ?? "User";
 
@@ -40,11 +34,12 @@ public class TokenService : ITokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_accessTokenLifetimeMinutes),
+            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenLifetimeMinutes),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature
-            )
+            ),
+            Issuer = _jwtSettings.Issuer
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -59,7 +54,7 @@ public class TokenService : ITokenService
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_secretKey);
+        var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
 
         var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
         {

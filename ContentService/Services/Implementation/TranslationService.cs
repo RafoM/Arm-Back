@@ -1,10 +1,11 @@
-﻿using LanguageService.Data.Entity;
-using LanguageService.Data;
-using LanguageService.Services.Interface;
+﻿using ContentService.Data.Entity;
+using ContentService.Data;
+using ContentService.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using ContentService.Models.RequestModels;
 
-namespace LanguageService.Services.Implementation
+namespace ContentService.Services.Implementation
 {
     public class TranslationService : ITranslationService
     {
@@ -65,18 +66,39 @@ namespace LanguageService.Services.Implementation
             }
         }
 
-        public async Task<Translation> CreateTranslationAsync(Translation translation)
+        public async Task<Translation> CreateTranslationAsync(TranslationRequestModel request)
         {
+            var translation = new Translation
+            {
+                EntityName = request.EntityName,
+                EntityId = request.EntityId,
+                FieldName = request.FieldName,
+                LanguageCode = request.LanguageCode,
+                Value = request.Value,
+                Group = request.Group
+            };
+
             _dbContext.Translations.Add(translation);
             await _dbContext.SaveChangesAsync();
             return translation;
         }
 
-        public async Task UpdateTranslationAsync(int id, Translation translation)
+        public async Task UpdateTranslationAsync(int id, TranslationRequestModel request)
         {
-            if (id != translation.Id)
-                throw new Exception("ID mismatch");
-            _dbContext.Entry(translation).State = EntityState.Modified;
+            var existingTranslation = await _dbContext.Translations.FindAsync(id);
+            if (existingTranslation == null)
+            {
+                throw new Exception("Translation not found.");
+            }
+
+            existingTranslation.EntityName = request.EntityName;
+            existingTranslation.EntityId = request.EntityId;
+            existingTranslation.FieldName = request.FieldName;
+            existingTranslation.LanguageCode = request.LanguageCode;
+            existingTranslation.Value = request.Value;
+            existingTranslation.Group = request.Group;
+
+            _dbContext.Translations.Update(existingTranslation);
             await _dbContext.SaveChangesAsync();
         }
 

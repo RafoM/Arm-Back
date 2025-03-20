@@ -1,9 +1,10 @@
-﻿using LanguageService.Data.Entity;
-using LanguageService.Services.Interface;
+﻿using ContentService.Data.Entity;
+using ContentService.Models.RequestModels;
+using ContentService.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LanguageService.Controllers
+namespace ContentService.Controllers
 {
     public class LanguagesController : BaseController
     {
@@ -41,7 +42,7 @@ namespace LanguageService.Controllers
         /// </summary>
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Language>> CreateLanguage([FromBody] Language language)
+        public async Task<ActionResult<Language>> CreateLanguage([FromBody] LanguageRequestModel language)
         {
             var created = await _languageService.CreateLanguageAsync(language);
             return CreatedAtAction(nameof(GetLanguage), new { id = created.Id }, created);
@@ -52,7 +53,7 @@ namespace LanguageService.Controllers
         /// </summary>
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateLanguage(int id, [FromBody] Language language)
+        public async Task<IActionResult> UpdateLanguage(int id, [FromBody] LanguageRequestModel language)
         {
             await _languageService.UpdateLanguageAsync(id, language);
             return NoContent();

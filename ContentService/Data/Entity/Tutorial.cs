@@ -1,4 +1,4 @@
-﻿using LanguageService.Data.Entity;
+﻿using ContentService.Data.Entity;
 
 namespace ContentService.Data.Entity
 {

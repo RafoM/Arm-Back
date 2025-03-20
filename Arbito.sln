@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService", "Identity
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{77C11D9F-1C4E-4B02-98BD-E159341BFF02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService", "LanguageService\ContentService.csproj", "{F9C717F5-1FF1-4652-B896-01370C278D21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentService", "ContentService\ContentService.csproj", "{441C4D7A-397E-4C8A-98AA-EE3FFDED66D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{77C11D9F-1C4E-4B02-98BD-E159341BFF02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77C11D9F-1C4E-4B02-98BD-E159341BFF02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77C11D9F-1C4E-4B02-98BD-E159341BFF02}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F9C717F5-1FF1-4652-B896-01370C278D21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9C717F5-1FF1-4652-B896-01370C278D21}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9C717F5-1FF1-4652-B896-01370C278D21}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9C717F5-1FF1-4652-B896-01370C278D21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{441C4D7A-397E-4C8A-98AA-EE3FFDED66D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{441C4D7A-397E-4C8A-98AA-EE3FFDED66D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{441C4D7A-397E-4C8A-98AA-EE3FFDED66D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{441C4D7A-397E-4C8A-98AA-EE3FFDED66D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
