@@ -5,7 +5,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "https://identityservice-959167850798.europe-west4.run.app",
+          "Host": "identityservice-959167850798.europe-west4.run.app",
           "Port": 443
         }
       ],
@@ -19,7 +19,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "https://identityservice-959167850798.europe-west4.run.app",
+          "Host": "identityservice-959167850798.europe-west4.run.app",
           "Port": 443
         }
       ],
@@ -36,7 +36,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "https://identityservice-959167850798.europe-west4.run.app",
+          "Host": "identityservice-959167850798.europe-west4.run.app",
           "Port": 443
         }
       ],
@@ -56,7 +56,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "https://identityservice-959167850798.europe-west4.run.app",
+          "Host": "identityservice-959167850798.europe-west4.run.app",
           "Port": 443
         }
       ],
@@ -143,7 +143,7 @@
         {
           "Name": "IdentityService",
           "Version": "v1",
-          "Url": "https://identityservice-959167850798.europe-west4.run.app/swagger/v1/swagger.json"
+          "Url": "identityservice-959167850798.europe-west4.run.app/swagger/v1/swagger.json"
         }
       ]
     },
