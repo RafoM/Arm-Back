@@ -106,6 +106,8 @@ if (builder.Configuration.GetValue<bool>("ApplyMigrations"))
     {
         dbContext.Database.Migrate();
     }
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await DatabaseSeeder.SeedAsync(dbContext, configuration);
 }
 
 if (app.Environment.IsDevelopment())
