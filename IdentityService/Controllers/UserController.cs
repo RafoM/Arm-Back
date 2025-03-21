@@ -59,9 +59,9 @@ namespace IdentityService.Controllers
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("{userId:guid}/role/{newRoleId:int}")]
-        public async Task<IActionResult> UpdateUserRole(Guid userId, int newRoleId)
+        public async Task<IActionResult> UpdateUserRole(UpdateUserRoleRequestModel requestModel) 
         {
-            var user = await _userService.UpdateUserRoleAsync(userId, newRoleId);
+            var user = await _userService.UpdateUserRoleAsync(requestModel);
             return Ok(user);
         }
         /// <summary>
@@ -77,10 +77,10 @@ namespace IdentityService.Controllers
         /// <summary>
         /// Endpoint to send a verification email for the specified user.
         /// </summary>
-        [HttpPost("send-verification-email/{userId:guid}")]
-        public async Task<IActionResult> SendVerificationEmail(Guid userId)
+        [HttpPost("send-verification-email")]
+        public async Task<IActionResult> SendVerificationEmail()
         {
-            await _userService.SendVerificationEmailAsync(userId);
+            await _userService.SendVerificationEmailAsync(UserId);
             return Ok(new { message = "Verification email sent." });
         }
 

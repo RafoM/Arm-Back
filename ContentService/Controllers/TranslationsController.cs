@@ -51,11 +51,11 @@ namespace ContentService.Controllers
         /// <summary>
         /// Updates an existing translation.
         /// </summary>
-        [HttpPut("{id:int}")]
+        [HttpPut]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateTranslation(int id, [FromBody] TranslationRequestModel translation)
+        public async Task<IActionResult> UpdateTranslation([FromBody] TranslationRequestModel translation)
         {
-            await _translationService.UpdateTranslationAsync(id, translation);
+            await _translationService.UpdateTranslationAsync(translation);
             return NoContent();
         }
 

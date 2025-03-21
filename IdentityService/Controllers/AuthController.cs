@@ -42,9 +42,9 @@ namespace IdentityService.Controllers
         /// Log in user via Google OAuth and returns JWT tokens.
         /// </summary>
         [HttpPost("google-login")]
-        public async Task<IActionResult> GoogleLogin([FromBody] string idToken)
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestModel requestModel)
         {
-            var (accessToken, refreshToken) = await _authService.GoogleLoginAsync(idToken);
+            var (accessToken, refreshToken) = await _authService.GoogleLoginAsync(requestModel.IdToken);
             return Ok(new { accessToken, refreshToken });
         }
 
@@ -54,9 +54,9 @@ namespace IdentityService.Controllers
         /// <param name="idToken"></param>
         /// <returns></returns>
         [HttpPost("google-register")]
-        public async Task<IActionResult> GoogleRegister([FromBody] string idToken)
+        public async Task<IActionResult> GoogleRegister([FromBody] GoogleLoginRequestModel requestModel)
         {
-            var (accessToken, refreshToken) = await _authService.GoogleRegistrationAsync(idToken);
+            var (accessToken, refreshToken) = await _authService.GoogleRegistrationAsync(requestModel.IdToken);
             return Ok(new { accessToken, refreshToken });
         }
 
@@ -64,9 +64,9 @@ namespace IdentityService.Controllers
         /// Refreshes an expired or near-expired access token using a valid refresh token.
         /// </summary>
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestModel requestModel)
         {
-            var (accessToken, newRefreshToken) = await _authService.RefreshTokenAsync(refreshToken);
+            var (accessToken, newRefreshToken) = await _authService.RefreshTokenAsync(requestModel.RefreshToken);
             return Ok(new { accessToken, newRefreshToken });
         }
 
@@ -74,9 +74,9 @@ namespace IdentityService.Controllers
         /// Logs out a user by invalidating a given refresh token.
         /// </summary>
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] string refreshToken)
+        public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestModel requestModel)
         {
-            await _authService.LogoutAsync(refreshToken);
+            await _authService.LogoutAsync(requestModel.RefreshToken);
             return Ok(new { message = "Logged out" });
         }
 

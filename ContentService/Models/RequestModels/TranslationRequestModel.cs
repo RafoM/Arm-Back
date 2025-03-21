@@ -2,6 +2,7 @@
 {
     public class TranslationRequestModel
     {
+        public int Id { get; set; }
         public string EntityName { get; set; }
         public int? EntityId { get; set; }
         public string FieldName { get; set; }

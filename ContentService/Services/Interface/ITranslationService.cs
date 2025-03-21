@@ -9,7 +9,7 @@ namespace ContentService.Services.Interface
         Task<Translation> GetTranslationByIdAsync(int id);
         Task<IEnumerable<Translation>> GetTranslationsAsync(string languageCode, string entityName = null, int? entityId = null, string group = null);
         Task<Translation> CreateTranslationAsync(TranslationRequestModel translation);
-        Task UpdateTranslationAsync(int id, TranslationRequestModel translation);
+        Task UpdateTranslationAsync(TranslationRequestModel translation);
         Task DeleteTranslationAsync(int id);
     }
 }

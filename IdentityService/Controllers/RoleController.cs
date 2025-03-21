@@ -1,4 +1,5 @@
 ﻿using IdentityService.Data.Entity;
+using IdentityService.Models.RequestModels;
 using IdentityService.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,10 +44,10 @@ namespace IdentityService.Controllers
         /// Create a new role (Admin only).
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> CreateRole([FromBody] string RoleName)
+        public async Task<IActionResult> CreateRole([FromBody] RoleRequestModel requestModel)
         {
 
-            var role = await _roleService.CreateRoleAsync(RoleName);
+            var role = await _roleService.CreateRoleAsync(requestModel.RoleName);
             return CreatedAtAction(nameof(GetRole), new { id = role.Id }, role);
         }
 
@@ -54,11 +55,11 @@ namespace IdentityService.Controllers
         /// Update a role (Admin only).
         /// </summary>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] string RoleName)
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] RoleRequestModel requestModel)
         {
             try
             {
-                await _roleService.UpdateRoleAsync(id, RoleName);
+                await _roleService.UpdateRoleAsync(id, requestModel.RoleName);
                 return NoContent();
             }
             catch (System.Exception ex)

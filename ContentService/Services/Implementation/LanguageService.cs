@@ -34,7 +34,7 @@ namespace ContentService.Services.Implementation
                 Code = request.Code,
                 Name = request.Name,
                 IsActive = request.IsActive,
-                Flag = request.Flag,
+                FlagUrl = request.FlagUrl,
                 Translations = request.Translations?.Select(t => new Translation
                 {
                     EntityName = t.EntityName,
@@ -60,7 +60,7 @@ namespace ContentService.Services.Implementation
             language.Code = request.Code;
             language.Name = request.Name;
             language.IsActive = request.IsActive;
-            language.Flag = request.Flag;
+            language.FlagUrl = request.FlagUrl;
 
 
             _dbContext.Languages.Update(language);
@@ -88,7 +88,7 @@ namespace ContentService.Services.Implementation
            
             var flagUrl = await _fileStorageService.UploadFileAsync(flagFile, "language-flags");
 
-            language.Flag = flagUrl;
+            language.FlagUrl = flagUrl;
             _dbContext.Languages.Update(language);
             await _dbContext.SaveChangesAsync();
 

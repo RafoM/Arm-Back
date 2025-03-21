@@ -83,9 +83,9 @@ namespace ContentService.Services.Implementation
             return translation;
         }
 
-        public async Task UpdateTranslationAsync(int id, TranslationRequestModel request)
+        public async Task UpdateTranslationAsync(TranslationRequestModel request)
         {
-            var existingTranslation = await _dbContext.Translations.FindAsync(id);
+            var existingTranslation = await _dbContext.Translations.FindAsync(request.Id);
             if (existingTranslation == null)
             {
                 throw new Exception("Translation not found.");

@@ -141,15 +141,15 @@ namespace IdentityService.Services.Implementation
         }
 
 
-        public async Task<User> UpdateUserRoleAsync(Guid userId, int newRoleId)
+        public async Task<User> UpdateUserRoleAsync(UpdateUserRoleRequestModel requestModel)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == requestModel.UserId);
             if (user == null) throw new Exception("User not found.");
 
-            var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Id == newRoleId);
+            var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Id == requestModel.RoleId);
             if (role == null) throw new Exception("Invalid role ID.");
 
-            user.RoleId = newRoleId;
+            user.RoleId = requestModel.RoleId;
             user.UpdatedDate = DateTime.UtcNow;
 
             _dbContext.Users.Update(user);
