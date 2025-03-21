@@ -76,7 +76,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "contentservice-959167850798.europe-west4.run.app",
           "Port": 443
         }
       ],
@@ -89,7 +89,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "contentservice-959167850798.europe-west4.run.app",
           "Port": 443
         }
       ],
@@ -108,7 +108,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "contentservice-959167850798.europe-west4.run.app",
           "Port": 443
         }
       ],
@@ -121,7 +121,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "contentservice-959167850798.europe-west4.run.app",
           "Port": 443
         }
       ],
@@ -153,12 +153,12 @@
         {
           "Name": "ContentService",
           "Version": "v1",
-          "Url": "https://localhost:443/swagger/v1/swagger.json"
+          "Url": "https://contentservice-959167850798.europe-west4.run.app/swagger/v1/swagger.json"
         }
       ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "https://apigateway-959167850798.europe-west4.run.app:8080"
+    "BaseUrl": "https://apigateway-959167850798.europe-west4.run.app"
   }
 }
