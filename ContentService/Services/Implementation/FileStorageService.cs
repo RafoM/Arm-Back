@@ -6,25 +6,24 @@ namespace ContentService.Services.Implementation
     public class FileStorageService : IFileStorageService
     {
        // private readonly StorageClient _storageClient;
-        private readonly string _bucketName;
+        private readonly IConfiguration _configuration;
 
         //StorageClient storageClient,
 
-        public FileStorageService( IConfiguration configuration)
+        public FileStorageService(IConfiguration configuration)
         {
            // _storageClient = storageClient;
-            _bucketName = configuration["GCS:BucketName"];
-            if (string.IsNullOrWhiteSpace(_bucketName))
-            {
-                throw new Exception("GCS bucket name is not configured.");
-            }
+            _configuration = configuration; 
         }
 
         public async Task<string> UploadFileAsync(IFormFile file, string folderName)
         {
             if (file == null || file.Length == 0)
                 throw new Exception("Invalid file.");
-
+            var bucketName = _configuration["GCS:BucketName"];
+            if (string.IsNullOrWhiteSpace(bucketName))
+                throw new Exception("GCS bucket name is not configured.");
+            
             var fileExtension = Path.GetExtension(file.FileName);
             var objectKey = $"{folderName}/{Guid.NewGuid()}{fileExtension}";
 
@@ -38,7 +37,7 @@ namespace ContentService.Services.Implementation
                 //);
             }
 
-            var publicUrl = $"https://storage.googleapis.com/{_bucketName}/{objectKey}";
+            var publicUrl = $"https://storage.googleapis.com/{bucketName}/{objectKey}";
             return publicUrl;
         }
 
@@ -47,7 +46,11 @@ namespace ContentService.Services.Implementation
             if (string.IsNullOrWhiteSpace(fileUrl))
                 return;
 
-            var prefix = $"https://storage.googleapis.com/{_bucketName}/";
+            var bucketName = _configuration["GCS:BucketName"];
+            if (string.IsNullOrWhiteSpace(bucketName))
+                throw new Exception("GCS bucket name is not configured.");
+
+            var prefix = $"https://storage.googleapis.com/{bucketName}/";
             if (!fileUrl.StartsWith(prefix))
                 throw new Exception("Invalid file URL.");
 
