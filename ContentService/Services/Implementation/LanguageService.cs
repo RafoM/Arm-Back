@@ -3,6 +3,7 @@ using ContentService.Data;
 using Microsoft.EntityFrameworkCore;
 using ContentService.Services.Interface;
 using ContentService.Models.RequestModels;
+using ContentService.Models.ResponseModels;
 
 namespace ContentService.Services.Implementation
 {
@@ -17,63 +18,64 @@ namespace ContentService.Services.Implementation
             _fileStorageService = fileStorageService;
         }
 
-        public async Task<IEnumerable<Language>> GetAllLanguagesAsync()
+        public async Task<IEnumerable<LanguageResponseModel>> GetAllAsync()
         {
-            return await _dbContext.Languages.ToListAsync();
-        }
-
-        public async Task<Language> GetLanguageByIdAsync(int id)
-        {
-            return await _dbContext.Languages.FindAsync(id);
-        }
-
-        public async Task<Language> CreateLanguageAsync(LanguageRequestModel request)
-        {
-            var language = new Language
-            {
-                Code = request.Code,
-                Name = request.Name,
-                IsActive = request.IsActive,
-                FlagUrl = request.FlagUrl,
-                Translations = request.Translations?.Select(t => new Translation
+            return await _dbContext.Languages
+                .Select(l => new LanguageResponseModel
                 {
-                    EntityName = t.EntityName,
-                    EntityId = t.EntityId,
-                    FieldName = t.FieldName,
-                    LanguageCode = t.LanguageCode,
-                    Value = t.Value,
-                    Group = t.Group
-                }).ToList()
+                    Id = l.Id,
+                    CultureCode = l.CultureCode,
+                    DisplayName = l.DisplayName
+                }).ToListAsync();
+        }
+
+        public async Task<LanguageResponseModel> GetByIdAsync(int id)
+        {
+            var lang = await _dbContext.Languages.FindAsync(id);
+            if (lang == null) return null;
+
+            return new LanguageResponseModel
+            {
+                Id = lang.Id,
+                CultureCode = lang.CultureCode,
+                DisplayName = lang.DisplayName
+            };
+        }
+
+        public async Task<int> CreateAsync(LanguageRequestModel model)
+        {
+            var lang = new Language
+            {
+                CultureCode = model.CultureCode,
+                DisplayName = model.DisplayName
             };
 
-            _dbContext.Languages.Add(language);
+            _dbContext.Languages.Add(lang);
             await _dbContext.SaveChangesAsync();
-            return language;
+
+            return lang.Id;
         }
 
-        public async Task UpdateLanguageAsync(int id, LanguageRequestModel request)
+        public async Task<bool> UpdateAsync(LanguageUpdateModel model)
         {
-            var language = await _dbContext.Languages.FindAsync(id);
-            if (language == null)
-                throw new Exception("Language not found.");
+            var lang = await _dbContext.Languages.FindAsync(model.Id);
+            if (lang == null) throw new InvalidOperationException($"Language with ID {model.Id} was not found.");
 
-            language.Code = request.Code;
-            language.Name = request.Name;
-            language.IsActive = request.IsActive;
-            language.FlagUrl = request.FlagUrl;
+            lang.CultureCode = model.CultureCode;
+            lang.DisplayName = model.DisplayName;
 
-
-            _dbContext.Languages.Update(language);
             await _dbContext.SaveChangesAsync();
+            return true;
         }
 
-        public async Task DeleteLanguageAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var language = await _dbContext.Languages.FindAsync(id);
-            if (language == null)
-                throw new Exception("Language not found");
-            _dbContext.Languages.Remove(language);
+            var lang = await _dbContext.Languages.FindAsync(id);
+            if (lang == null) return false;
+
+            _dbContext.Languages.Remove(lang);
             await _dbContext.SaveChangesAsync();
+            return true;
         }
 
         public async Task<string> UploadFlagAsync(int languageId, IFormFile flagFile)

@@ -29,27 +29,75 @@ namespace ContentService.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Code")
+                    b.Property<string>("CultureCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("Flag")
+                    b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("FlagUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code")
+                    b.HasIndex("CultureCode")
                         .IsUnique();
 
-                    b.ToTable("Languages");
+                    b.ToTable("Languages", (string)null);
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.Localization", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("PageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PageId", "Key")
+                        .IsUnique();
+
+                    b.ToTable("LocalizationKeys", (string)null);
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.Page", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Pages", (string)null);
                 });
 
             modelBuilder.Entity("ContentService.Data.Entity.Translation", b =>
@@ -60,26 +108,10 @@ namespace ContentService.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("EntityId")
+                    b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
-                    b.Property<string>("EntityName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FieldName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LanguageCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("LanguageId")
+                    b.Property<int>("LocalizationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Value")
@@ -90,19 +122,55 @@ namespace ContentService.Migrations
 
                     b.HasIndex("LanguageId");
 
-                    b.ToTable("Translations");
+                    b.HasIndex("LocalizationId", "LanguageId")
+                        .IsUnique();
+
+                    b.ToTable("Translations", (string)null);
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.Localization", b =>
+                {
+                    b.HasOne("ContentService.Data.Entity.Page", "Page")
+                        .WithMany("LocalizationKeys")
+                        .HasForeignKey("PageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Page");
                 });
 
             modelBuilder.Entity("ContentService.Data.Entity.Translation", b =>
                 {
-                    b.HasOne("ContentService.Data.Entity.Language", null)
+                    b.HasOne("ContentService.Data.Entity.Language", "Language")
                         .WithMany("Translations")
-                        .HasForeignKey("LanguageId");
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ContentService.Data.Entity.Localization", "Localization")
+                        .WithMany("Translations")
+                        .HasForeignKey("LocalizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Language");
+
+                    b.Navigation("Localization");
                 });
 
             modelBuilder.Entity("ContentService.Data.Entity.Language", b =>
                 {
                     b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.Localization", b =>
+                {
+                    b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.Page", b =>
+                {
+                    b.Navigation("LocalizationKeys");
                 });
 #pragma warning restore 612, 618
         }

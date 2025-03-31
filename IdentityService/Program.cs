@@ -77,6 +77,12 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Identity Service API",
+        Version = "v1"
+    });
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -113,7 +119,10 @@ if (builder.Configuration.GetValue<bool>("ApplyMigrations"))
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity Service API v1");
+    });
 }
 
 app.UseHttpsRedirection();

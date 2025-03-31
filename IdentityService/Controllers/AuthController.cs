@@ -84,9 +84,9 @@ namespace IdentityService.Controllers
         /// Initiates password reset by sending an email with a reset token/link.
         /// </summary>
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestModel requestModel)
         {
-            await _authService.ForgotPasswordAsync(email);
+            await _authService.ForgotPasswordAsync(requestModel);
             return Ok(new { message = "If the email is valid, a reset link will be sent." });
         }
 

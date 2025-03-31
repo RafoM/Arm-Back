@@ -11,7 +11,7 @@ namespace IdentityService.Services.Interface
         Task<(string accessToken, string refreshToken)> GoogleLoginAsync(string idToken);
         Task<(string accessToken, string refreshToken)> RefreshTokenAsync(string token);
         Task LogoutAsync(string refreshToken);
-        Task ForgotPasswordAsync(string email);
+        Task ForgotPasswordAsync(ForgotPasswordRequestModel requestModel);
         Task ResetPasswordAsync(string jwtResetToken, ResetPasswordRequestModel requestModel);
     }
 }

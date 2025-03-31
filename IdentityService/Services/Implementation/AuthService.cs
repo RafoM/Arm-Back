@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Google.Apis.Auth;
+﻿using Google.Apis.Auth;
 using IdentityService.Data;
 using IdentityService.Data.Entity;
 using IdentityService.Models.ConfigModels;
@@ -224,9 +223,9 @@ namespace IdentityService.Services.Implementation
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task ForgotPasswordAsync(string email)
+        public async Task ForgotPasswordAsync(ForgotPasswordRequestModel requestModel)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == requestModel.Email);
             if (user == null) return;
 
             var resetPasswordBaseUrl = _configuration["JwtSettings:ResetPasswordBaseUrl"];
@@ -249,10 +248,6 @@ namespace IdentityService.Services.Implementation
 
         public async Task ResetPasswordAsync(string jwtResetToken, ResetPasswordRequestModel request)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            if (user == null)
-                throw new Exception("Invalid credentials.");
-
             if (request.NewPassword != request.ConfirmPassword)
             {
                 throw new Exception("New password and confirm password do not match.");
@@ -281,6 +276,12 @@ namespace IdentityService.Services.Implementation
                 var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
                 if (userIdClaim == null) throw new Exception("Token missing user ID.");
 
+                var userId = Guid.Parse(userIdClaim.Value);
+
+                var user = await _dbContext.Users.FindAsync(userId);
+
+                if (user == null)
+                    throw new Exception("User not found.");
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
                 _dbContext.Users.Update(user);
                 await _dbContext.SaveChangesAsync();

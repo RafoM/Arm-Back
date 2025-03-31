@@ -1,15 +1,14 @@
-﻿using ContentService.Data.Entity;
-using ContentService.Models.RequestModels;
+﻿using ContentService.Models.RequestModels;
+using ContentService.Models.ResponseModels;
 
 namespace ContentService.Services.Interface
 {
     public interface ILanguageService
     {
-        Task<IEnumerable<Language>> GetAllLanguagesAsync();
-        Task<Language> GetLanguageByIdAsync(int id);
-        Task<Language> CreateLanguageAsync(LanguageRequestModel language);
-        Task UpdateLanguageAsync(int id, LanguageRequestModel language);
-        Task DeleteLanguageAsync(int id);
-        Task<string> UploadFlagAsync(int languageId, IFormFile flagFile);
+        Task<IEnumerable<LanguageResponseModel>> GetAllAsync();
+        Task<LanguageResponseModel> GetByIdAsync(int id);
+        Task<int> CreateAsync(LanguageRequestModel model);
+        Task<bool> UpdateAsync(LanguageUpdateModel model);
+        Task<bool> DeleteAsync(int id);
     }
 }

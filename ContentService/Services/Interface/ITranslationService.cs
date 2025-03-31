@@ -1,15 +1,17 @@
 ﻿using ContentService.Data.Entity;
 using ContentService.Models.RequestModels;
+using ContentService.Models.ResponseModels;
 
 namespace ContentService.Services.Interface
 {
     public interface ITranslationService
     {
-        Task<IEnumerable<Translation>> GetAllTranslationsAsync();
-        Task<Translation> GetTranslationByIdAsync(int id);
-        Task<IEnumerable<Translation>> GetTranslationsAsync(string languageCode, string entityName = null, int? entityId = null, string group = null);
-        Task<Translation> CreateTranslationAsync(TranslationRequestModel translation);
-        Task UpdateTranslationAsync(TranslationRequestModel translation);
-        Task DeleteTranslationAsync(int id);
+        Task<List<TranslationResponseModel>> GetAllAsync();
+        Task<TranslationResponseModel?> GetByIdAsync(int id);
+        Task<TranslationResponseModel> CreateAsync(TranslationRequestModel model);
+        Task<TranslationResponseModel?> UpdateAsync(TranslationUpdateModel model);
+        Task<bool> DeleteAsync(int id);
+        Task<Dictionary<string, string>> GetTranslationsByPageAsync(int pageId, int languageId);
+
     }
 }

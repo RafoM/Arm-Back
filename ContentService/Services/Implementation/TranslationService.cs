@@ -4,13 +4,14 @@ using ContentService.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using ContentService.Models.RequestModels;
+using ContentService.Models.ResponseModels;
 
 namespace ContentService.Services.Implementation
 {
     public class TranslationService : ITranslationService
     {
-        private readonly ContentDbContext _dbContext;
         private readonly IMemoryCache _cache;
+        private readonly ContentDbContext _dbContext;
 
         public TranslationService(ContentDbContext dbContext, IMemoryCache cache)
         {
@@ -18,97 +19,121 @@ namespace ContentService.Services.Implementation
             _cache = cache;
         }
 
-        public async Task<IEnumerable<Translation>> GetAllTranslationsAsync()
+        public async Task<Dictionary<string, string>> GetTranslationsByPageAsync(int pageId, int languageId)
         {
-            return await _dbContext.Translations.ToListAsync();
+            var cacheKey = $"translations:page:{pageId}:lang:{languageId}";
+
+            if (_cache.TryGetValue(cacheKey, out Dictionary<string, string> cached))
+                return cached;
+
+            var translations = await _dbContext.Translations
+                .Include(t => t.Localization)
+                .Where(t => t.Localization.PageId == pageId && t.LanguageId == languageId)
+                .ToDictionaryAsync(t => t.Localization.Key, t => t.Value);
+
+            _cache.Set(cacheKey, translations, TimeSpan.FromMinutes(10));
+
+            return translations;
         }
 
-        public async Task<Translation> GetTranslationByIdAsync(int id)
+
+
+        public async Task<List<TranslationResponseModel>> GetAllAsync()
         {
-            return await _dbContext.Translations.FindAsync(id);
+            return await _dbContext.Translations
+                .Include(t => t.Localization)
+                .Include(t => t.Language)
+                .Select(t => new TranslationResponseModel
+                {
+                    Id = t.Id,
+                    LocalizationId = t.LocalizationId,
+                    LocalizationKey = t.Localization.Key,
+                    LanguageId = t.LanguageId,
+                    CultureCode = t.Language.CultureCode,
+                    Value = t.Value
+                })
+                .ToListAsync();
         }
 
-        public async Task<IEnumerable<Translation>> GetTranslationsAsync(string languageCode, string entityName = null, int? entityId = null, string group = null)
+        public async Task<TranslationResponseModel?> GetByIdAsync(int id)
         {
-            if (!string.IsNullOrEmpty(group) && group.ToLower() == "global")
+            var t = await _dbContext.Translations
+                .Include(x => x.Localization)
+                .Include(x => x.Language)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (t == null) return null;
+
+            return new TranslationResponseModel
             {
-                var cacheKey = $"GlobalTranslations_{languageCode}";
-                if (_cache.TryGetValue(cacheKey, out IEnumerable<Translation> cachedTranslations))
-                {
-                    return cachedTranslations;
-                }
-
-                var translations = await _dbContext.Translations
-                    .Where(t => t.LanguageCode == languageCode && t.Group == group)
-                    .ToListAsync();
-
-                _cache.Set(cacheKey, translations, TimeSpan.FromMinutes(10));
-                return translations;
-            }
-            else
-            {
-                var query = _dbContext.Translations.AsQueryable();
-
-                if (!string.IsNullOrEmpty(languageCode))
-                {
-                    query = query.Where(t => t.LanguageCode == languageCode);
-                }
-                if (!string.IsNullOrEmpty(entityName))
-                {
-                    query = query.Where(t => t.EntityName == entityName);
-                }
-                if (entityId.HasValue)
-                {
-                    query = query.Where(t => t.EntityId == entityId.Value);
-                }
-
-                return await query.ToListAsync();
-            }
+                Id = t.Id,
+                LocalizationId = t.LocalizationId,
+                LocalizationKey = t.Localization.Key,
+                LanguageId = t.LanguageId,
+                CultureCode = t.Language.CultureCode,
+                Value = t.Value
+            };
         }
 
-        public async Task<Translation> CreateTranslationAsync(TranslationRequestModel request)
+        public async Task<TranslationResponseModel> CreateAsync(TranslationRequestModel model)
         {
-            var translation = new Translation
+            var entity = new Translation
             {
-                EntityName = request.EntityName,
-                EntityId = request.EntityId,
-                FieldName = request.FieldName,
-                LanguageCode = request.LanguageCode,
-                Value = request.Value,
-                Group = request.Group
+                LocalizationId = model.LocalizationId,
+                LanguageId = model.LanguageId,
+                Value = model.Value.Trim()
             };
 
-            _dbContext.Translations.Add(translation);
+            _dbContext.Translations.Add(entity);
             await _dbContext.SaveChangesAsync();
-            return translation;
-        }
 
-        public async Task UpdateTranslationAsync(TranslationRequestModel request)
-        {
-            var existingTranslation = await _dbContext.Translations.FindAsync(request.Id);
-            if (existingTranslation == null)
+            var localization = await _dbContext.Localizations.FindAsync(entity.LocalizationId);
+            var language = await _dbContext.Languages.FindAsync(entity.LanguageId);
+
+            return new TranslationResponseModel
             {
-                throw new Exception("Translation not found.");
-            }
-
-            existingTranslation.EntityName = request.EntityName;
-            existingTranslation.EntityId = request.EntityId;
-            existingTranslation.FieldName = request.FieldName;
-            existingTranslation.LanguageCode = request.LanguageCode;
-            existingTranslation.Value = request.Value;
-            existingTranslation.Group = request.Group;
-
-            _dbContext.Translations.Update(existingTranslation);
-            await _dbContext.SaveChangesAsync();
+                Id = entity.Id,
+                LocalizationId = entity.LocalizationId,
+                LocalizationKey = localization?.Key ?? string.Empty,
+                LanguageId = entity.LanguageId,
+                CultureCode = language?.CultureCode ?? string.Empty,
+                Value = entity.Value
+            };
         }
 
-        public async Task DeleteTranslationAsync(int id)
+        public async Task<TranslationResponseModel?> UpdateAsync(TranslationUpdateModel model)
         {
-            var translation = await _dbContext.Translations.FindAsync(id);
-            if (translation == null)
-                throw new Exception("Translation not found");
-            _dbContext.Translations.Remove(translation);
+            var entity = await _dbContext.Translations.FindAsync(model.Id);
+            if (entity == null) return null;
+
+            entity.LocalizationId = model.LocalizationId;
+            entity.LanguageId = model.LanguageId;
+            entity.Value = model.Value.Trim();
+
             await _dbContext.SaveChangesAsync();
+
+            var localization = await _dbContext.Localizations.FindAsync(entity.LocalizationId);
+            var language = await _dbContext.Languages.FindAsync(entity.LanguageId);
+
+            return new TranslationResponseModel
+            {
+                Id = entity.Id,
+                LocalizationId = entity.LocalizationId,
+                LocalizationKey = localization?.Key ?? string.Empty,
+                LanguageId = entity.LanguageId,
+                CultureCode = language?.CultureCode ?? string.Empty,
+                Value = entity.Value
+            };
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var entity = await _dbContext.Translations.FindAsync(id);
+            if (entity == null) return false;
+
+            _dbContext.Translations.Remove(entity);
+            await _dbContext.SaveChangesAsync();
+            return true;
         }
 
     }

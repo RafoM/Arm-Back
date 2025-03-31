@@ -1,0 +1,6 @@
+@TransactionCore_HostAddress = http://localhost:5136
+
+GET {{TransactionCore_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

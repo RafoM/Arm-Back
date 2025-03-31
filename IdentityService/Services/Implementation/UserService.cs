@@ -68,7 +68,7 @@ namespace IdentityService.Services.Implementation
             _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
 
-            var baseUrl = _configuration["AppSettings:BaseUrl"];
+            var baseUrl = _configuration["BaseUrl"];
             var verificationUrl = $"{baseUrl}/api/user/verify?token={token}";
 
             var subject = "Please verify your email address";
