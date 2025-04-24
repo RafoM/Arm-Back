@@ -16,10 +16,11 @@ namespace TransactionCore.Services.Implementation
             _dbContext = dbContext;
         }
 
-        public async Task UpdateUserSubscription(Guid userFinanceId)
-        {
+        //public async Task<> GetSubscriptionPrice() 
+        //{
+            
+        //}
 
-        }
 
         public async Task<IEnumerable<SubscriptionResponseModel>> GetAllAsync(int? languageId)
         {

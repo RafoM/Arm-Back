@@ -49,12 +49,12 @@ var signingKey = new SymmetricSecurityKey(keyBytes);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsConfigModel>();
 builder.Services.Configure<SmtpSettingsConfigModel>(builder.Configuration.GetSection("SmtpSettings"));
 
-builder.Services.AddIdentityServer()
-    .AddInMemoryClients(IdentityServerDefinitions.GetClients(builder.Configuration))
-    .AddInMemoryApiScopes(IdentityServerDefinitions.GetApiScopes())
-    .AddInMemoryApiResources(IdentityServerDefinitions.GetApiResources())
-    .AddInMemoryIdentityResources(IdentityServerDefinitions.GetIdentityResources())
-    .AddDeveloperSigningCredential();
+//builder.Services.AddIdentityServer()
+//    .AddInMemoryClients(IdentityServerDefinitions.GetClients(builder.Configuration))
+//    .AddInMemoryApiScopes(IdentityServerDefinitions.GetApiScopes())
+//    .AddInMemoryApiResources(IdentityServerDefinitions.GetApiResources())
+//    .AddInMemoryIdentityResources(IdentityServerDefinitions.GetIdentityResources())
+//    .AddDeveloperSigningCredential();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -151,7 +151,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseIdentityServer();
+//app.UseIdentityServer();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
