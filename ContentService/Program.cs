@@ -55,6 +55,11 @@ builder.Services.AddScoped<ILanguageService, LanguageService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IBlogTagService, BlogTagService>();
+builder.Services.AddScoped<ICaseService, CaseService>();
+builder.Services.AddScoped<ICaseTagService, CaseTagService>();
+
 //builder.Services.AddSingleton(StorageClient.Create());
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -76,6 +81,12 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
+    });
+
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Identity Service API",
+        Version = "v1"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -131,8 +142,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.RoutePrefix = string.Empty;
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content Service API V1");
     });
 }
 

@@ -22,6 +22,31 @@ namespace IdentityService.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("IdentityService.Data.Entity.Referral", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ReferredUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReferrerUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReferredUserId");
+
+                    b.HasIndex("ReferrerUserId");
+
+                    b.ToTable("Referrals");
+                });
+
             modelBuilder.Entity("IdentityService.Data.Entity.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -137,10 +162,6 @@ namespace IdentityService.Migrations
                     b.Property<string>("ProfileImageUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReferralCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
@@ -165,6 +186,25 @@ namespace IdentityService.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("IdentityService.Data.Entity.Referral", b =>
+                {
+                    b.HasOne("IdentityService.Data.Entity.User", "Referred")
+                        .WithMany()
+                        .HasForeignKey("ReferredUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IdentityService.Data.Entity.User", "Referrer")
+                        .WithMany()
+                        .HasForeignKey("ReferrerUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Referred");
+
+                    b.Navigation("Referrer");
                 });
 
             modelBuilder.Entity("IdentityService.Data.Entity.RefreshToken", b =>

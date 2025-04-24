@@ -11,7 +11,6 @@
         public string Country { get; set; }
         public string PhoneNumber { get; set; }
         public string TelegramUserName { get; set; }
-        public string ReferralCode { get; set; }
         public string ?ProfileImageUrl { get; set; }
         public int RoleId { get; set; }
         public Role Role { get; set; }

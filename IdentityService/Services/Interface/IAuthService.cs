@@ -13,5 +13,6 @@ namespace IdentityService.Services.Interface
         Task LogoutAsync(string refreshToken);
         Task ForgotPasswordAsync(ForgotPasswordRequestModel requestModel);
         Task ResetPasswordAsync(string jwtResetToken, ResetPasswordRequestModel requestModel);
+        string GetReferralCode(Guid userId);
     }
 }

@@ -40,12 +40,12 @@ namespace IdentityService.Controllers
         /// <summary>
         /// Update user info
         /// </summary>
-        [HttpPut("{userId:guid}")]
-        public async Task<IActionResult> UpdateUserInfo(Guid userId, [FromBody] UserInfoUpdateRequestModel requestModel)
+        [HttpPut]
+        public async Task<IActionResult> UpdateUserInfo([FromBody] UserInfoUpdateRequestModel requestModel)
         {
             try
             {
-                await _userService.UpdateUserInfoAsync(userId, requestModel);
+                await _userService.UpdateUserInfoAsync(requestModel);
                 return Ok(new { message = "User info successfully updated" });
             }
             catch (Exception ex)
@@ -57,8 +57,8 @@ namespace IdentityService.Controllers
         /// <summary>
         /// Update user role
         /// </summary>
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{userId:guid}/role/{newRoleId:int}")]
+        [Authorize(Roles = "AdminOrMicroservice")]
+        [HttpPut]
         public async Task<IActionResult> UpdateUserRole(UpdateUserRoleRequestModel requestModel) 
         {
             var user = await _userService.UpdateUserRoleAsync(requestModel);

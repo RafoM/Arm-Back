@@ -1,9 +1,14 @@
+using IdentityService.Models.ConfigModels;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using TransactionCore;
+using TransactionCore.BackgroundServices;
+using TransactionCore.Consumer;
 using TransactionCore.Data;
 using TransactionCore.Services.Implementation;
 using TransactionCore.Services.Interface;
@@ -17,15 +22,30 @@ if (string.IsNullOrEmpty(connectionString))
     throw new Exception("Connection string 'DefaultConnection' is missing.");
 }
 
+//Services
+builder.Services.AddHttpClient();
 
+builder.Services.AddDbContext<TransactionCoreDbContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICryptoService, CryptoService>();
+builder.Services.AddScoped<IIdentityServiceClient, IdentityServiceClient>();
 builder.Services.AddScoped<INetworkService, NetworkService>();
 builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPromoService, PromoService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<ISubscriptionUsageService, SubscriptionUsageService>();
+builder.Services.AddScoped<ITronWebhookService, TronWebhookService>();
+builder.Services.AddScoped<IUserInfoService, UserInfoService>();
+builder.Services.AddScoped<IWalletService, WalletService>();
 
-builder.Services.AddDbContext<TransactionCoreDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.Configure<RabbitMqConfigModel>(builder.Configuration.GetSection("RabbitMQ"));
+builder.Services.AddMessaging(builder.Configuration, typeof(CreateUserInfoConsumer));
 
+builder.Services.AddHostedService<PaymentMonitoringService>();
+builder.Services.AddHostedService<PromoExpirationService>();
+builder.Services.AddHostedService<SubscriptionCleanupJob>();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
@@ -91,6 +111,9 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+
+//app
 
 var app = builder.Build();
 

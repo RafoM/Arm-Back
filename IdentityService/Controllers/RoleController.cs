@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace IdentityService.Controllers
 {
 
-    [Authorize(Roles = "Admin")]
     public class RoleController : BaseController
     {
         private readonly IRoleService _roleService;
@@ -21,6 +20,7 @@ namespace IdentityService.Controllers
         /// List all roles (Admin only).
         /// </summary>
         [HttpGet]
+        [Authorize(Policy = "AdminOrMicroservice")]
         public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
         {
             var roles = await _roleService.GetAllRolesAsync();
@@ -31,6 +31,7 @@ namespace IdentityService.Controllers
         /// Get a role by ID (Admin only).
         /// </summary>
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Role>> GetRole(int id)
         {
             var role = await _roleService.GetRoleByIdAsync(id);
@@ -44,6 +45,7 @@ namespace IdentityService.Controllers
         /// Create a new role (Admin only).
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateRole([FromBody] RoleRequestModel requestModel)
         {
 
@@ -54,12 +56,13 @@ namespace IdentityService.Controllers
         /// <summary>
         /// Update a role (Admin only).
         /// </summary>
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] RoleRequestModel requestModel)
+        [HttpPut]
+        [Authorize(Policy = "AdminOrMicroservice")]
+        public async Task<IActionResult> UpdateRole([FromBody] RoleUpdateModel requestModel)
         {
             try
             {
-                await _roleService.UpdateRoleAsync(id, requestModel.RoleName);
+                await _roleService.UpdateRoleAsync(requestModel);
                 return NoContent();
             }
             catch (System.Exception ex)
@@ -72,6 +75,7 @@ namespace IdentityService.Controllers
         /// Delete a role (Admin only).
         /// </summary>
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteRole(int id)
         {
             try

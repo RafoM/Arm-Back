@@ -2,6 +2,7 @@
 using IdentityService.Data;
 using IdentityService.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using IdentityService.Models.RequestModels;
 
 namespace IdentityService.Services.Implementation
 {
@@ -42,15 +43,15 @@ namespace IdentityService.Services.Implementation
             return role;
         }
 
-        public async Task UpdateRoleAsync(int id, string newRoleName)
+        public async Task UpdateRoleAsync(RoleUpdateModel model)
         {
-            var role = await _dbContext.Roles.FindAsync(id);
-            if (role == null) throw new Exception($"Role with ID={id} not found.");
+            var role = await _dbContext.Roles.FindAsync(model.RoleId);
+            if (role == null) throw new Exception($"Role with ID={model.RoleId} not found.");
 
-            var nameTaken = await _dbContext.Roles.AnyAsync(r => r.Name == newRoleName && r.Id != id);
-            if (nameTaken) throw new Exception($"Another role with the name '{newRoleName}' already exists.");
+            var nameTaken = await _dbContext.Roles.AnyAsync(r => r.Name == model.RoleName && r.Id != model.RoleId);
+            if (nameTaken) throw new Exception($"Another role with the name '{model.RoleName}' already exists.");
 
-            role.Name = newRoleName;
+            role.Name = model.RoleName;
             _dbContext.Roles.Update(role);
             await _dbContext.SaveChangesAsync();
         }

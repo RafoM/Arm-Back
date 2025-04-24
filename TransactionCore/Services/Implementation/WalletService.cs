@@ -11,10 +11,19 @@ namespace TransactionCore.Services.Implementation
     public class WalletService : IWalletService
     {
         private readonly TransactionCoreDbContext _dbContext;
+        private readonly IPaymentService _paymentService;
+        private readonly ILogger<WalletService> _logger;
 
-        public WalletService(TransactionCoreDbContext dbContext)
+        public WalletService(TransactionCoreDbContext dbContext, IPaymentService paymentService, ILogger<WalletService> logger)
         {
             _dbContext = dbContext;
+            _paymentService = paymentService;
+            _logger = logger;
+        }
+
+        public async Task<bool> WalletExistsAsync(string walletAddress)
+        {
+            return await _dbContext.Wallets.AnyAsync(w => w.Address == walletAddress);
         }
 
         public async Task<IEnumerable<WalletResponseModel>> GetAllAsync()
@@ -118,23 +127,45 @@ namespace TransactionCore.Services.Implementation
         /// <param name="walletAddress">The wallet address.</param>
         /// <param name="transactionAmount">The transaction amount.</param>
         /// <param name="transactionId">The transaction identifier.</param>
-        public async Task UpdateWalletWithTransactionAsync(string walletAddress, decimal transactionAmount, string transactionId)
+        public async Task UpdateWalletWithTokenTransactionAsync(string toAddress, decimal amount, string txId)
         {
-            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Address == walletAddress);
-
+            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Address == toAddress);
+            var payment = await _dbContext.Payments.FirstOrDefaultAsync(p => p.WalletId == wallet.Id);
             if (wallet == null)
             {
                 throw new Exception("Wallet not found.");
             }
-            
-            wallet.Balance += transactionAmount;
-            wallet.LastEntry = transactionAmount;
-            wallet.LastTransactionId = transactionId;
+
+            wallet.Balance += amount;
+            wallet.LastEntry = amount;
+            wallet.LastTransactionId = txId;
 
             wallet.IsActive = true;
 
             _dbContext.Wallets.Update(wallet);
             await _dbContext.SaveChangesAsync();
+
+            await _paymentService.ApprovePayment(payment.UserFinanceId, amount);
+        }
+
+        public async Task UnlockAndDetachWalletAsync(Guid paymentId, CancellationToken cancellationToken = default)
+        {
+            var payment = await _dbContext.Payments
+                .Include(p => p.Wallet)
+                .FirstOrDefaultAsync(p => p.Id == paymentId, cancellationToken);
+
+            if (payment == null || payment.Wallet == null)
+            {
+                _logger.LogWarning("Payment {PaymentId} or associated wallet not found.", paymentId);
+                return;
+            }
+
+            payment.Wallet.Status = WalletStatusEnum.IsFree;
+            payment.WalletId = null;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Wallet {WalletId} freed and detached from payment {PaymentId}", payment.Wallet.Id, payment.Id);
         }
     }
 }

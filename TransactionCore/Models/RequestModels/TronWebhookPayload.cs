@@ -18,27 +18,37 @@
         public long BlockNumber { get; set; }
 
         /// <summary>
-        /// The address sending the USDT.
+        /// The address sending the tokens.
         /// </summary>
         public string From { get; set; }
 
         /// <summary>
-        /// The address receiving the USDT.
+        /// The address receiving the tokens.
         /// </summary>
         public string To { get; set; }
 
         /// <summary>
-        /// The value transferred in smallest units (USDT uses 6 decimals).
+        /// The value transferred in smallest units.
         /// </summary>
         public string Value { get; set; }
 
         /// <summary>
-        /// The token symbol (should be "USDT").
+        /// The token symbol (e.g. USDT, USDC, TRONPAD).
         /// </summary>
         public string Token { get; set; }
 
         /// <summary>
-        /// The timestamp of the event.
+        /// The contract address of the TRC20 token.
+        /// </summary>
+        public string ContractAddress { get; set; }
+
+        /// <summary>
+        /// The number of decimals the token uses (e.g. 6 for USDT).
+        /// </summary>
+        public int Decimals { get; set; }
+
+        /// <summary>
+        /// The timestamp of the event (in milliseconds since epoch).
         /// </summary>
         public long Timestamp { get; set; }
     }

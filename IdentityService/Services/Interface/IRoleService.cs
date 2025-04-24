@@ -1,4 +1,5 @@
 ﻿using IdentityService.Data.Entity;
+using IdentityService.Models.RequestModels;
 
 namespace IdentityService.Services.Interface
 {
@@ -7,7 +8,7 @@ namespace IdentityService.Services.Interface
         Task<IEnumerable<Role>> GetAllRolesAsync();
         Task<Role> GetRoleByIdAsync(int id);
         Task<Role> CreateRoleAsync(string roleName);
-        Task UpdateRoleAsync(int id, string newRoleName);
+        Task UpdateRoleAsync(RoleUpdateModel model);
         Task DeleteRoleAsync(int id);
     }
 }

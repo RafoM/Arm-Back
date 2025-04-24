@@ -9,7 +9,7 @@ namespace IdentityService.Services.Interface
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<UserInfoResponseModel> GetUserInfoAsync(Guid userId);
         Task<User> UpdateUserRoleAsync(UpdateUserRoleRequestModel requestModel);
-        Task UpdateUserInfoAsync(Guid userId, UserInfoUpdateRequestModel request);
+        Task UpdateUserInfoAsync(UserInfoUpdateRequestModel request);
         Task<string> UpdateUserProfileImageAsync(Guid userId, IFormFile imageFile);
         Task<bool> IsEmailVerifiedAsync(Guid userId);
         Task SendVerificationEmailAsync(Guid userId);

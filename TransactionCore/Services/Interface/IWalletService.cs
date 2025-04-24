@@ -8,8 +8,10 @@ namespace TransactionCore.Services.Interface
         Task DeleteAsync(Guid id);
         Task UpdateAsync(WalletUpdateModel model);
         Task<WalletResponseModel> CreateAsync(WalletRequestModel model);
+        Task<bool> WalletExistsAsync(string walletAddress);
         Task<WalletResponseModel> GetByIdAsync(Guid id);
         Task<IEnumerable<WalletResponseModel>> GetAllAsync();
-        Task UpdateWalletWithTransactionAsync(string walletAddress, decimal transactionAmount, string transactionId);
+        Task UpdateWalletWithTokenTransactionAsync(string toAddress, decimal amount, string txId);
+        Task UnlockAndDetachWalletAsync(Guid paymentId, CancellationToken cancellationToken = default);
     }
 }

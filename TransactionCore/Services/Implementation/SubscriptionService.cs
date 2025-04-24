@@ -16,6 +16,11 @@ namespace TransactionCore.Services.Implementation
             _dbContext = dbContext;
         }
 
+        public async Task UpdateUserSubscription(Guid userFinanceId)
+        {
+
+        }
+
         public async Task<IEnumerable<SubscriptionResponseModel>> GetAllAsync(int? languageId)
         {
             if (languageId == null) languageId = 1;
@@ -59,7 +64,8 @@ namespace TransactionCore.Services.Implementation
                 Duration = request.Duration,
                 Price = request.Price,
                 Discount = request.Discount,
-                Currency = request.Currency
+                Currency = request.Currency,
+                RoleId = request.RoleId,
             };
 
             _dbContext.SubscriptionPackages.Add(package);
@@ -89,6 +95,7 @@ namespace TransactionCore.Services.Implementation
             existing.Price = request.Price;
             existing.Discount = request.Discount;
             existing.Currency = request.Currency;
+            existing.RoleId = request.RoleId;
 
             _dbContext.SubscriptionPackages.Update(existing);
             await _dbContext.SaveChangesAsync();

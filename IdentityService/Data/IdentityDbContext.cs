@@ -11,8 +11,27 @@ namespace IdentityService.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Referral> Referrals { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Referral>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            });
+                modelBuilder.Entity<Referral>()
+                        .HasOne(r => r.Referrer)
+                        .WithMany()
+                        .HasForeignKey(r => r.ReferrerUserId)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Referral>()
+                        .HasOne(r => r.Referred)
+                        .WithMany()
+                        .HasForeignKey(r => r.ReferredUserId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(x => x.Id);

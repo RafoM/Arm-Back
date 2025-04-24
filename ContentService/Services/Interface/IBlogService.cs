@@ -1,13 +1,15 @@
 ﻿using ContentService.Data.Entity;
+using ContentService.Models.RequestModels;
+using ContentService.Models.ResponseModels;
 
 namespace ContentService.Services.Interface
 {
     public interface IBlogService
     {
-        //Task<IEnumerable<Blog>> GetAllBlogsAsync();
-        //Task<Blog> GetBlogByIdAsync(int id);
-        //Task<Blog> CreateBlogAsync(Blog blog, IFormFile imageFile);
-        //Task UpdateBlogAsync(int id, Blog blog, IFormFile imageFile = null);
-        //Task DeleteBlogAsync(int id);
+        Task<BlogResponseModel> CreateAsync(BlogRequestModel request);
+        Task<BlogResponseModel> UpdateAsync(BlogUpdateModel request);
+        Task<BlogResponseModel> GetByIdAsync(int blogId);
+        Task<IEnumerable<BlogResponseModel>> GetAllAsync();
+        Task DeleteAsync(int blogId);
     }
 }

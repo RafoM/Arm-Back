@@ -1,10 +1,15 @@
 using Google.Cloud.Storage.V1;
+using IdentityService;
+using IdentityService.Consumers;
 using IdentityService.Data;
+using IdentityService.IdentityServerConfig;
 using IdentityService.Models.ConfigModels;
 using IdentityService.Services.Implementation;
 using IdentityService.Services.Interface;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -32,6 +37,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.Configure<JwtSettingsConfigModel>(builder.Configuration.GetSection("JwtSettings"));
 
+
+builder.Services.Configure<RabbitMqConfigModel>(builder.Configuration.GetSection("RabbitMQ"));
+builder.Services.AddMessaging(builder.Configuration,typeof(UpdateUserRoleConsumer));
+
 //builder.Services.AddSingleton(StorageClient.Create());
 
 var jwtSecretKey = builder.Configuration["JwtSettings:SecretKey"] ?? "placeholder-secret";
@@ -39,6 +48,13 @@ var keyBytes = Encoding.UTF8.GetBytes(jwtSecretKey);
 var signingKey = new SymmetricSecurityKey(keyBytes);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsConfigModel>();
 builder.Services.Configure<SmtpSettingsConfigModel>(builder.Configuration.GetSection("SmtpSettings"));
+
+builder.Services.AddIdentityServer()
+    .AddInMemoryClients(IdentityServerDefinitions.GetClients(builder.Configuration))
+    .AddInMemoryApiScopes(IdentityServerDefinitions.GetApiScopes())
+    .AddInMemoryApiResources(IdentityServerDefinitions.GetApiResources())
+    .AddInMemoryIdentityResources(IdentityServerDefinitions.GetIdentityResources())
+    .AddDeveloperSigningCredential();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -59,7 +75,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOrMicroservice", policy =>
+    {
+        policy.RequireAssertion(context =>
+            context.User.IsInRole("Admin") ||
+            context.User.HasClaim("client_id", "TransactionCore")
+        );
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -126,10 +151,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseIdentityServer();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

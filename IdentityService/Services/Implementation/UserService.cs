@@ -13,16 +13,18 @@ namespace IdentityService.Services.Implementation
         private readonly IdentityDbContext _dbContext;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly IAuthService _authService;
         //private readonly StorageClient _storageClient;
 
         //, StorageClient storageClient
 
-        public UserService(IdentityDbContext dbContext, IConfiguration configuration, IEmailService emailService)
+        public UserService(IdentityDbContext dbContext, IConfiguration configuration, IEmailService emailService, IAuthService authService)
         {
             _dbContext = dbContext;
             _configuration = configuration;
             _emailService = emailService;
-           // _storageClient = storageClient;
+            _authService = authService;
+            // _storageClient = storageClient;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -32,9 +34,21 @@ namespace IdentityService.Services.Implementation
                                    .ToListAsync();
         }
 
-        public async Task UpdateUserInfoAsync(Guid userId, UserInfoUpdateRequestModel request)
+        public async Task<string> GetReferralUrlAsync(Guid userId)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _dbContext.Users.FindAsync(userId);
+            if (user == null) throw new Exception("User not found.");
+
+            var baseUrl = _configuration["Referral:BaseRegisterUrl"]
+                          ?? throw new Exception("Referral base URL not configured.");
+            var referralCode = _authService.GetReferralCode(userId);
+            return $"{baseUrl}?ref={referralCode}";
+        }
+
+
+        public async Task UpdateUserInfoAsync(UserInfoUpdateRequestModel request)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == request.UserId);
             if (user == null) throw new Exception("User not found.");
 
             user.FirstName = request.FirstName;

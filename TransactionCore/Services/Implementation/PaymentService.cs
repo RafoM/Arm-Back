@@ -11,24 +11,31 @@ namespace TransactionCore.Services.Implementation
     public class PaymentService : IPaymentService
     {
         private readonly TransactionCoreDbContext _dbContext;
-        private readonly IUserFinanceService _userFinance;
-        public PaymentService(TransactionCoreDbContext dbContext, IUserFinanceService userFinance)
+        private readonly IUserInfoService _userFinance;
+        private readonly IPromoService _promoService;
+        private readonly SubscriptionUsageService _subscriptionUsageService;
+        public PaymentService(TransactionCoreDbContext dbContext, IUserInfoService userFinance, IPromoService promoService, SubscriptionUsageService subscriptionUsageService)
         {
             _dbContext = dbContext;
             _userFinance = userFinance;
+            _promoService = promoService;
+            _subscriptionUsageService = subscriptionUsageService;
         }
 
         public async Task ApprovePayment(Guid userFinanceId, decimal amount)
         {
             var paymentDetails = await _dbContext.Payments.FirstOrDefaultAsync(x => x.UserFinanceId == userFinanceId);
-            var userFinance = await _dbContext.UserFinances.FirstOrDefaultAsync(x => x.Id == userFinanceId);
-            
+            var userFinance = await _dbContext.UserInfos.FirstOrDefaultAsync(x => x.Id == userFinanceId);
+            var roleId = await _dbContext.SubscriptionPackages.Where(s => s.Id == paymentDetails.SubscriptionPackageId).Select(x => x.RoleId).FirstOrDefaultAsync();
+            var promo = await _dbContext.Promos.FirstOrDefaultAsync(x => x.Id == paymentDetails.PromoId);
             var x = paymentDetails.ExpectedFee - amount;
-                
+            var isPayed = false;    
+            
             if (x > 0) 
             { 
                 userFinance.AmountWalletId = paymentDetails.WalletId; 
                 userFinance.Balance += x;
+                //notifie
             }
             if (x == 0) 
             {
@@ -41,7 +48,7 @@ namespace TransactionCore.Services.Implementation
             {
                 paymentDetails.PaymentDate = DateTime.UtcNow;
                 paymentDetails.Status = PaymentStatusEnum.Paid;
-                //add subscription access for user
+                await _subscriptionUsageService.GrantSubscriptionAsync(userFinance.UserId, paymentDetails.SubscriptionPackageId, promo.BonusDays);
             }
             else if (x < 0)
             {
@@ -54,11 +61,15 @@ namespace TransactionCore.Services.Implementation
 
         public async Task<PaymentDetailsResponseModel> GetPaymentDetails(Guid userId, PaymentDetailsRequestModel requestModel)
         {
-            var userFinance = await _dbContext.UserFinances.FirstOrDefaultAsync(x => x.UserId == userId);
-            if(userFinance == null)  userFinance = await _userFinance.CreateUserFinanceAsync(userId);
-            if (userFinance.ExpectedPaymentId != null)
+            if (string.IsNullOrEmpty(requestModel.PromoCode))                  
             {
-                var payment = await _dbContext.Payments.FirstOrDefaultAsync(x => x.Id == userFinance.ExpectedPaymentId);
+               await _promoService.ApplyPromoToUserAsync(userId, requestModel.PromoCode);
+            }
+            var userinfo = await _dbContext.UserInfos.FirstOrDefaultAsync(x => x.UserId == userId);
+            if(userinfo == null)  userinfo = await _userFinance.CreateUserinfoAsync(userId);
+            if (userinfo.ExpectedPaymentId != null)
+            {
+                var payment = await _dbContext.Payments.FirstOrDefaultAsync(x => x.Id == userinfo.ExpectedPaymentId);
                 var actualWallet = await _dbContext.Wallets.FirstOrDefaultAsync(x => x.Id == payment.WalletId);
                 payment.Status = PaymentStatusEnum.NotActual;
                 payment.WalletId = null;
@@ -71,7 +82,6 @@ namespace TransactionCore.Services.Implementation
 
             var paymentMethod = await _dbContext.PaymentMethods.FirstOrDefaultAsync(x => x.NetworkId == requestModel.NetworkId && 
                                                                                          x.CryptoId == requestModel.CryptoId);
-
             if (paymentMethod == null)
                 throw new Exception("Active payment method not found for the given network and crypto.");
 
@@ -80,29 +90,33 @@ namespace TransactionCore.Services.Implementation
             if (wallet == null)
                 throw new Exception("No free wallet available for the selected payment method.");
 
-            var subPrice = subscription.Price * requestModel.Duration;
-            var price = subPrice - (subPrice * (decimal)subscription.Discount) / 100;
+            var promo = await _promoService.GetUserPromoAsync(userId);
 
-            var paymentId = await CreatePayment(userFinance.Id, wallet.Id, price);
+            var price = subscription.Price - (subscription.Price * (decimal)subscription.Discount) / 100;
+            if (promo != null)
+            {
+                price = price - ((price * (decimal)promo.Promo.DiscountPercent) / 100);
+            }
+            var paymentId = await CreatePayment(userinfo.Id, wallet.Id, price, requestModel.SubscriptionPackageId, promo.Id);
 
             var paymentDetails = new PaymentDetailsResponseModel
             {
                 Price = price,
                 TransactionFee = paymentMethod.TransactionFee,
                 WaletAddress = wallet.Address,
-                Balance = userFinance.Balance,
-                ExpectedFee = (price - userFinance.Balance <= 0)?  0 : price - userFinance.Balance
+                Balance = userinfo.Balance,
+                ExpectedFee = price,
             };
 
             
             wallet.Status = WalletStatusEnum.Pending;
-            userFinance.ExpectedPaymentId = paymentId;
+            userinfo.ExpectedPaymentId = paymentId;
             await _dbContext.SaveChangesAsync();
 
             return paymentDetails;
         }
 
-        private async Task<Guid> CreatePayment(Guid userFinanceId, Guid walletId, decimal expectedFee)
+        private async Task<Guid> CreatePayment(Guid userFinanceId, Guid walletId, decimal expectedFee, Guid subscriptionPackageId, Guid? promoId)
         {
 
             var payment = new Payment
@@ -111,7 +125,9 @@ namespace TransactionCore.Services.Implementation
                 WalletId = walletId,
                 Status = PaymentStatusEnum.Pending,
                 CreatedDate = DateTime.UtcNow,
-                UserFinanceId = userFinanceId
+                UserFinanceId = userFinanceId,
+                SubscriptionPackageId = subscriptionPackageId,
+                PromoId = promoId   
             };
             await _dbContext.AddAsync(payment);
             await _dbContext.SaveChangesAsync();

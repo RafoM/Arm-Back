@@ -1,9 +1,11 @@
 ﻿using Google.Apis.Auth;
+using IdentityService.Common.Helpers;
 using IdentityService.Data;
 using IdentityService.Data.Entity;
 using IdentityService.Models.ConfigModels;
 using IdentityService.Models.RequestModels;
 using IdentityService.Services.Interface;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -21,13 +23,16 @@ namespace IdentityService.Services.Implementation
         private readonly IConfiguration _configuration;
         private readonly JwtSettingsConfigModel _jwtSettings;
         private readonly IEmailService _emailService;
-        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration, IEmailService emailService)
+        private readonly IPublishEndpoint _publishEndpoint;
+
+        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration, IEmailService emailService, IPublishEndpoint publishEndpoint = null)
         {
             _dbContext = dbContext;
             _tokenService = tokenService;
             _configuration = configuration;
             _jwtSettings = jwtSettings.Value;
             _emailService = emailService;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<(string accessToken, string refreshToken)> RegisterAsync(RegisterRequestModel request)
@@ -38,13 +43,15 @@ namespace IdentityService.Services.Implementation
             if (request.Password != request.ConfirmPassword)
                 throw new Exception("Passwords do not match.");
 
-            var userRole = await _dbContext.Roles.Where(r => r.Name == "User").FirstOrDefaultAsync();
+            var userRole = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Name == "User")
+                          ?? throw new Exception("Default user role not found.");
 
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            var newUserId = Guid.NewGuid();
 
             var newUser = new User
             {
-                Id = Guid.NewGuid(),
+                Id = newUserId,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 Email = request.Email,
@@ -52,31 +59,74 @@ namespace IdentityService.Services.Implementation
                 Country = request.Country,
                 PhoneNumber = request.PhoneNumber,
                 TelegramUserName = request.TelegramUserName,
-                ReferralCode = request.ReferralCode,
                 RoleId = userRole.Id,
                 CreatedDate = DateTime.UtcNow,
                 IsEmailVerified = false,
                 IsGmailAccount = false
             };
 
-            var accessToken = _tokenService.GenerateAccessToken(newUser);
-            var refreshToken = _tokenService.GenerateRefreshToken();
-
             _dbContext.Users.Add(newUser);
             await _dbContext.SaveChangesAsync();
 
-            var refreshTokenEntity = new RefreshToken
+            Guid? referrerId = null;
+            if (!string.IsNullOrWhiteSpace(request.ReferralCode))
+            {
+                referrerId = await GetReferrerIdFromCode(request.ReferralCode);
+                var referrer = await _dbContext.Users
+                    .FirstOrDefaultAsync(u => u.Id == referrerId);
+
+                if (referrer != null)
+                {
+                    referrerId = referrer.Id;
+                    _dbContext.Referrals.Add(new Referral
+                    {
+                        Id = Guid.NewGuid(),
+                        ReferrerUserId = referrer.Id,
+                        ReferredUserId = newUserId,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+            await _publishEndpoint.Publish<CreateUserInfo>(new
+            {
+                UserId = newUser.Id,
+                ReferrerId = referrerId,
+                PromoCode = request.PromoCode
+            });
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            _dbContext.RefreshTokens.Add(new RefreshToken
             {
                 Id = Guid.NewGuid(),
-                UserId = newUser.Id,
+                UserId = newUserId,
                 Token = refreshToken,
                 ExpireDate = DateTime.UtcNow.AddDays(7),
                 CreatedDate = DateTime.UtcNow
-            };
-            _dbContext.RefreshTokens.Add(refreshTokenEntity);
+            });
+
             await _dbContext.SaveChangesAsync();
 
+            var accessToken = _tokenService.GenerateAccessToken(newUser);
             return (accessToken, refreshToken);
+        }
+        private async Task<Guid?> GetReferrerIdFromCode(string referralCode)
+        {
+            try
+            {
+                var referrerId = ReferralHelper.DecryptReferralCode(referralCode);
+
+                var exists = await _dbContext.Users.AnyAsync(u => u.Id == referrerId);
+                return exists ? referrerId : null;
+            }
+            catch
+            {
+                return null; 
+            }
+        }
+        public string GetReferralCode(Guid userId)
+        {
+            return ReferralHelper.EncryptUserId(userId);
         }
 
         public async Task<(string accessToken, string refreshToken)> LoginAsync(LoginRequestModel request)
