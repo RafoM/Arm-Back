@@ -60,33 +60,33 @@ namespace TransactionCore.Services.Implementation
 
             return userFinance;
         }
-        public async Task UpdateUserRoleAsync(Guid userId, int roleId)
-        {
-            var token = await _authService.AuthorizeMicroserviceAsync();
-            var client = _clientFactory.CreateClient("IdentityService");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        //public async Task UpdateUserRoleAsync(Guid userId, int roleId)
+        //{
+        //    var token = await _authService.AuthorizeMicroserviceAsync();
+        //    var client = _clientFactory.CreateClient("IdentityService");
+        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var url = _config["ChangeRoleUrl"];
+        //    var url = _config["ChangeRoleUrl"];
 
-            var payload = new
-            {
-                UserId = userId,
-                RoleId = roleId
-            };
+        //    var payload = new
+        //    {
+        //        UserId = userId,
+        //        RoleId = roleId
+        //    };
 
-            var content = new StringContent(
-                JsonSerializer.Serialize(payload),
-                Encoding.UTF8,
-                "application/json"
-            );
+        //    var content = new StringContent(
+        //        JsonSerializer.Serialize(payload),
+        //        Encoding.UTF8,
+        //        "application/json"
+        //    );
 
-            var response = await client.PutAsync(url, content);
+        //    var response = await client.PutAsync(url, content);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Failed to update user role: {response.StatusCode} - {error}");
-            }
-        }
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        var error = await response.Content.ReadAsStringAsync();
+        //        throw new Exception($"Failed to update user role: {response.StatusCode} - {error}");
+        //    }
+        //}
     }
 }

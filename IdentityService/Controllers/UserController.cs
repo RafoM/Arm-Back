@@ -57,8 +57,8 @@ namespace IdentityService.Controllers
         /// <summary>
         /// Update user role
         /// </summary>
-        [Authorize(Roles = "AdminOrMicroservice")]
-        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [HttpPut("role")]
         public async Task<IActionResult> UpdateUserRole(UpdateUserRoleRequestModel requestModel) 
         {
             var user = await _userService.UpdateUserRoleAsync(requestModel);

@@ -13,8 +13,8 @@ namespace TransactionCore.Services.Implementation
         private readonly TransactionCoreDbContext _dbContext;
         private readonly IUserInfoService _userFinance;
         private readonly IPromoService _promoService;
-        private readonly SubscriptionUsageService _subscriptionUsageService;
-        public PaymentService(TransactionCoreDbContext dbContext, IUserInfoService userFinance, IPromoService promoService, SubscriptionUsageService subscriptionUsageService)
+        private readonly ISubscriptionUsageService _subscriptionUsageService;
+        public PaymentService(TransactionCoreDbContext dbContext, IUserInfoService userFinance, IPromoService promoService, ISubscriptionUsageService subscriptionUsageService)
         {
             _dbContext = dbContext;
             _userFinance = userFinance;
