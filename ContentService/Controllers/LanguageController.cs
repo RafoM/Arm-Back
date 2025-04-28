@@ -83,5 +83,26 @@ namespace ContentService.Controllers
             var success = await _languageService.DeleteAsync(id);
             return success ? NoContent() : NotFound();
         }
+        /// <summary>
+        /// Uploads a flag image for a specific language.
+        /// </summary>
+        /// <param name="languageId">The ID of the language.</param>
+        /// <param name="flagFile">The flag image file (e.g., PNG, JPG).</param>
+        /// <returns>The URL or path of the uploaded flag.</returns>
+        [HttpPost("{languageId}/flag")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UploadFlag(int languageId, [FromForm] IFormFile flagFile)
+        {
+            if (flagFile == null || flagFile.Length == 0)
+            {
+                return BadRequest("Invalid flag file.");
+            }
+
+            var flagUrl = await _languageService.UploadFlagAsync(languageId, flagFile);
+
+            return Ok(flagUrl);
+        }
     }
 }

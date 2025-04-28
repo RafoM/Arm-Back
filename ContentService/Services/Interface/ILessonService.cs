@@ -10,5 +10,6 @@ namespace ContentService.Services.Interface
         Task<LessonResponseModel> GetLessonByNumberAsync(int tutorialId, int lessonNumber);
         Task UpdateLessonAsync(LessonUpdateModel request);
         Task DeleteLessonAsync(int tutorialId, int lessonNumber);
+        Task<string> UploadMediaAsync(IFormFile mediaFile);
     }
 }

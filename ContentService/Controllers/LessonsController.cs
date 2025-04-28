@@ -71,5 +71,25 @@ namespace ContentService.Controllers
             await _lessonService.DeleteLessonAsync(tutorialId, lessonNumber);
             return NoContent();
         }
+        /// <summary>
+        /// Uploads a media file (image, video, etc.) for lessons or tutorials.
+        /// </summary>
+        /// <param name="mediaFile">The media file to upload (e.g., PNG, JPG, MP4).</param>
+        /// <returns>The URL or path of the uploaded media file.</returns>
+        [HttpPost("upload")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UploadMedia([FromForm] IFormFile mediaFile)
+        {
+            if (mediaFile == null || mediaFile.Length == 0)
+            {
+                return BadRequest("Invalid media file.");
+            }
+
+            var mediaUrl = await _lessonService.UploadMediaAsync(mediaFile);
+
+            return Ok(mediaUrl);
+        }
     }
 }

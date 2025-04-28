@@ -10,10 +10,11 @@ namespace ContentService.Services.Implementation
     public class LessonService : ILessonService
     {
         private readonly ContentDbContext _context;
-
-        public LessonService(ContentDbContext context)
+        private readonly IFileStorageService _fileStorageService;
+        public LessonService(ContentDbContext context, IFileStorageService fileStorageService)
         {
             _context = context;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<LessonResponseModel> CreateLessonAsync(int tutorialId, LessonRequestModel request)
@@ -33,7 +34,15 @@ namespace ContentService.Services.Implementation
 
             return MapLesson(lesson);
         }
+        public async Task<string> UploadMediaAsync(IFormFile mediaFile)
+        {
+            if (mediaFile == null || mediaFile.Length == 0)
+                throw new Exception("Invalid media file.");
 
+            var flagUrl = await _fileStorageService.UploadFileAsync(mediaFile, "lesson-medias");
+
+            return flagUrl;
+        }
         public async Task<List<LessonResponseModel>> GetLessonsAsync(int tutorialId)
         {
             return await _context.Lessons
