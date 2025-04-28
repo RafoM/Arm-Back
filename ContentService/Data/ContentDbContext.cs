@@ -16,9 +16,23 @@ namespace ContentService.Data
         public DbSet<BlogTag> BlogTags { get; set; }
         public DbSet<Case> Cases { get; set; }
         public DbSet<CaseTag> CaseTags { get; set; }
+        public DbSet<Tutorial> Tutorials { get; set; }
+        public DbSet<Lesson> Lessons { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Lesson>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Content).IsRequired();
+                entity.Property(e => e.LessonNumber).IsRequired();
+                entity.HasIndex(e => new { e.TutorialId, e.LessonNumber }).IsUnique();
+
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+
             modelBuilder.Entity<Case>(entity =>
             {
                 entity.HasKey(e => e.Id);
