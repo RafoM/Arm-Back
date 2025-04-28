@@ -85,7 +85,7 @@ builder.Services.AddSwaggerGen(c =>
 
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Identity Service API",
+        Title = "Content Service API",
         Version = "v1"
     });
 
