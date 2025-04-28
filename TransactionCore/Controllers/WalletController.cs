@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TransactionCore.Models.RequestModels;
 using TransactionCore.Models.ResponseModels;
 using TransactionCore.Services.Interface;
 
 namespace TransactionCore.Controllers
 {
+    [Authorize]
     public class WalletController : BaseController
     {
         private readonly IWalletService _walletService;
@@ -46,6 +48,7 @@ namespace TransactionCore.Controllers
         /// </summary>
         /// <param name="model">The wallet request model.</param>
         /// <returns>The newly created wallet response model.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<WalletResponseModel>> Create([FromBody] WalletRequestModel model)
         {
@@ -59,6 +62,7 @@ namespace TransactionCore.Controllers
         /// <param name="id">The wallet identifier.</param>
         /// <param name="model">The wallet request model.</param>
         /// <returns>No content.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] WalletUpdateModel model)
         {
@@ -71,6 +75,7 @@ namespace TransactionCore.Controllers
         /// </summary>
         /// <param name="id">The wallet identifier.</param>
         /// <returns>No content.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

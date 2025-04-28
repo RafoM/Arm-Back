@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ContentService.Controllers
 {
@@ -28,6 +29,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// The newly created <see cref="BlogTagResponseModel"/> with its assigned ID.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<BlogTagResponseModel>> CreateTag([FromBody] BlogTagRequestModel request)
         {
@@ -77,6 +79,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// The updated <see cref="BlogTagResponseModel"/> if successful; otherwise 404 Not Found.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<ActionResult<BlogTagResponseModel>> UpdateTag([FromBody] BlogTagUpdateModel request)
         {
@@ -99,6 +102,7 @@ namespace ContentService.Controllers
         /// </summary>
         /// <param name="tagId">ID of the tag to be deleted.</param>
         /// <returns>No content if successful, or 404 Not Found if the tag does not exist.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{tagId}")]
         public async Task<IActionResult> DeleteTag(int tagId)
         {

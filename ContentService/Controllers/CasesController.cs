@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ContentService.Controllers
 {
@@ -59,6 +60,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// A single <see cref="CaseResponseModel"/> if found; otherwise 404 Not Found.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpGet("{CaseId}")]
         public async Task<ActionResult<CaseResponseModel>> GetCaseById(int CaseId)
         {
@@ -80,6 +82,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// The updated <see cref="CaseResponseModel"/> if found; otherwise 404 Not Found.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<ActionResult<CaseResponseModel>> UpdateCase([FromBody] CaseUpdateModel request)
         {
@@ -104,6 +107,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// A 204 No Content response if the Case was deleted; 404 Not Found if it does not exist.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{CaseId}")]
         public async Task<IActionResult> DeleteCase(int CaseId)
         {

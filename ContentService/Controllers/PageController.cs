@@ -1,5 +1,6 @@
 ﻿using ContentService.Models.RequestModels;
 using ContentService.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContentService.Controllers
@@ -35,6 +36,7 @@ namespace ContentService.Controllers
         /// <summary>
         /// Creates a new page.
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] PageRequestModel model)
         {
@@ -45,6 +47,7 @@ namespace ContentService.Controllers
         /// <summary>
         /// Updates an existing page.
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] PageUpdateModel model)
         {
@@ -55,6 +58,7 @@ namespace ContentService.Controllers
         /// <summary>
         /// Deletes a page by ID.
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

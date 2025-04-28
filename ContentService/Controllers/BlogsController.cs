@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ContentService.Controllers
 {
@@ -29,6 +30,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// A newly created <see cref="BlogResponseModel"/>, along with a 201 Created response.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<BlogResponseModel>> CreateBlog([FromBody] BlogRequestModel request)
         {
@@ -80,6 +82,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// The updated <see cref="BlogResponseModel"/> if found; otherwise 404 Not Found.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<ActionResult<BlogResponseModel>> UpdateBlog([FromBody] BlogUpdateModel request)
         {
@@ -104,6 +107,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// A 204 No Content response if the blog was deleted; 404 Not Found if it does not exist.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{blogId}")]
         public async Task<IActionResult> DeleteBlog(int blogId)
         {

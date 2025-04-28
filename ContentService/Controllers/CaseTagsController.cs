@@ -1,6 +1,7 @@
 ﻿using ContentService.Models.RequestModels;
 using ContentService.Models.ResponseModels;
 using ContentService.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContentService.Controllers
@@ -25,6 +26,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// The newly created <see cref="CaseTagResponseModel"/> with its assigned ID.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<CaseTagResponseModel>> CreateTag([FromBody] CaseTagRequestModel request)
         {
@@ -74,6 +76,7 @@ namespace ContentService.Controllers
         /// <returns>
         /// The updated <see cref="CaseTagResponseModel"/> if successful; otherwise 404 Not Found.
         /// </returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<ActionResult<CaseTagResponseModel>> UpdateTag([FromBody] CaseTagUpdateModel request)
         {
@@ -96,6 +99,7 @@ namespace ContentService.Controllers
         /// </summary>
         /// <param name="tagId">ID of the tag to be deleted.</param>
         /// <returns>No content if successful, or 404 Not Found if the tag does not exist.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{tagId}")]
         public async Task<IActionResult> DeleteTag(int tagId)
         {

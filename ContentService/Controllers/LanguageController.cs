@@ -43,6 +43,7 @@ namespace ContentService.Controllers
         /// </summary>
         /// <param name="model">The language data to create.</param>
         /// <returns>The created language object.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] LanguageRequestModel model)
         {
@@ -55,6 +56,7 @@ namespace ContentService.Controllers
         /// </summary>
         /// <param name="model">The updated language data.</param>
         /// <returns>The updated language object if successful.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] LanguageUpdateModel model)
         {
@@ -74,6 +76,7 @@ namespace ContentService.Controllers
         /// </summary>
         /// <param name="id">The ID of the language to delete.</param>
         /// <returns>No content if deleted successfully.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

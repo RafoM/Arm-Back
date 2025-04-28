@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TransactionCore.Models.RequestModels;
 using TransactionCore.Models.ResponseModels;
 using TransactionCore.Services.Interface;
 
 namespace TransactionCore.Controllers
 {
+    [Authorize]
     public class CryptoController : BaseController
     {
         private readonly ICryptoService _service;
@@ -49,6 +51,7 @@ namespace TransactionCore.Controllers
         /// </summary>
         /// <param name="request">The cryptocurrency details.</param>
         /// <returns>The newly created cryptocurrency.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<CryptoResponseModel>> Create([FromBody] CryptoRequestModel request)
         {
@@ -62,6 +65,7 @@ namespace TransactionCore.Controllers
         /// <param name="id">The identifier of the cryptocurrency to update.</param>
         /// <param name="request">The updated cryptocurrency details.</param>
         /// <returns>No content.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] CryptoUpdateModel request)
         {
@@ -74,6 +78,7 @@ namespace TransactionCore.Controllers
         /// </summary>
         /// <param name="id">The identifier of the cryptocurrency to delete.</param>
         /// <returns>No content.</returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

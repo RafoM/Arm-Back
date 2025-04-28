@@ -52,6 +52,7 @@ namespace ContentService.Controllers
         /// <summary>
         /// Creates a new translation.
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] TranslationRequestModel model)
         {
@@ -62,6 +63,7 @@ namespace ContentService.Controllers
         /// <summary>
         /// Updates an existing translation.
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] TranslationUpdateModel model)
         {
@@ -72,6 +74,7 @@ namespace ContentService.Controllers
         /// <summary>
         /// Deletes a translation by ID.
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
