@@ -80,7 +80,7 @@ namespace TransactionCore.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             await _walletService.DeleteAsync(id);
-            return NoContent();
+            return Ok();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace IdentityService.Controllers
         /// List all roles (Admin only).
         /// </summary>
         [HttpGet]
-        [Authorize(Policy = "AdminOrMicroservice")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
         {
             var roles = await _roleService.GetAllRolesAsync();
@@ -46,7 +46,7 @@ namespace IdentityService.Controllers
         /// </summary>
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateRole([FromBody] RoleRequestModel requestModel)
+        public async Task<ActionResult<Role>> CreateRole([FromBody] RoleRequestModel requestModel)
         {
 
             var role = await _roleService.CreateRoleAsync(requestModel.RoleName);
@@ -63,7 +63,7 @@ namespace IdentityService.Controllers
             try
             {
                 await _roleService.UpdateRoleAsync(requestModel);
-                return NoContent();
+                return Ok();
             }
             catch (System.Exception ex)
             {
@@ -81,7 +81,7 @@ namespace IdentityService.Controllers
             try
             {
                 await _roleService.DeleteRoleAsync(id);
-                return NoContent();
+                return Ok();
             }
             catch (System.Exception ex)
             {

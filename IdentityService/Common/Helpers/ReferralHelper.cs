@@ -47,7 +47,16 @@ namespace IdentityService.Common.Helpers
             var plainBytes = decryptor.TransformFinalBlock(cipherBytes, 0, cipherBytes.Length);
 
             var userId = Encoding.UTF8.GetString(plainBytes);
-            return Guid.Parse(userId);
+            try
+            {
+                return Guid.Parse(userId);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
     }
 

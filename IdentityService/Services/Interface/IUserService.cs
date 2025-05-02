@@ -15,5 +15,6 @@ namespace IdentityService.Services.Interface
         Task SendVerificationEmailAsync(Guid userId);
         Task ChangePasswordAsync(Guid userId, ChangePasswordRequestModel requestModel);
         Task<bool> VerifyEmailAsync(string token);
+        Task ReferralVisit(string referralCode);
     }
 }

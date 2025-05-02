@@ -1,4 +1,6 @@
-﻿using IdentityService.Models.RequestModels;
+﻿using IdentityService.Data.Entity;
+using IdentityService.Models.RequestModels;
+using IdentityService.Models.ResponseModels;
 using IdentityService.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +22,7 @@ namespace IdentityService.Controllers
         /// Get a user's info by ID
         /// </summary>
         [HttpGet("info")]
-        public async Task<IActionResult> GetUserInfo()
+        public async Task<ActionResult<UserInfoResponseModel>> GetUserInfo()
         {
             var user = await _userService.GetUserInfoAsync(UserId);
             return Ok(user);
@@ -31,7 +33,7 @@ namespace IdentityService.Controllers
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
@@ -59,7 +61,7 @@ namespace IdentityService.Controllers
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("role")]
-        public async Task<IActionResult> UpdateUserRole(UpdateUserRoleRequestModel requestModel) 
+        public async Task<ActionResult<User>> UpdateUserRole(UpdateUserRoleRequestModel requestModel) 
         {
             var user = await _userService.UpdateUserRoleAsync(requestModel);
             return Ok(user);
@@ -68,7 +70,7 @@ namespace IdentityService.Controllers
         /// Uploads a profile image for a user. Returns the S3 URL.
         /// </summary>
         [HttpPost("profile-image")]
-        public async Task<IActionResult> UploadProfileImage(IFormFile file)
+        public async Task<ActionResult<string>> UploadProfileImage(IFormFile file)
         {
             var imageUrl = await _userService.UpdateUserProfileImageAsync(UserId, file);
             return Ok(new { imageUrl });
@@ -130,7 +132,7 @@ namespace IdentityService.Controllers
         /// true if the email is verified, false otherwise.
         /// </returns>
         [HttpGet("is-email-verified")]
-        public async Task<IActionResult> IsEmailVerified()
+        public async Task<ActionResult<bool>> IsEmailVerified()
         {
             return Ok(await _userService.IsEmailVerifiedAsync(UserId));
         }

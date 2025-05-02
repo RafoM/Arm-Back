@@ -52,7 +52,14 @@ namespace IdentityService.Services.Implementation
 
         public async Task ReferralVisit(string referralCode)
         {
+            if (string.IsNullOrEmpty(referralCode))
+            {
+                throw new ArgumentNullException("referral code is null");
+            }
             var referrerId = ReferralHelper.DecryptReferralCode(referralCode);
+           
+            var exists = await _dbContext.Users.AnyAsync(u => u.Id == referrerId);
+            if (!exists) { throw new InvalidDataException("user not found"); }
             await _publishEndpoint.Publish<IIncrementReferralVisits>(new
             {
                 UserId = referrerId
