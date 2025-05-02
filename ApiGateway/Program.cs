@@ -1,3 +1,4 @@
+using ApiGateway;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
@@ -6,15 +7,16 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-builder.Configuration.AddJsonFile("ocelot.Development.json", optional: true, reloadOnChange: true);
+await OcelotConfigGenerator.GenerateOcelotConfigAsync();
+
+//builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile("ocelot.json", optional: true, reloadOnChange: true);
 builder.Services.AddControllers();
 var jwtSecret = builder.Configuration["JwtSettings:SecretKey"];
 if (string.IsNullOrEmpty(jwtSecret))
 {
     throw new Exception("JWT secret key is not configured.");
 }
-
 var keyBytes = Encoding.UTF8.GetBytes(jwtSecret);
 
 builder.Services.AddAuthentication(options =>
