@@ -1,10 +1,11 @@
-﻿using IdentityService.Models.RequestModels;
+﻿using Arbito.Shared.Contracts.Identity;
+using IdentityService.Models.RequestModels;
 using IdentityService.Services.Interface;
 using MassTransit;
 
 namespace IdentityService.Consumers
 {
-    public class UpdateUserRoleConsumer : IConsumer<UpdateUserRoleRequestModel>
+    public class UpdateUserRoleConsumer : IConsumer<IUpdateUserRoleRequest>
     {
         private readonly IUserService _userService;
 
@@ -13,9 +14,14 @@ namespace IdentityService.Consumers
             _userService = userService;
         }
 
-        public async Task Consume(ConsumeContext<UpdateUserRoleRequestModel> context)
+        public async Task Consume(ConsumeContext<IUpdateUserRoleRequest> context)
         {
-            await _userService.UpdateUserRoleAsync(context.Message);
+            var request = new UpdateUserRoleRequestModel
+            {
+                RoleId = context.Message.NewRoleId,
+                UserId = context.Message.UserId
+            };
+            await _userService.UpdateUserRoleAsync(request);
         }
     }
 }

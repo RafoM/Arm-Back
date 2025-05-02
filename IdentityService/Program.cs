@@ -39,7 +39,7 @@ builder.Services.Configure<JwtSettingsConfigModel>(builder.Configuration.GetSect
 
 
 builder.Services.Configure<RabbitMqConfigModel>(builder.Configuration.GetSection("RabbitMQ"));
-builder.Services.AddMessaging(builder.Configuration, typeof(UpdateUserRoleConsumer));
+builder.Services.AddMessaging(builder.Configuration, typeof(UpdateUserRoleConsumer), typeof(GetUserRoleConsumer));
 
 //builder.Services.AddSingleton(StorageClient.Create());
 

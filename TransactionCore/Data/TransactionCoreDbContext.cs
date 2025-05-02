@@ -20,17 +20,99 @@ namespace TransactionCore.Data
         public DbSet<Promo> Promos { get; set; }
         public DbSet<PromoUsage> PromoUsages { get; set; }
         public DbSet<SubscriptionUsage> SubscriptionUsages { get; set; }
+        public DbSet<ReferralRoleRewardConfig> ReferralRoleRewardConfigs { get; set; }
+        public DbSet<RemainderInfo> RemainderInfos { get; set; }
+        public DbSet<ReferralPayment> ReferralPayments { get; set; }
+        public DbSet<ReferralActivity> ReferralActivities { get; set; }
+        public DbSet<ReferralWithdrawal> ReferralWithdrawals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ReferralPayment>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(p => p.Id).HasDefaultValueSql("NEWID()");
+
+                entity.Property(e => e.CreatedAt)
+                    .IsRequired();
+
+                entity.HasOne(e => e.Payment)
+                    .WithMany()
+                    .HasForeignKey(e => e.PaymentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+
+
+                entity.HasOne(e => e.ReferrerUserInfo)
+                    .WithMany()
+                    .HasForeignKey(e => e.ReferrerUserInfoId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<ReferralWithdrawal>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(p => p.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(p => p.Amount).HasPrecision(18, 4);
+                entity.HasOne(e => e.ReferrerUserInfo)
+                    .WithMany()
+                    .HasForeignKey(e => e.ReferrerUserInfoId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<ReferralActivity>(e =>
+            {
+                e.HasKey(r => r.Id);
+                e.Property(p => p.Id).HasDefaultValueSql("NEWID()");
+
+                e.Property(r => r.Action).IsRequired();
+
+                e.HasOne(r => r.ReferredUserInfo)
+                 .WithMany()
+                 .HasForeignKey(r => r.ReferredUserInfoId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(r => r.Payment)
+                 .WithMany()
+                 .HasForeignKey(r => r.PaymentId)
+                 .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<ReferralRoleRewardConfig>(p =>
+            {
+                p.HasKey(s => s.Id);
+                p.Property(p => p.Id).HasDefaultValueSql("NEWID()");
+            });
+
+           
+
+            modelBuilder.Entity<RemainderInfo>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(p => p.Amount).HasPrecision(18, 4);
+                entity.HasOne(e => e.Wallet)
+                      .WithMany()
+                      .HasForeignKey(e => e.WalletId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+
+            modelBuilder.Entity<ReferralRoleRewardConfig>(p =>
+            {
+                p.HasKey(s => s.Id);
+                p.Property(p => p.Id).HasDefaultValueSql("NEWID()");
+            });
+            
 
             modelBuilder.Entity<SubscriptionUsage>(p =>
             {
                 p.HasKey(s => s.Id);
                 p.Property(p => p.Id).HasDefaultValueSql("NEWID()");
             });
-          
+
 
             modelBuilder.Entity<SubscriptionUsage>()
                 .HasOne(s => s.UserInfo)
@@ -67,16 +149,24 @@ namespace TransactionCore.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(p => p.ReferalBalance).HasPrecision(18, 4);
+                entity.Property(p => p.Balance).HasPrecision(18, 4);
+
             });
 
             modelBuilder.Entity<Payment>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(p => p.ExpectedFee).HasPrecision(18, 4);
                 entity.HasOne(e => e.Wallet)
                       .WithMany()
                       .HasForeignKey(e => e.WalletId)
                       .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(r => r.UserInfo)
+                 .WithMany()
+                 .HasForeignKey(r => r.UserInfoId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Wallet>(entity =>
@@ -93,6 +183,7 @@ namespace TransactionCore.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(p => p.Price).HasPrecision(18, 4);
                 entity.Property(e => e.Name)
                       .IsRequired();
             });
@@ -116,7 +207,7 @@ namespace TransactionCore.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(x => x.Id).HasDefaultValueSql("NEWID()");
-
+                entity.Property(p => p.TransactionFee).HasPrecision(18, 4);
                 entity.HasOne(pm => pm.Crypto)
                       .WithMany()
                       .HasForeignKey(pm => pm.CryptoId)

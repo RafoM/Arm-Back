@@ -18,7 +18,7 @@ namespace ContentService.Data
         public DbSet<CaseTag> CaseTags { get; set; }
         public DbSet<Tutorial> Tutorials { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
-
+        //rolepermission
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

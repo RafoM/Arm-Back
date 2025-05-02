@@ -10,6 +10,7 @@ namespace TransactionCore.Data.Entity
         public Guid NetworkId { get; set; }
         public Network Network { get; set; }
         public decimal TransactionFee { get; set; }
+        public PaymentMethodStatusEnum Status { get; set; }
         public string Note { get; set; }
     }
 }

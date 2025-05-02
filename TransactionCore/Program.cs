@@ -34,6 +34,9 @@ builder.Services.AddScoped<INetworkService, NetworkService>();
 builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPromoService, PromoService>();
+builder.Services.AddScoped<IReferralRoleRewardSerice, ReferralRoleRewardSerice>();
+builder.Services.AddScoped<IReferralService, ReferralService>();
+builder.Services.AddScoped<IRemainderInfoService, RemainderInfoService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ISubscriptionUsageService, SubscriptionUsageService>();
 builder.Services.AddScoped<ITronWebhookService, TronWebhookService>();
@@ -46,7 +49,10 @@ builder.Services.AddMessaging(builder.Configuration, typeof(CreateUserInfoConsum
 builder.Services.AddHostedService<PaymentMonitoringService>();
 builder.Services.AddHostedService<PromoExpirationService>();
 builder.Services.AddHostedService<SubscriptionCleanupJob>();
-
+builder.Services.AddMessaging(
+    builder.Configuration,
+    typeof(CreateUserInfoConsumer),
+    typeof(IncrementReferralVisitsConsumer));
 var identitySettings = builder.Configuration.GetSection("IdentitySettings");
 var authorityUrl = identitySettings["Authority"];
 var audience = identitySettings["Audience"];

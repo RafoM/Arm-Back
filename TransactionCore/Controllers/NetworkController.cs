@@ -73,6 +73,9 @@ namespace TransactionCore.Controllers
             return NoContent();
         }
 
+        //UploadNetworkIcon
+
+
         /// <summary>
         /// Deletes a blockchain network.
         /// </summary>

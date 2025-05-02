@@ -1,10 +1,13 @@
 ﻿using Google.Cloud.Storage.V1;
+using IdentityService.Common.Helpers;
 using IdentityService.Data;
 using IdentityService.Data.Entity;
 using IdentityService.Models.RequestModels;
 using IdentityService.Models.ResponseModels;
 using IdentityService.Services.Interface;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Arbito.Shared.Contracts.Transaction;
 
 namespace IdentityService.Services.Implementation
 {
@@ -14,16 +17,18 @@ namespace IdentityService.Services.Implementation
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
         private readonly IAuthService _authService;
+        private readonly IPublishEndpoint _publishEndpoint;
         //private readonly StorageClient _storageClient;
 
         //, StorageClient storageClient
 
-        public UserService(IdentityDbContext dbContext, IConfiguration configuration, IEmailService emailService, IAuthService authService)
+        public UserService(IdentityDbContext dbContext, IConfiguration configuration, IEmailService emailService, IAuthService authService, IPublishEndpoint publishEndpoint)
         {
             _dbContext = dbContext;
             _configuration = configuration;
             _emailService = emailService;
             _authService = authService;
+            _publishEndpoint = publishEndpoint;
             // _storageClient = storageClient;
         }
 
@@ -45,6 +50,14 @@ namespace IdentityService.Services.Implementation
             return $"{baseUrl}?ref={referralCode}";
         }
 
+        public async Task ReferralVisit(string referralCode)
+        {
+            var referrerId = ReferralHelper.DecryptReferralCode(referralCode);
+            await _publishEndpoint.Publish<IIncrementReferralVisits>(new
+            {
+                UserId = referrerId
+            });
+        }
 
         public async Task UpdateUserInfoAsync(UserInfoUpdateRequestModel request)
         {

@@ -73,6 +73,8 @@ namespace TransactionCore.Controllers
             return NoContent();
         }
 
+        //UploadCryptoIcon
+
         /// <summary>
         /// Deletes a cryptocurrency.
         /// </summary>
