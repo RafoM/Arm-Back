@@ -1,4 +1,5 @@
 ﻿using ContentService.Models.RequestModels;
+using ContentService.Models.ResponseModels;
 using ContentService.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace ContentService.Controllers
         /// Gets all localizations.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<LocalizationResponseModel>>> GetAll()
         {
             return Ok(await _service.GetAllAsync());
         }
@@ -27,7 +28,7 @@ namespace ContentService.Controllers
         /// Gets a localization by ID.
         /// </summary>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<LocalizationResponseModel>> GetById(int id)
         {
             var result = await _service.GetByIdAsync(id);
             return result == null ? NotFound() : Ok(result);
@@ -38,7 +39,7 @@ namespace ContentService.Controllers
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] LocalizationRequestModel model)
+        public async Task<ActionResult<LocalizationResponseModel>> Create([FromBody] LocalizationRequestModel model)
         {
             var result = await _service.CreateAsync(model);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
@@ -49,7 +50,7 @@ namespace ContentService.Controllers
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] LocalizationUpdateModel model)
+        public async Task<ActionResult<LocalizationResponseModel>> Update([FromBody] LocalizationUpdateModel model)
         {
             var result = await _service.UpdateAsync(model);
             return result == null ? NotFound() : Ok(result);

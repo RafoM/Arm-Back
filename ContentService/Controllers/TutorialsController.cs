@@ -1,4 +1,5 @@
 ﻿using ContentService.Models.RequestModels;
+using ContentService.Models.ResponseModels;
 using ContentService.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace ContentService.Controllers
         /// <returns>The created tutorial.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> CreateTutorial([FromBody] TutorialRequestModel request)
+        public async Task<ActionResult<TutorialResponseModel>> CreateTutorial([FromBody] TutorialRequestModel request)
             => Ok(await _tutorialService.CreateTutorialAsync(request));
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace ContentService.Controllers
         /// </summary>
         /// <returns>List of tutorials.</returns>
         [HttpGet]
-        public async Task<IActionResult> GetAllTutorials()
+        public async Task<ActionResult<IEnumerable<TutorialResponseModel>>> GetAllTutorials()
             => Ok(await _tutorialService.GetAllTutorialsAsync());
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace ContentService.Controllers
         /// <param name="id">Tutorial ID.</param>
         /// <returns>The requested tutorial.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTutorialById(int id)
+        public async Task<ActionResult<TutorialResponseModel>> GetTutorialById(int id)
             => Ok(await _tutorialService.GetTutorialByIdAsync(id));
 
         /// <summary>
