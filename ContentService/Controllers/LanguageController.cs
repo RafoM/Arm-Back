@@ -87,22 +87,21 @@ namespace ContentService.Controllers
         /// <summary>
         /// Uploads a flag image for a specific language.
         /// </summary>
-        /// <param name="languageId">The ID of the language.</param>
-        /// <param name="flagFile">The flag image file (e.g., PNG, JPG).</param>
-        /// <returns>The URL or path of the uploaded flag.</returns>
-        [HttpPost("{languageId}/flag")]
+        /// <param name="request">The flag upload request.</param>
+        /// <returns>The URL of the uploaded flag.</returns>
+        [HttpPost("flag")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<string>> UploadFlag(int languageId, [FromForm] IFormFile flagFile)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<string>> UploadFlag([FromForm] UploadLanguageFlagRequest request)
         {
-            if (flagFile == null || flagFile.Length == 0)
+            if (request.FlagFile == null || request.FlagFile.Length == 0)
             {
                 return BadRequest("Invalid flag file.");
             }
 
-            var flagUrl = await _languageService.UploadFlagAsync(languageId, flagFile);
-
+            var flagUrl = await _languageService.UploadFlagAsync(request.LanguageId, request.FlagFile);
             return Ok(flagUrl);
         }
     }
