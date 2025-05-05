@@ -37,6 +37,27 @@ namespace TransactionCore.Services.Implementation
             });
         }
 
+        public async Task<IEnumerable<PaymentMethodResponseModel>> GetAllPaymentMethodsByCryptoIdAsync(Guid cryptoId)
+        {
+            var methods = await _dbContext.PaymentMethods
+                .Include(pm => pm.Crypto)
+                .Include(pm => pm.Network)
+                .Where(pm => pm.CryptoId == cryptoId && pm.Status == PaymentMethodStatusEnum.Active)
+                .ToListAsync();
+
+            return methods.Select(pm => new PaymentMethodResponseModel
+            {
+                Id = pm.Id,
+                CryptoId = pm.CryptoId,
+                CryptoName = pm.Crypto.Name,
+                NetworkId = pm.NetworkId,
+                NetworkName = pm.Network.Name,
+                TransactionFee = pm.TransactionFee,
+                Note = pm.Note
+            }).ToList();
+        }
+
+
         public async Task<PaymentMethodResponseModel> GetByIdAsync(Guid id)
         {
             var pm = await _dbContext.PaymentMethods

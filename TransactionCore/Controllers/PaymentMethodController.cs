@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TransactionCore.Models.RequestModels;
 using TransactionCore.Models.ResponseModels;
+using TransactionCore.Services.Implementation;
 using TransactionCore.Services.Interface;
 
 namespace TransactionCore.Controllers
@@ -29,6 +30,18 @@ namespace TransactionCore.Controllers
         {
             var methods = await _service.GetAllAsync();
             return Ok(methods);
+        }
+
+        /// <summary>
+        /// Get all active payment methods by Crypto ID.
+        /// </summary>
+        /// <param name="cryptoId">The ID of the crypto asset.</param>
+        /// <returns>List of matching payment methods.</returns>
+        [HttpGet("by-crypto/{cryptoId}")]
+        public async Task<ActionResult<IEnumerable<PaymentMethodResponseModel>>> GetAllByCryptoId(Guid cryptoId)
+        {
+            var result = await _service.GetAllPaymentMethodsByCryptoIdAsync(cryptoId);
+            return Ok(result);
         }
 
         /// <summary>
