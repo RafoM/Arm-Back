@@ -172,6 +172,46 @@ namespace ContentService.Migrations
                     b.ToTable("Languages", (string)null);
                 });
 
+            modelBuilder.Entity("ContentService.Data.Entity.Lesson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("LessonNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TutorialId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TutorialId", "LessonNumber")
+                        .IsUnique();
+
+                    b.ToTable("Lessons");
+                });
+
             modelBuilder.Entity("ContentService.Data.Entity.Localization", b =>
                 {
                     b.Property<int>("Id")
@@ -250,6 +290,32 @@ namespace ContentService.Migrations
                     b.ToTable("Translations", (string)null);
                 });
 
+            modelBuilder.Entity("ContentService.Data.Entity.Tutorial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Difficulty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tutorials");
+                });
+
             modelBuilder.Entity("caseTagMap", b =>
                 {
                     b.Property<int>("CaseId")
@@ -280,6 +346,17 @@ namespace ContentService.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_BlogTagMap_BlogTags_BlogTagId");
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.Lesson", b =>
+                {
+                    b.HasOne("ContentService.Data.Entity.Tutorial", "Tutorial")
+                        .WithMany("Lessons")
+                        .HasForeignKey("TutorialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tutorial");
                 });
 
             modelBuilder.Entity("ContentService.Data.Entity.Localization", b =>
@@ -342,6 +419,11 @@ namespace ContentService.Migrations
             modelBuilder.Entity("ContentService.Data.Entity.Page", b =>
                 {
                     b.Navigation("LocalizationKeys");
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.Tutorial", b =>
+                {
+                    b.Navigation("Lessons");
                 });
 #pragma warning restore 612, 618
         }

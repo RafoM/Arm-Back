@@ -26,29 +26,22 @@ builder.Services.AddDbContext<ContentDbContext>(options =>
 
 
 
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"];
-var issuer = jwtSettings["Issuer"];
+var identitySettings = builder.Configuration.GetSection("IdentitySettings");
+var authorityUrl = identitySettings["Authority"];
+var audience = identitySettings["Audience"]; 
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = true;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = issuer,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
-    };
-});
+        options.Authority = authorityUrl; 
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false, 
+            ValidateIssuer = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
+    });
 
 
 builder.Services.AddScoped<ILanguageService, LanguageService>();
@@ -59,6 +52,8 @@ builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IBlogTagService, BlogTagService>();
 builder.Services.AddScoped<ICaseService, CaseService>();
 builder.Services.AddScoped<ICaseTagService, CaseTagService>();
+builder.Services.AddScoped<ITutorialService, TutorialService>();
+builder.Services.AddScoped<ILessonService, LessonService>();
 
 //builder.Services.AddSingleton(StorageClient.Create());
 

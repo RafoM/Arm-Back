@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using Arbito.Shared.Contracts.Identity;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using TransactionCore.Data;
 using TransactionCore.Data.Entity;
@@ -11,7 +12,6 @@ namespace TransactionCore.Services.Implementation
     {
         private readonly TransactionCoreDbContext _dbContext;
         private readonly IPublishEndpoint _publishEndpoint;
-
         public SubscriptionUsageService(TransactionCoreDbContext dbContext, IPublishEndpoint publishEndpoint)
         {
             _dbContext = dbContext;
@@ -40,12 +40,15 @@ namespace TransactionCore.Services.Implementation
             };
 
             userInfo.IsSubscribed = true;
-            await _publishEndpoint.Publish<UpdateUserRole>(new
+            await _publishEndpoint.Publish<IUpdateUserRoleRequest>(new
             {
                 UserId = usage.UserInfo.UserId,
                 RoleId = package.RoleId
             });
             _dbContext.SubscriptionUsages.Add(usage);
+
+            
+
             await _dbContext.SaveChangesAsync();
         }
     }

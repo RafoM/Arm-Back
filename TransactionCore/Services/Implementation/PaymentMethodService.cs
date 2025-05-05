@@ -61,14 +61,19 @@ namespace TransactionCore.Services.Implementation
 
         public async Task<PaymentMethodResponseModel> CreateAsync(PaymentMethodRequestModel request)
         {
+          
             var paymentMethod = new PaymentMethod
             {
                 CryptoId = request.CryptoId,
                 NetworkId = request.NetworkId,
                 TransactionFee = request.TransactionFee,
-                Note = request.Note
+                Note = request.Note,
+                Status =PaymentMethodStatusEnum.Deactive
             };
-
+            if (request.Status)
+            {
+                paymentMethod.Status = PaymentMethodStatusEnum.Active;
+            }
             _dbContext.PaymentMethods.Add(paymentMethod);
             await _dbContext.SaveChangesAsync();
 
@@ -97,7 +102,12 @@ namespace TransactionCore.Services.Implementation
             existing.NetworkId = request.NetworkId;
             existing.TransactionFee = request.TransactionFee;
             existing.Note = request.Note;
+            existing.Status = PaymentMethodStatusEnum.Deactive;
 
+            if (request.Status)
+            {
+                existing.Status = PaymentMethodStatusEnum.Active;
+            }
             _dbContext.PaymentMethods.Update(existing);
             await _dbContext.SaveChangesAsync();
         }

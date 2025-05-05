@@ -10,5 +10,6 @@ namespace ContentService.Services.Interface
         Task<int> CreateAsync(LanguageRequestModel model);
         Task<bool> UpdateAsync(LanguageUpdateModel model);
         Task<bool> DeleteAsync(int id);
+        Task<string> UploadFlagAsync(int languageId, IFormFile flagFile);
     }
 }

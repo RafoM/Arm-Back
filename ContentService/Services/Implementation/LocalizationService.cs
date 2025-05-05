@@ -19,22 +19,17 @@ namespace ContentService.Services.Implementation
         public async Task<List<LocalizationResponseModel>> GetAllAsync()
         {
             return await _dbContext.Localizations
-                .Include(l => l.Page)
                 .Select(l => new LocalizationResponseModel
                 {
                     Id = l.Id,
-                    Key = l.Key,
-                    PageId = l.PageId,
-                    PageName = l.Page.Name
+                    Key = l.Key
                 })
                 .ToListAsync();
         }
 
         public async Task<LocalizationResponseModel?> GetByIdAsync(int id)
         {
-            var entity = await _dbContext.Localizations
-                .Include(l => l.Page)
-                .FirstOrDefaultAsync(l => l.Id == id);
+            var entity = await _dbContext.Localizations.FirstOrDefaultAsync(l => l.Id == id);
 
             if (entity == null) return null;
 
@@ -42,8 +37,6 @@ namespace ContentService.Services.Implementation
             {
                 Id = entity.Id,
                 Key = entity.Key,
-                PageId = entity.PageId,
-                PageName = entity.Page.Name
             };
         }
 
@@ -52,7 +45,6 @@ namespace ContentService.Services.Implementation
             var localization = new Localization
             {
                 Key = model.Key.Trim(),
-                PageId = model.PageId
             };
 
             _dbContext.Localizations.Add(localization);
@@ -62,7 +54,6 @@ namespace ContentService.Services.Implementation
             {
                 Id = localization.Id,
                 Key = localization.Key,
-                PageId = localization.PageId
             };
         }
 
@@ -72,15 +63,13 @@ namespace ContentService.Services.Implementation
             if (entity == null) return null;
 
             entity.Key = model.Key.Trim();
-            entity.PageId = model.PageId;
 
             await _dbContext.SaveChangesAsync();
 
             return new LocalizationResponseModel
             {
                 Id = entity.Id,
-                Key = entity.Key,
-                PageId = entity.PageId
+                Key = entity.Key
             };
         }
 

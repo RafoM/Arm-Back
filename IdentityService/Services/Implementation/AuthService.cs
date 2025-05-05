@@ -1,4 +1,5 @@
-﻿using Google.Apis.Auth;
+﻿using Arbito.Shared.Contracts.Transaction;
+using Google.Apis.Auth;
 using IdentityService.Common.Helpers;
 using IdentityService.Data;
 using IdentityService.Data.Entity;
@@ -89,11 +90,12 @@ namespace IdentityService.Services.Implementation
             }
 
             await _dbContext.SaveChangesAsync();
-            await _publishEndpoint.Publish<CreateUserInfo>(new
+            await _publishEndpoint.Publish<ICreateUserInfoRequest>(new
             {
                 UserId = newUser.Id,
                 ReferrerId = referrerId,
-                PromoCode = request.PromoCode
+                PromoCode = request.PromoCode,
+                Email = request.Email
             });
             var refreshToken = _tokenService.GenerateRefreshToken();
             _dbContext.RefreshTokens.Add(new RefreshToken

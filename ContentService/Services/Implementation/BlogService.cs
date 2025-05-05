@@ -46,6 +46,8 @@ namespace ContentService.Services.Implementation
             return await GetByIdAsync(newBlog.Id);
         }
 
+        //GetBlogByTagIds
+
         public async Task<BlogResponseModel> UpdateAsync(BlogUpdateModel request)
         {
             var blog = await _dbContext.Blogs

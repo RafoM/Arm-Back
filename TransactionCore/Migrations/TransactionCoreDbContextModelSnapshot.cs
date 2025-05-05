@@ -65,7 +65,8 @@ namespace TransactionCore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("ExpectedFee")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
@@ -79,7 +80,7 @@ namespace TransactionCore.Migrations
                     b.Property<Guid>("SubscriptionPackageId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserFinanceId")
+                    b.Property<Guid>("UserInfoId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("WalletId")
@@ -88,6 +89,8 @@ namespace TransactionCore.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SubscriptionPackageId");
+
+                    b.HasIndex("UserInfoId");
 
                     b.HasIndex("WalletId");
 
@@ -111,8 +114,12 @@ namespace TransactionCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("TransactionFee")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
@@ -186,6 +193,156 @@ namespace TransactionCore.Migrations
                     b.ToTable("PromoUsages");
                 });
 
+            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralActivity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<int>("Action")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ActionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("Commission")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReferredUserInfoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("ReferredUserInfoId");
+
+                    b.ToTable("ReferralActivities");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralPayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<decimal>("Commission")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReferrerUserInfoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("ReferrerUserInfoId");
+
+                    b.ToTable("ReferralPayments");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralRoleRewardConfig", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<decimal?>("FixedPercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("UseReferralLevels")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReferralRoleRewardConfigs");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralWithdrawal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Network")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ReferrerUserInfoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ToAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TxHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReferrerUserInfoId");
+
+                    b.ToTable("ReferralWithdrawals");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.RemainderInfo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<Guid>("UserInfoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WalletId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WalletId");
+
+                    b.ToTable("RemainderInfos");
+                });
+
             modelBuilder.Entity("TransactionCore.Data.Entity.SubscriptionPackage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -215,7 +372,8 @@ namespace TransactionCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -266,11 +424,16 @@ namespace TransactionCore.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
-                    b.Property<Guid?>("AmountWalletId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DenormalizedEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ExpectedPaymentId")
                         .HasColumnType("uniqueidentifier");
@@ -279,13 +442,20 @@ namespace TransactionCore.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("ReferalBalance")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("ReferralPurchaseCount")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("ReferrerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Visits")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -337,12 +507,20 @@ namespace TransactionCore.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TransactionCore.Data.Entity.UserInfo", "UserInfo")
+                        .WithMany()
+                        .HasForeignKey("UserInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TransactionCore.Data.Entity.Wallet", "Wallet")
                         .WithMany()
                         .HasForeignKey("WalletId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("SubscriptionPackage");
+
+                    b.Navigation("UserInfo");
 
                     b.Navigation("Wallet");
                 });
@@ -375,6 +553,65 @@ namespace TransactionCore.Migrations
                         .IsRequired();
 
                     b.Navigation("Promo");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralActivity", b =>
+                {
+                    b.HasOne("TransactionCore.Data.Entity.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TransactionCore.Data.Entity.UserInfo", "ReferredUserInfo")
+                        .WithMany()
+                        .HasForeignKey("ReferredUserInfoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("ReferredUserInfo");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralPayment", b =>
+                {
+                    b.HasOne("TransactionCore.Data.Entity.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TransactionCore.Data.Entity.UserInfo", "ReferrerUserInfo")
+                        .WithMany()
+                        .HasForeignKey("ReferrerUserInfoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("ReferrerUserInfo");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralWithdrawal", b =>
+                {
+                    b.HasOne("TransactionCore.Data.Entity.UserInfo", "ReferrerUserInfo")
+                        .WithMany()
+                        .HasForeignKey("ReferrerUserInfoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ReferrerUserInfo");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.RemainderInfo", b =>
+                {
+                    b.HasOne("TransactionCore.Data.Entity.Wallet", "Wallet")
+                        .WithMany()
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("TransactionCore.Data.Entity.SubscriptionUsage", b =>

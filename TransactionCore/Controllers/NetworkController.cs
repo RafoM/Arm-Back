@@ -70,8 +70,11 @@ namespace TransactionCore.Controllers
         public async Task<IActionResult> Update([FromBody] NetworkResponseModel request)
         {
             await _service.UpdateAsync(request);
-            return NoContent();
+            return Ok();
         }
+
+        //UploadNetworkIcon
+
 
         /// <summary>
         /// Deletes a blockchain network.
@@ -83,7 +86,7 @@ namespace TransactionCore.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             await _service.DeleteAsync(id);
-            return NoContent();
+            return Ok();
         }
     }
 }

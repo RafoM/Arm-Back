@@ -145,7 +145,7 @@ namespace TransactionCore.Services.Implementation
             _dbContext.Wallets.Update(wallet);
             await _dbContext.SaveChangesAsync();
 
-            await _paymentService.ApprovePayment(payment.UserFinanceId, amount);
+            await _paymentService.ApprovePayment(payment.UserInfoId, amount, txId);
         }
 
         public async Task UnlockAndDetachWalletAsync(Guid paymentId, CancellationToken cancellationToken = default)

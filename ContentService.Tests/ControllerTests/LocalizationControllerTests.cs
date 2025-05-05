@@ -43,8 +43,8 @@ namespace ContentService.Tests.ControllerTests
         [Fact]
         public async Task Create_ShouldReturnCreated()
         {
-            var model = new LocalizationRequestModel { Key = "Test", PageId = 1 };
-            var response = new LocalizationResponseModel { Id = 1, Key = "Test", PageId = 1 };
+            var model = new LocalizationRequestModel { Key = "Test" };
+            var response = new LocalizationResponseModel { Id = 1, Key = "Test"};
             _service.Setup(s => s.CreateAsync(model)).ReturnsAsync(response);
             var result = await _controller.Create(model);
             result.Should().BeOfType<CreatedAtActionResult>();
@@ -53,7 +53,7 @@ namespace ContentService.Tests.ControllerTests
         [Fact]
         public async Task Update_ShouldReturnNotFound_WhenNull()
         {
-            var model = new LocalizationUpdateModel { Id = 1, Key = "Test", PageId = 1 };
+            var model = new LocalizationUpdateModel { Id = 1, Key = "Test" };
             _service.Setup(s => s.UpdateAsync(model)).ReturnsAsync((LocalizationResponseModel?)null);
             var result = await _controller.Update( model);
             result.Should().BeOfType<NotFoundResult>();
