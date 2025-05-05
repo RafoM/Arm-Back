@@ -35,7 +35,8 @@ namespace TransactionCore.Services.Implementation
             var roleId = await _dbContext.SubscriptionPackages.Where(s => s.Id == paymentDetails.SubscriptionPackageId).Select(x => x.RoleId).FirstOrDefaultAsync();
             var promo = await _dbContext.Promos.FirstOrDefaultAsync(x => x.Id == paymentDetails.PromoId);
             var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(x => x.Id == paymentDetails.WalletId);
-
+            paymentDetails.TxHash = txHash;
+            paymentDetails.PayedFee = amount;
             var x = amount - paymentDetails.ExpectedFee;
             var isPayed = false;
 
