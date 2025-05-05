@@ -22,34 +22,12 @@ namespace TransactionCore.Data
         public DbSet<SubscriptionUsage> SubscriptionUsages { get; set; }
         public DbSet<ReferralRoleRewardConfig> ReferralRoleRewardConfigs { get; set; }
         public DbSet<RemainderInfo> RemainderInfos { get; set; }
-        public DbSet<ReferralPayment> ReferralPayments { get; set; }
         public DbSet<ReferralActivity> ReferralActivities { get; set; }
         public DbSet<ReferralWithdrawal> ReferralWithdrawals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<ReferralPayment>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(p => p.Id).HasDefaultValueSql("NEWID()");
-
-                entity.Property(e => e.CreatedAt)
-                    .IsRequired();
-
-                entity.HasOne(e => e.Payment)
-                    .WithMany()
-                    .HasForeignKey(e => e.PaymentId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-
-
-                entity.HasOne(e => e.ReferrerUserInfo)
-                    .WithMany()
-                    .HasForeignKey(e => e.ReferrerUserInfoId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
 
             modelBuilder.Entity<ReferralWithdrawal>(entity =>
             {

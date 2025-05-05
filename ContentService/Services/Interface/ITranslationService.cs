@@ -11,7 +11,6 @@ namespace ContentService.Services.Interface
         Task<TranslationResponseModel> CreateAsync(TranslationRequestModel model);
         Task<TranslationResponseModel?> UpdateAsync(TranslationUpdateModel model);
         Task<bool> DeleteAsync(int id);
-        Task<Dictionary<string, string>> GetTranslationsByPageAsync(int pageId, int languageId);
-
+        Task<Dictionary<string, string>> GetTranslationsByLanguageIdAsync(int languageId);
     }
 }

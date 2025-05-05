@@ -57,34 +57,42 @@ namespace TransactionCore.Controllers
         }
 
         /// <summary>
-        /// Returns referral activity list.
+        /// Returns referral activities (registrations, payment attempts, purchases) for the current user.
         /// </summary>
         [HttpGet("activity")]
-        public async Task<ActionResult<List<ReferralActivityResponseModel>>> GetActivity()
+        public async Task<ActionResult<PageResultModel<ReferralActivityResponseModel>>> GetReferralActivity(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
-            var result = await _referralService.GetReferralActivityAsync(UserId);
+            var result = await _referralService.GetReferralActivityAsync(UserId, pageNumber, pageSize);
             return Ok(result);
         }
 
         /// <summary>
-        /// Returns referral payment history.
+        /// Returns paginated referral payment rewards earned by the current user.
         /// </summary>
         [HttpGet("payments")]
-        public async Task<ActionResult<List<ReferralPaymentResponseModel>>> GetPayments()
+        public async Task<ActionResult<PageResultModel<ReferralPaymentResponseModel>>> GetReferralPayments(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
-            var result = await _referralService.GetReferralPaymentsAsync(UserId);
+            var result = await _referralService.GetReferralPaymentsAsync(UserId, pageNumber, pageSize);
             return Ok(result);
         }
 
+
         /// <summary>
-        /// Returns referral withdrawal history.
+        /// Returns paginated referral withdrawal requests made by the current user.
         /// </summary>
         [HttpGet("withdrawals")]
-        public async Task<ActionResult<List<ReferralWithdrawalResponseModel>>> GetWithdrawals()
+        public async Task<ActionResult<PageResultModel<ReferralWithdrawalResponseModel>>> GetReferralWithdrawals(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
-            var result = await _referralService.GetReferralWithdrawalsAsync(UserId);
+            var result = await _referralService.GetReferralWithdrawalsAsync(UserId, pageNumber, pageSize);
             return Ok(result);
         }
+
 
         /// <summary>
         /// Creates a withdrawal request.

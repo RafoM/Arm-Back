@@ -1,5 +1,6 @@
 ﻿using ContentService.Data.Entity;
 using ContentService.Models.RequestModels;
+using ContentService.Services.Implementation;
 using ContentService.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,21 +14,6 @@ namespace ContentService.Controllers
         public TranslationController(ITranslationService service)
         {
             _service = service;
-        }
-
-        /// <summary>
-        /// Gets all translations for a given page and language.
-        /// </summary>
-        /// <param name="pageId">The ID of the page.</param>
-        /// <param name="languageId">The ID of the language.</param>
-        [HttpGet("by-page")]
-        public async Task<IActionResult> GetByPage([FromQuery] int pageId, [FromQuery] int languageId)
-        {
-            if (pageId <= 0 || languageId <= 0)
-                return BadRequest("Valid pageId and languageId are required.");
-
-            var result = await _service.GetTranslationsByPageAsync(pageId, languageId);
-            return Ok(result);
         }
         
         /// <summary>
@@ -48,7 +34,15 @@ namespace ContentService.Controllers
             var result = await _service.GetByIdAsync(id);
             return result == null ? NotFound() : Ok(result);
         }
-
+        /// <summary>
+        /// Get all translations by language ID as a dictionary (Key: Localization.Key, Value: Translation.Value).
+        /// </summary>
+        [HttpGet("by-language/{languageId}")]
+        public async Task<ActionResult<Dictionary<string, string>>> GetTranslationsByLanguageId(int languageId)
+        {
+            var result = await _service.GetTranslationsByLanguageIdAsync(languageId);
+            return Ok(result);
+        }
         /// <summary>
         /// Creates a new translation.
         /// </summary>

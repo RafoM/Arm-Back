@@ -28,7 +28,7 @@ namespace TransactionCore.Services.Implementation
             _referralService = referralService;
         }
 
-        public async Task ApprovePayment(Guid userInfoId, decimal amount)
+        public async Task ApprovePayment(Guid userInfoId, decimal amount, string txHash)
         {
             var paymentDetails = await _dbContext.Payments.FirstOrDefaultAsync(x => x.UserInfoId == userInfoId);
             var userInfo = await _dbContext.UserInfos.FirstOrDefaultAsync(x => x.Id == userInfoId);
@@ -60,8 +60,7 @@ namespace TransactionCore.Services.Implementation
                 {
                     var referrer = await _dbContext.UserInfos.FirstOrDefaultAsync(x => x.UserId == userInfo.ReferrerId);
                     await _userInfoService.AddReward(referrer.Id, reward, wallet.Id);
-                    await _referralService.CreateReferralActivityAsync(userInfo.Id, ReferralActionTypeEnum.PaymentAttempt, paymentDetails.Id, reward);
-                    await _referralService.CreateReferralPaymentAsync(paymentDetails.Id, reward);
+                    await _referralService.CreateReferralActivityAsync(userInfo.Id, ReferralActionTypeEnum.Purchase, paymentDetails.Id, reward);
                 }
             }
             else if (x < 0)
@@ -134,6 +133,39 @@ namespace TransactionCore.Services.Implementation
             return paymentDetails;
         }
 
+        public async Task<PageResultModel<UserPaymentResponseModel>> GetUserPaymentsAsync(Guid userId, int pageNumber = 1, int pageSize = 10)
+        {
+            var query = _dbContext.Payments
+                .Where(p => p.UserInfo.UserId == userId)
+                .OrderByDescending(p => p.CreatedDate)
+                .Select(p => new UserPaymentResponseModel
+                {
+                    Amount = p.PayedFee ?? 0,
+                    Currency = p.Wallet.PaymentMethod.Crypto.Name,
+                    Network = p.Wallet.PaymentMethod.Network.Name,
+                    Plan = p.SubscriptionPackage.Name,
+                    Status = p.Status.ToString(),
+                    CreatedAt = p.CreatedDate,
+                    PaidAt = p.PaymentDate
+                });
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var data = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PageResultModel<UserPaymentResponseModel>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                Data = data
+            };
+        }
 
         private async Task<Guid> CreatePayment(Guid userFinanceId, Guid walletId, decimal expectedFee, Guid subscriptionPackageId, Guid? promoId)
         {

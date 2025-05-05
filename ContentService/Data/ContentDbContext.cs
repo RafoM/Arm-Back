@@ -9,7 +9,6 @@ namespace ContentService.Data
             : base(options) { }
 
         public DbSet<Language> Languages { get; set; }
-        public DbSet<Page> Pages { get; set; }
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Translation> Translations { get; set; }
         public DbSet<Blog> Blogs { get; set; }
@@ -115,21 +114,6 @@ namespace ContentService.Data
                       .HasMaxLength(100);
             });
 
-            modelBuilder.Entity<Page>(entity =>
-            {
-                entity.ToTable("Pages");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
-                entity.HasIndex(e => e.Name).IsUnique();
-                entity.Property(e => e.Name)
-                      .IsRequired()
-                      .HasMaxLength(100);
-
-                entity.Property(e => e.DisplayName)
-                      .HasMaxLength(150);
-            });
-
             modelBuilder.Entity<Localization>(entity =>
             {
                 entity.ToTable("LocalizationKeys");
@@ -140,12 +124,6 @@ namespace ContentService.Data
                       .IsRequired()
                       .HasMaxLength(200);
 
-                entity.HasIndex(e => new { e.PageId, e.Key }).IsUnique();
-
-                entity.HasOne(e => e.Page)
-                      .WithMany(p => p.LocalizationKeys)
-                      .HasForeignKey(e => e.PageId)
-                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Translation>(entity =>

@@ -67,12 +67,6 @@ namespace ContentService.Tests.ControllerTests
             result.Should().BeOfType<NoContentResult>();
         }
 
-        [Fact]
-        public async Task GetByPage_ShouldReturnOk()
-        {
-            _service.Setup(s => s.GetTranslationsByPageAsync(1, 1)).ReturnsAsync(new Dictionary<string, string>());
-            var result = await _controller.GetByPage(1, 1);
-            result.Should().BeOfType<OkObjectResult>();
-        }
+       
     }
 }
