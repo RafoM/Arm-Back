@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 
@@ -6,14 +7,14 @@ namespace ApiGateway
 {
     public static class OcelotConfigGenerator
     {
-        public static async Task GenerateOcelotConfigAsync()
+        public static async Task GenerateOcelotConfigAsync(IConfiguration configuration)
         {
-            var swaggerUrls = Environment.GetEnvironmentVariables()
-                .Cast<DictionaryEntry>()
-                .Where(e => e.Key is string key && key.StartsWith("SWAGGER_SOURCE_"))
+            var swaggerSourcesSection = configuration.GetSection("SwaggerSources");
+            var swaggerUrls = swaggerSourcesSection
+                .GetChildren()
                 .ToDictionary(
-                    e => ((string)e.Key).Replace("SWAGGER_SOURCE_", "").ToLowerInvariant(),
-                    e => e.Value?.ToString() ?? string.Empty
+                    child => child.Key.ToLowerInvariant(),
+                    child => child.Value ?? string.Empty
                 );
 
             if (!swaggerUrls.Any())
@@ -33,7 +34,7 @@ namespace ApiGateway
                 catch (Exception ex)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"⚠️ Failed to fetch Swagger from {swaggerUrl}: {ex.Message}");
+                    Console.WriteLine($"Failed to fetch Swagger from {swaggerUrl}: {ex.Message}");
                     Console.ResetColor();
                     continue;
                 }

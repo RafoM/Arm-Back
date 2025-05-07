@@ -6,7 +6,7 @@ using Ocelot.Middleware;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-await OcelotConfigGenerator.GenerateOcelotConfigAsync(builder.Configuration);
+await OcelotConfigGenerator.GenerateOcelotConfigAsync();
 
 builder.Configuration.AddJsonFile("ocelot.json", optional: true, reloadOnChange: true);
 builder.Services.AddControllers();
