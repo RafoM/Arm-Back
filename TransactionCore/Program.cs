@@ -44,7 +44,6 @@ builder.Services.AddScoped<IUserInfoService, UserInfoService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
 
 builder.Services.Configure<RabbitMqConfigModel>(builder.Configuration.GetSection("RabbitMQ"));
-builder.Services.AddMessaging(builder.Configuration, typeof(CreateUserInfoConsumer));
 
 builder.Services.AddHostedService<PaymentMonitoringService>();
 builder.Services.AddHostedService<PromoExpirationService>();
