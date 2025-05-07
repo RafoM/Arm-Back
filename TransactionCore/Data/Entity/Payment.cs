@@ -12,8 +12,10 @@ namespace TransactionCore.Data.Entity
         public PaymentStatusEnum Status { get; set; }
         public Guid? PromoId { get; set; }
         public decimal ExpectedFee { get; set; }
+        public decimal? PayedFee { get; set; }
         public Guid SubscriptionPackageId { get; set; }
         public SubscriptionPackage SubscriptionPackage { get; set; }
+        public string TxHash { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? PaymentDate { get; set; }
     }

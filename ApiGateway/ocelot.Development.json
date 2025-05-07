@@ -12,7 +12,6 @@
       "UpstreamPathTemplate": "/auth/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "SwaggerKey": "identity"
-
     },
     {
       "DownstreamPathTemplate": "/api/user/{everything}",
@@ -72,6 +71,46 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/configuration",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identityservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/configuration",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "SwaggerKey": "identity",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/outputcache/{region}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identityservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/outputcache/{region}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "SwaggerKey": "identity",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/translations/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -134,6 +173,415 @@
       "RouteClaimsRequirement": {
         "role": "Admin"
       }
+    },
+    {
+      "DownstreamPathTemplate": "/api/blogs/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/blogs/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/blogs/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/blogs/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/blogtags/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/blogtags/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/blogtags/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/blogtags/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/cases/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/cases/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/cases/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/cases/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/casetags/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/casetags/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/casetags/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/casetags/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/localization/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/localization/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/localization/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/localization/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/page/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/page/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/page/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/page/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/configuration",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content-configuration",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/outputcache/{region}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content-outputcache/{region}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "SwaggerKey": "content",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/crypto/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/crypto/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/crypto/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/crypto/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "transaction",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/network/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/network/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/network/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/network/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "transaction",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/paymentmethod/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/paymentmethod/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/paymentmethod/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/paymentmethod/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "transaction",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/subscription/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/subscription/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/subscription/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/subscription/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "transaction",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/wallet/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/wallet/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "SwaggerKey": "transaction",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/wallet/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/wallet/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "transaction",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/tronwebhook",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/tronwebhook",
+      "UpstreamHttpMethod": [ "POST" ],
+      "SwaggerKey": "transaction"
     }
   ],
   "SwaggerEndPoints": [
@@ -154,6 +602,16 @@
           "Name": "ContentService",
           "Version": "v1",
           "Url": "https://contentservice-959167850798.europe-west4.run.app/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "transaction",
+      "Config": [
+        {
+          "Name": "TransactionCore",
+          "Version": "v1",
+          "Url": "https://transactioncore-959167850798.europe-west4.run.app/swagger/v1/swagger.json"
         }
       ]
     }

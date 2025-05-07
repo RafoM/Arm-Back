@@ -10,5 +10,6 @@ namespace TransactionCore.Services.Interface
         Task<PaymentMethodResponseModel> CreateAsync(PaymentMethodRequestModel request);
         Task UpdateAsync(PaymentMethodUpdateModel request);
         Task DeleteAsync(Guid id);
+        Task<IEnumerable<PaymentMethodResponseModel>> GetAllPaymentMethodsByCryptoIdAsync(Guid cryptoId);
     }
 }

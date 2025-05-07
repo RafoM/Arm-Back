@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ContentService.Models.RequestModels
 {
     public class UploadLanguageFlagRequest
     {
-        [FromForm]
+        [Required]
         public int LanguageId { get; set; }
 
-        [FromForm]
+        [Required]
         public IFormFile FlagFile { get; set; }
     }
 }

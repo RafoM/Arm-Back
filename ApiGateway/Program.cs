@@ -7,10 +7,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-await OcelotConfigGenerator.GenerateOcelotConfigAsync();
-
-//builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-builder.Configuration.AddJsonFile("ocelot.json", optional: true, reloadOnChange: true);
+// builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile("ocelot.Development.json", optional: true, reloadOnChange: true);
 builder.Services.AddControllers();
 var jwtSecret = builder.Configuration["JwtSettings:SecretKey"];
 if (string.IsNullOrEmpty(jwtSecret))

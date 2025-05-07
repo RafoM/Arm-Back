@@ -1,5 +1,7 @@
 ﻿using ContentService.Data.Entity;
 using ContentService.Models.RequestModels;
+using ContentService.Models.ResponseModels;
+using ContentService.Services.Implementation;
 using ContentService.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,27 +16,12 @@ namespace ContentService.Controllers
         {
             _service = service;
         }
-
-        /// <summary>
-        /// Gets all translations for a given page and language.
-        /// </summary>
-        /// <param name="pageId">The ID of the page.</param>
-        /// <param name="languageId">The ID of the language.</param>
-        [HttpGet("by-page")]
-        public async Task<IActionResult> GetByPage([FromQuery] int pageId, [FromQuery] int languageId)
-        {
-            if (pageId <= 0 || languageId <= 0)
-                return BadRequest("Valid pageId and languageId are required.");
-
-            var result = await _service.GetTranslationsByPageAsync(pageId, languageId);
-            return Ok(result);
-        }
         
         /// <summary>
         /// Gets all translations.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<TranslationResponseModel>>> GetAll()
         {
             return Ok(await _service.GetAllAsync());
         }
@@ -43,18 +30,26 @@ namespace ContentService.Controllers
         /// Gets a translation by ID.
         /// </summary>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<TranslationResponseModel>> GetById(int id)
         {
             var result = await _service.GetByIdAsync(id);
             return result == null ? NotFound() : Ok(result);
         }
-
+        /// <summary>
+        /// Get all translations by language ID as a dictionary (Key: Localization.Key, Value: Translation.Value).
+        /// </summary>
+        [HttpGet("by-language/{languageId}")]
+        public async Task<ActionResult<Dictionary<string, string>>> GetTranslationsByLanguageId(int languageId)
+        {
+            var result = await _service.GetTranslationsByLanguageIdAsync(languageId);
+            return Ok(result);
+        }
         /// <summary>
         /// Creates a new translation.
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TranslationRequestModel model)
+        public async Task<ActionResult<TranslationResponseModel>> Create([FromBody] TranslationRequestModel model)
         {
             var result = await _service.CreateAsync(model);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
@@ -65,7 +60,7 @@ namespace ContentService.Controllers
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromBody] TranslationUpdateModel model)
+        public async Task<ActionResult<TranslationResponseModel>> Update([FromBody] TranslationUpdateModel model)
         {
             var result = await _service.UpdateAsync(model);
             return result == null ? NotFound() : Ok(result);

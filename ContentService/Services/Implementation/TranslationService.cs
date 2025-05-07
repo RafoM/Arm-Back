@@ -19,25 +19,6 @@ namespace ContentService.Services.Implementation
             _cache = cache;
         }
 
-        public async Task<Dictionary<string, string>> GetTranslationsByPageAsync(int pageId, int languageId)
-        {
-            var cacheKey = $"translations:page:{pageId}:lang:{languageId}";
-
-            if (_cache.TryGetValue(cacheKey, out Dictionary<string, string> cached))
-                return cached;
-
-            var translations = await _dbContext.Translations
-                .Include(t => t.Localization)
-                .Where(t => t.Localization.PageId == pageId && t.LanguageId == languageId)
-                .ToDictionaryAsync(t => t.Localization.Key, t => t.Value);
-
-            _cache.Set(cacheKey, translations, TimeSpan.FromMinutes(10));
-
-            return translations;
-        }
-
-
-
         public async Task<List<TranslationResponseModel>> GetAllAsync()
         {
             return await _dbContext.Translations
@@ -53,6 +34,17 @@ namespace ContentService.Services.Implementation
                     Value = t.Value
                 })
                 .ToListAsync();
+        }
+
+        public async Task<Dictionary<string, string>> GetTranslationsByLanguageIdAsync(int languageId)
+        {
+            return await _dbContext.Translations
+                .Where(t => t.LanguageId == languageId)
+                .Include(t => t.Localization)
+                .ToDictionaryAsync(
+                    t => t.Localization.Key,
+                    t => t.Value
+                );
         }
 
         public async Task<TranslationResponseModel?> GetByIdAsync(int id)

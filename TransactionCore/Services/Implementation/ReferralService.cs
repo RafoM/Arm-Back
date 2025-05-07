@@ -23,10 +23,15 @@ namespace TransactionCore.Services.Implementation
         {
             var userInfo = await GetCurrentUserInfoAsync(userId);
 
-            var totalReferrals = await _dbContext.UserInfos.CountAsync(u => u.ReferrerId == userInfo.UserId);
-            var potentialEarnings = await _dbContext.ReferralPayments
-                .Where(r => r.ReferrerUserInfoId == userInfo.Id)
-                .SumAsync(r => (decimal?)r.Commission) ?? 0;
+            var totalReferrals = await _dbContext.UserInfos
+                .CountAsync(u => u.ReferrerId == userInfo.UserId);
+
+            var potentialEarnings = await _dbContext.ReferralActivities
+                .Where(a => a.ReferredUserInfo.ReferrerId == userInfo.UserId &&
+                            a.Action == ReferralActionTypeEnum.Purchase &&
+                            a.Commission.HasValue)
+                .SumAsync(a => (decimal?)a.Commission) ?? 0;
+
             var withdrawalsOrdered = await _dbContext.ReferralWithdrawals
                 .Where(w => w.ReferrerUserInfoId == userInfo.Id)
                 .SumAsync(w => (decimal?)w.Amount) ?? 0;
@@ -40,15 +45,30 @@ namespace TransactionCore.Services.Implementation
             };
         }
 
+
         public async Task<ReferralConversionStatsResponseModel> GetReferralConversionStatsAsync(Guid userId)
         {
             var userInfo = await GetCurrentUserInfoAsync(userId);
 
-            var referredUsers = await _dbContext.UserInfos.Where(u => u.ReferrerId == userInfo.UserId).ToListAsync();
+            var referredUsers = await _dbContext.UserInfos
+                .Where(u => u.ReferrerId == userInfo.UserId)
+                .ToListAsync();
             var referredUserIds = referredUsers.Select(u => u.Id).ToList();
 
-            var purchases = await _dbContext.Payments.CountAsync(p => referredUserIds.Contains(p.UserInfoId) && p.Status == PaymentStatusEnum.Paid);
-            var attempts = await _dbContext.Payments.CountAsync(p => referredUserIds.Contains(p.UserInfoId));
+            var activities = await _dbContext.ReferralActivities
+                .Where(a => referredUserIds.Contains(a.ReferredUserInfoId))
+                .ToListAsync();
+
+            var purchases = activities
+                .Count(a => a.Action == ReferralActionTypeEnum.Purchase);
+
+            var attempts = activities
+                .Count(a => a.Action == ReferralActionTypeEnum.PaymentAttempt);
+
+            var totalValue = activities
+                .Where(a => a.Action == ReferralActionTypeEnum.Purchase && a.Commission.HasValue)
+                .Sum(a => a.Commission.Value);
+
             var reward = await _referralRoleReward.GetReferralRewardPercentageAsync(userInfo.Id, userInfo.ReferralPurchaseCount) * 100;
             var currentLevel = new ReferralLevelResponseModel
             {
@@ -56,7 +76,7 @@ namespace TransactionCore.Services.Implementation
                 Percentage = (int)reward
             };
 
-            var nextLevel = new ReferralLevelResponseModel 
+            var nextLevel = new ReferralLevelResponseModel
             {
                 Label = "EarlyAccess",
                 Percentage = 40
@@ -64,9 +84,7 @@ namespace TransactionCore.Services.Implementation
 
             return new ReferralConversionStatsResponseModel
             {
-                TotalReferralValue = await _dbContext.ReferralPayments
-                    .Where(r => r.ReferrerUserInfoId == userInfo.Id)
-                    .SumAsync(r => (decimal?)r.Commission) ?? 0,
+                TotalReferralValue = totalValue,
                 Visitors = userInfo.Visits,
                 Registered = referredUsers.Count,
                 Purchased = purchases,
@@ -74,6 +92,7 @@ namespace TransactionCore.Services.Implementation
                 NextLevel = nextLevel
             };
         }
+
 
         public async Task<List<TimedStatResponseModel>> GetRegistrationsAsync(Guid userId, int range)
         {
@@ -123,72 +142,128 @@ namespace TransactionCore.Services.Implementation
             return result;
         }
 
-        public async Task<List<ReferralActivityResponseModel>> GetReferralActivityAsync(Guid userId)
+        public async Task<PageResultModel<ReferralActivityResponseModel>> GetReferralActivityAsync(
+     Guid userId, int pageNumber = 1, int pageSize = 10)
         {
             var userInfo = await GetCurrentUserInfoAsync(userId);
 
-            var activities = await _dbContext.ReferralActivities
+            var query = _dbContext.ReferralActivities
+                .Include(a => a.ReferredUserInfo)
                 .Include(a => a.Payment).ThenInclude(p => p.SubscriptionPackage)
                 .Where(a => a.ReferredUserInfo.ReferrerId == userInfo.UserId)
-                .OrderByDescending(a => a.ActionDate)
+                .OrderByDescending(a => a.ActionDate);
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return activities.Select(a => new ReferralActivityResponseModel
+            var data = items.Select(a => new ReferralActivityResponseModel
             {
                 ReferredUser = a.ReferredUserInfo.UserId.ToString(),
                 Commission = a.Commission,
                 Action = a.Action.ToString() + (a.Payment?.SubscriptionPackage?.Name != null ? $" – {a.Payment.SubscriptionPackage.Name}" : string.Empty),
                 ActionDate = a.ActionDate
-            }).ToList();
-        }
+            });
 
-        public async Task<List<ReferralPaymentResponseModel>> GetReferralPaymentsAsync(Guid userId)
-        {
-            var userInfo = await GetCurrentUserInfoAsync(userId);
-
-            var payments = await _dbContext.ReferralPayments
-                .Include(r => r.Payment).ThenInclude(p => p.SubscriptionPackage)
-                .Include(r => r.Payment).ThenInclude(p => p.Wallet)
-                .Where(r => r.ReferrerUserInfoId == userInfo.Id)
-                .OrderByDescending(r => r.CreatedAt)
-                .ToListAsync();
-
-            return payments.Select(r => new ReferralPaymentResponseModel
+            return new PageResultModel<ReferralActivityResponseModel>
             {
-                User = r.Payment.UserInfo.DenormalizedEmail,
-                Amount = r.Payment.ExpectedFee,
-                Currency = r.Payment.Wallet?.PaymentMethod?.Crypto?.Name ?? "USDT",
-                Network = r.Payment.Wallet?.PaymentMethod?.Network?.Name ?? "TRON",
-                Plan = r.Payment.SubscriptionPackage?.Name ?? "-",
-                Status = r.Payment.Status.ToString(),
-                CreatedAt = r.Payment.CreatedDate,
-                PaidAt = r.Payment.PaymentDate,
-                TxHash = r.Payment.Wallet?.LastTransactionId
-            }).ToList();
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                TotalCount = totalCount,
+                Data = data.ToList()
+            };
         }
 
-        public async Task<List<ReferralWithdrawalResponseModel>> GetReferralWithdrawalsAsync(Guid userId)
+        public async Task<PageResultModel<ReferralPaymentResponseModel>> GetReferralPaymentsAsync(
+     Guid userId, int pageNumber = 1, int pageSize = 10)
         {
             var userInfo = await GetCurrentUserInfoAsync(userId);
 
-            var withdrawals = await _dbContext.ReferralWithdrawals
-                .Where(w => w.ReferrerUserInfoId == userInfo.Id)
-                .OrderByDescending(w => w.CreatedAt)
+            var query = _dbContext.ReferralActivities
+                .Include(a => a.Payment).ThenInclude(p => p.SubscriptionPackage)
+                .Include(a => a.Payment).ThenInclude(p => p.Wallet).ThenInclude(w => w.PaymentMethod).ThenInclude(pm => pm.Crypto)
+                .Include(a => a.Payment).ThenInclude(p => p.Wallet).ThenInclude(w => w.PaymentMethod).ThenInclude(pm => pm.Network)
+                .Include(a => a.Payment).ThenInclude(p => p.UserInfo)
+                .Where(a => a.Action == ReferralActionTypeEnum.Purchase &&
+                            a.Payment != null &&
+                            a.Payment.UserInfo.ReferrerId == userInfo.UserId)
+                .OrderByDescending(a => a.ActionDate);
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var data = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(r => new ReferralPaymentResponseModel
+                {
+                    Email = r.Payment.UserInfo.DenormalizedEmail,
+                    Amount = r.Payment.ExpectedFee,
+                    Currency = r.Payment.Wallet.PaymentMethod.Crypto.Name ?? "USDT",
+                    Network = r.Payment.Wallet.PaymentMethod.Network.Name ?? "TRON",
+                    Plan = r.Payment.SubscriptionPackage.Name ?? "-",
+                    Status = r.Payment.Status.ToString(),
+                    CreatedAt = r.Payment.CreatedDate,
+                    PaidAt = r.Payment.PaymentDate
+                })
                 .ToListAsync();
 
-            return withdrawals.Select(w => new ReferralWithdrawalResponseModel
+            return new PageResultModel<ReferralPaymentResponseModel>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                TotalCount = totalCount,
+                Data = data
+            };
+        }
+
+
+        public async Task<PageResultModel<ReferralWithdrawalResponseModel>> GetReferralWithdrawalsAsync(
+    Guid userId, int pageNumber = 1, int pageSize = 10)
+        {
+            var userInfo = await GetCurrentUserInfoAsync(userId);
+
+            var query = _dbContext.ReferralWithdrawals
+                .Where(w => w.ReferrerUserInfoId == userInfo.Id)
+                .OrderByDescending(w => w.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var data = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var mapped = data.Select(w => new ReferralWithdrawalResponseModel
             {
                 User = userInfo.DenormalizedEmail,
                 Amount = w.Amount,
                 Currency = w.Currency,
                 Network = w.Network,
                 ToAddress = w.ToAddress,
-                Status =  w.Status.ToString(),
+                Status = w.Status.ToString(),
                 CreatedAt = w.CreatedAt,
                 ProcessedAt = w.ProcessedAt,
                 TxHash = w.TxHash
-            }).ToList();
+            });
+
+            return new PageResultModel<ReferralWithdrawalResponseModel>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                TotalCount = totalCount,
+                Data = mapped.ToList()
+            };
         }
+
 
         public async Task CreateReferralWithdrawalAsync(Guid userId, ReferralWithdrawalRequestModel request)
         {
@@ -214,31 +289,6 @@ namespace TransactionCore.Services.Implementation
         {
             return await _dbContext.UserInfos.FirstOrDefaultAsync(u => u.UserId == userId)
                 ?? throw new Exception("User info not found.");
-        }
-
-
-        public async Task CreateReferralPaymentAsync(Guid paymentId, decimal commission)
-        {
-            var payment = await _dbContext.Payments
-                .Include(p => p.UserInfo)
-                .FirstOrDefaultAsync(p => p.Id == paymentId);
-
-            if (payment == null)
-                throw new Exception("Payment not found.");
-
-            if (payment.UserInfo?.ReferrerId == null)
-                return; 
-
-            var referralPayment = new ReferralPayment
-            {
-                PaymentId = paymentId,
-                ReferrerUserInfoId = payment.UserInfo.ReferrerId.Value,
-                Commission = commission,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _dbContext.ReferralPayments.Add(referralPayment);
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task CreateReferralActivityAsync(Guid referredUserInfoId, ReferralActionTypeEnum action, Guid? paymentId = null, decimal? commission = null)
