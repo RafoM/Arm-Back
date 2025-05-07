@@ -19,7 +19,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SWAGGER_SOURCE_IDENTITY": "https://localhost:44350/swagger/v1/swagger.json",
         "SWAGGER_SOURCE_CONTENT": "https://localhost:44369/swagger/v1/swagger.json",
-        "SWAGGER_SOURCE_TRANSACTION": "http://localhost:5136/swagger/v1/swagger.json"
+        "SWAGGER_SOURCE_TRANSACTION": "https://localhost:44351/swagger/v1/swagger.json"
       }
     }
   }

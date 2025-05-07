@@ -9,49 +9,56 @@ namespace ApiGateway
         public static async Task GenerateOcelotConfigAsync()
         {
             var swaggerUrls = Environment.GetEnvironmentVariables()
-                              .Cast<DictionaryEntry>()
-                              .Where(e => e.Key is string key && key.StartsWith("SWAGGER_SOURCE_"))
-                              .ToDictionary(
-                                  e => ((string)e.Key).Replace("SWAGGER_SOURCE_", "").ToLowerInvariant(),
-                                  e => e.Value?.ToString() ?? string.Empty
-                              );
-            if (swaggerUrls.Count == 0)
-            {
-                throw new Exception("swagger urls is null");
-            }
-            var routes = new JArray();
+                .Cast<DictionaryEntry>()
+                .Where(e => e.Key is string key && key.StartsWith("SWAGGER_SOURCE_"))
+                .ToDictionary(
+                    e => ((string)e.Key).Replace("SWAGGER_SOURCE_", "").ToLowerInvariant(),
+                    e => e.Value?.ToString() ?? string.Empty
+                );
+
+            if (!swaggerUrls.Any())
+                throw new Exception("No Swagger source URLs found in environment variables.");
+
+            var routesMap = new Dictionary<string, JObject>();
             var swaggerEndpoints = new JArray();
 
             foreach (var (key, swaggerUrl) in swaggerUrls)
             {
-                using var client = new HttpClient();
-                var swaggerJson = await client.GetStringAsync(swaggerUrl);
+                var swaggerJson = await new HttpClient().GetStringAsync(swaggerUrl);
                 var swagger = JObject.Parse(swaggerJson);
-                var paths = swagger["paths"];
+                var paths = swagger["paths"] as JObject;
 
-                foreach (var pathItem in paths!.Children<JProperty>())
+                if (paths == null)
+                    continue;
+
+                foreach (var pathItem in paths.Properties())
                 {
                     var path = pathItem.Name;
-                    foreach (var method in pathItem.Value.Children<JProperty>())
+                    var upstreamPath = $"/{key}{path}";
+                    var downstreamPath = path.StartsWith("/api") ? path : $"/api{path}";
+                    var routeKey = $"{key}:{path}";
+
+                    if (!routesMap.TryGetValue(routeKey, out var route))
                     {
-                        var route = new JObject
+                        route = new JObject
                         {
-                            ["DownstreamPathTemplate"] = $"/api{path}",
+                            ["DownstreamPathTemplate"] = downstreamPath,
                             ["DownstreamScheme"] = "https",
                             ["DownstreamHostAndPorts"] = new JArray
-                    {
-                        new JObject
-                        {
-                            ["Host"] = new Uri(swaggerUrl).Host,
-                            ["Port"] = 443
-                        }
-                    },
-                            ["UpstreamPathTemplate"] = $"/{key}{path}",
-                            ["UpstreamHttpMethod"] = new JArray(method.Name.ToUpperInvariant()),
+                            {
+                                new JObject
+                                {
+                                    ["Host"] = new Uri(swaggerUrl).Host,
+                                    ["Port"] = 443
+                                }
+                            },
+                            ["UpstreamPathTemplate"] = upstreamPath,
+                            ["UpstreamHttpMethod"] = new JArray(),
                             ["SwaggerKey"] = key
                         };
 
-                        if (path.Contains("/admin") || path.Contains("/role"))
+                        // Secure route based on path
+                        if (path.Contains("/admin", StringComparison.OrdinalIgnoreCase) || path.Contains("/role", StringComparison.OrdinalIgnoreCase))
                         {
                             route["AuthenticationOptions"] = new JObject
                             {
@@ -64,7 +71,15 @@ namespace ApiGateway
                             };
                         }
 
-                        routes.Add(route);
+                        routesMap[routeKey] = route;
+                    }
+
+                    var httpMethods = (JArray)route["UpstreamHttpMethod"];
+                    foreach (var method in pathItem.Value.Children<JProperty>())
+                    {
+                        var httpMethod = method.Name.ToUpperInvariant();
+                        if (!httpMethods.Contains(httpMethod))
+                            httpMethods.Add(httpMethod);
                     }
                 }
 
@@ -72,31 +87,30 @@ namespace ApiGateway
                 {
                     ["Key"] = key,
                     ["Config"] = new JArray
-            {
-                new JObject
-                {
-                    ["Name"] = $"{char.ToUpper(key[0]) + key[1..]}Service",
-                    ["Version"] = "v1",
-                    ["Url"] = swaggerUrl
-                }
-            }
+                    {
+                        new JObject
+                        {
+                            ["Name"] = $"{char.ToUpper(key[0]) + key[1..]}Service",
+                            ["Version"] = "v1",
+                            ["Url"] = swaggerUrl
+                        }
+                    }
                 });
             }
 
-            var baseUrl = Environment.GetEnvironmentVariable("API_GATEWAY_URL") ?? "https://apigateway.local";
-
             var config = new JObject
             {
-                ["Routes"] = routes,
+                ["Routes"] = new JArray(routesMap.Values),
                 ["SwaggerEndPoints"] = swaggerEndpoints,
                 ["GlobalConfiguration"] = new JObject
                 {
-                    ["BaseUrl"] = baseUrl
+                    ["BaseUrl"] = Environment.GetEnvironmentVariable("API_GATEWAY_URL") ?? "https://apigateway.local"
                 }
             };
 
-            File.WriteAllText("ocelot.Development.json", JsonConvert.SerializeObject(config, Formatting.Indented));
-            Console.WriteLine("✅ ocelot.json generated.");
+            var outputPath = "ocelot.Development.json";
+            File.WriteAllText(outputPath, JsonConvert.SerializeObject(config, Formatting.Indented));
+            Console.WriteLine($"{outputPath} generated successfully.");
         }
     }
 }
