@@ -1,587 +1,1721 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/auth/{everything}",
+      "DownstreamPathTemplate": "/api/api/Admin/dashboard",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "identityservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/auth/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamPathTemplate": "/identity/api/Admin/dashboard",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
       "SwaggerKey": "identity"
     },
     {
-      "DownstreamPathTemplate": "/api/user/{everything}",
+      "DownstreamPathTemplate": "/api/api/Auth/register",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "identityservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/user/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamPathTemplate": "/identity/api/Auth/register",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Auth/login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Auth/login",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Auth/google-login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Auth/google-login",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Auth/google-register",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Auth/google-register",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Auth/refresh-token",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Auth/refresh-token",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Auth/logout",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Auth/logout",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Auth/forgot-password",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Auth/forgot-password",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Auth/reset-password/{token}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Auth/reset-password/{token}",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/configuration",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/configuration",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/configuration",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/configuration",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/outputcache/{region}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/outputcache/{region}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Role",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Role",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Role",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Role",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Role",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Role",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Role/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Role/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Role/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/Role/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/User/info",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/User/info",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/User",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/User",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/User",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/User",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/User/role",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/identity/api/User/role",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
       "SwaggerKey": "identity",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/role/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "identityservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/role/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "identity",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
       },
       "RouteClaimsRequirement": {
         "role": "Admin"
       }
     },
     {
-      "DownstreamPathTemplate": "/api/admin/{everything}",
+      "DownstreamPathTemplate": "/api/api/User/profile-image",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "identityservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/admin/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "identity",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
+      "UpstreamPathTemplate": "/identity/api/User/profile-image",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
     },
     {
-      "DownstreamPathTemplate": "/configuration",
+      "DownstreamPathTemplate": "/api/api/User/send-verification-email",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "identityservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/configuration",
-      "UpstreamHttpMethod": [ "GET", "POST" ],
-      "SwaggerKey": "identity",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
+      "UpstreamPathTemplate": "/identity/api/User/send-verification-email",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
     },
     {
-      "DownstreamPathTemplate": "/outputcache/{region}",
+      "DownstreamPathTemplate": "/api/api/User/change-password",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "identityservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/outputcache/{region}",
-      "UpstreamHttpMethod": [ "DELETE" ],
-      "SwaggerKey": "identity",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
+      "UpstreamPathTemplate": "/identity/api/User/change-password",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
     },
     {
-      "DownstreamPathTemplate": "/api/translations/{everything}",
+      "DownstreamPathTemplate": "/api/api/User/verify",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/translations/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "content"
+      "UpstreamPathTemplate": "/identity/api/User/verify",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "identity"
     },
     {
-      "DownstreamPathTemplate": "/api/translations/{everything}",
+      "DownstreamPathTemplate": "/api/api/User/is-email-verified",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/translations/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
+      "UpstreamPathTemplate": "/identity/api/User/is-email-verified",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "identity"
     },
     {
-      "DownstreamPathTemplate": "/api/languages/{everything}",
+      "DownstreamPathTemplate": "/api/api/Visit",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/languages/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "content"
+      "UpstreamPathTemplate": "/identity/api/Visit",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "identity"
     },
     {
-      "DownstreamPathTemplate": "/api/languages/{everything}",
+      "DownstreamPathTemplate": "/api/api/Crypto",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/languages/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/blogs/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
+      "UpstreamPathTemplate": "/transaction/api/Crypto",
+      "UpstreamHttpMethod": [
+        "GET"
       ],
-      "UpstreamPathTemplate": "/blogs/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "content"
-    },
-    {
-      "DownstreamPathTemplate": "/api/blogs/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/blogs/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/blogtags/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/blogtags/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "content"
-    },
-    {
-      "DownstreamPathTemplate": "/api/blogtags/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/blogtags/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/cases/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/cases/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "content"
-    },
-    {
-      "DownstreamPathTemplate": "/api/cases/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/cases/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/casetags/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/casetags/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "content"
-    },
-    {
-      "DownstreamPathTemplate": "/api/casetags/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/casetags/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/localization/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/localization/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "content"
-    },
-    {
-      "DownstreamPathTemplate": "/api/localization/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/localization/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/page/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/page/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "content"
-    },
-    {
-      "DownstreamPathTemplate": "/api/page/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/page/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/configuration",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/content-configuration",
-      "UpstreamHttpMethod": [ "GET", "POST" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/outputcache/{region}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "contentservice-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/content-outputcache/{region}",
-      "UpstreamHttpMethod": [ "DELETE" ],
-      "SwaggerKey": "content",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/crypto/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/crypto/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
       "SwaggerKey": "transaction"
     },
     {
-      "DownstreamPathTemplate": "/api/crypto/{everything}",
+      "DownstreamPathTemplate": "/api/api/Crypto",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/crypto/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "transaction",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/network/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
+      "UpstreamPathTemplate": "/transaction/api/Crypto",
+      "UpstreamHttpMethod": [
+        "POST"
       ],
-      "UpstreamPathTemplate": "/network/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
       "SwaggerKey": "transaction"
     },
     {
-      "DownstreamPathTemplate": "/api/network/{everything}",
+      "DownstreamPathTemplate": "/api/api/Crypto",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/network/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "transaction",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/paymentmethod/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
+      "UpstreamPathTemplate": "/transaction/api/Crypto",
+      "UpstreamHttpMethod": [
+        "PUT"
       ],
-      "UpstreamPathTemplate": "/paymentmethod/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
       "SwaggerKey": "transaction"
     },
     {
-      "DownstreamPathTemplate": "/api/paymentmethod/{everything}",
+      "DownstreamPathTemplate": "/api/api/Crypto/{id}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/paymentmethod/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "transaction",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/subscription/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
+      "UpstreamPathTemplate": "/transaction/api/Crypto/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
       ],
-      "UpstreamPathTemplate": "/subscription/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
       "SwaggerKey": "transaction"
     },
     {
-      "DownstreamPathTemplate": "/api/subscription/{everything}",
+      "DownstreamPathTemplate": "/api/api/Crypto/{id}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
+          "Host": "localhost",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/subscription/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "transaction",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/wallet/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
+      "UpstreamPathTemplate": "/transaction/api/Crypto/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
       ],
-      "UpstreamPathTemplate": "/wallet/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "SwaggerKey": "transaction",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/wallet/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/wallet/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "transaction",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "Admin"
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/tronwebhook",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "transactioncore-959167850798.europe-west4.run.app",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/tronwebhook",
-      "UpstreamHttpMethod": [ "POST" ],
       "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Network",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Network",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Network",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Network",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Network",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Network",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Network/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Network/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Network/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Network/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/PaymentMethod",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/PaymentMethod",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/PaymentMethod",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/PaymentMethod",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/PaymentMethod",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/PaymentMethod",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/PaymentMethod/by-crypto/{cryptoId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/PaymentMethod/by-crypto/{cryptoId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/PaymentMethod/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/PaymentMethod/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/PaymentMethod/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/PaymentMethod/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Payments/all",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Payments/all",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Referral/summary",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Referral/summary",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Referral/conversion-stats",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Referral/conversion-stats",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Referral/registrations",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Referral/registrations",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Referral/purchases",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Referral/purchases",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Referral/activity",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Referral/activity",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Referral/payments",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Referral/payments",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Referral/withdrawals",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Referral/withdrawals",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Referral/withdrawals",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Referral/withdrawals",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Subscription",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Subscription",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Subscription",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Subscription",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Subscription",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Subscription",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Subscription/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Subscription/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Subscription/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Subscription/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/TronWebhook",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/TronWebhook",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Wallet",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Wallet",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Wallet",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Wallet",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Wallet",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Wallet",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Wallet/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Wallet/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Wallet/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Wallet/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Blogs",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Blogs",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Blogs",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Blogs",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Blogs",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Blogs",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Blogs/{blogId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Blogs/{blogId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Blogs/{blogId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Blogs/{blogId}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/BlogTags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/BlogTags",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/BlogTags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/BlogTags",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/BlogTags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/BlogTags",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/BlogTags/{tagId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/BlogTags/{tagId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/BlogTags/{tagId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/BlogTags/{tagId}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Cases",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Cases",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Cases",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Cases",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Cases",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Cases",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Cases/{CaseId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Cases/{CaseId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Cases/{CaseId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Cases/{CaseId}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/CaseTags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/CaseTags",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/CaseTags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/CaseTags",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/CaseTags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/CaseTags",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/CaseTags/{tagId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/CaseTags/{tagId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/CaseTags/{tagId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/CaseTags/{tagId}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/configuration",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/configuration",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/configuration",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/configuration",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Language",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Language",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Language",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Language",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Language",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Language",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Language/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Language/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Language/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Language/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Language/flag",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Language/flag",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Lessons",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Lessons",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Lessons",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Lessons",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Lessons",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Lessons",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Lessons/{lessonNumber}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Lessons/{lessonNumber}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Lessons/{lessonNumber}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Lessons/{lessonNumber}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Lessons/upload-media",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Lessons/upload-media",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Localization",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Localization",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Localization",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Localization",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Localization",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Localization",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Localization/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Localization/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Localization/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Localization/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/outputcache/{region}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/outputcache/{region}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Translation",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Translation",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Translation",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Translation",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Translation/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Translation/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Translation/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Translation/{id}",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Translation/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Translation/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Translation/by-language/{languageId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Translation/by-language/{languageId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Tutorials",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Tutorials",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Tutorials",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Tutorials",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Tutorials",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Tutorials",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Tutorials/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Tutorials/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/api/Tutorials/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Tutorials/{id}",
+      "UpstreamHttpMethod": [
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
     }
   ],
   "SwaggerEndPoints": [
@@ -591,7 +1725,17 @@
         {
           "Name": "IdentityService",
           "Version": "v1",
-          "Url": "https://identityservice-959167850798.europe-west4.run.app/swagger/v1/swagger.json"
+          "Url": "https://localhost:44350/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "transaction",
+      "Config": [
+        {
+          "Name": "TransactionService",
+          "Version": "v1",
+          "Url": "http://localhost:5136/swagger/v1/swagger.json"
         }
       ]
     },
@@ -601,22 +1745,12 @@
         {
           "Name": "ContentService",
           "Version": "v1",
-          "Url": "https://contentservice-959167850798.europe-west4.run.app/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "transaction",
-      "Config": [
-        {
-          "Name": "TransactionCore",
-          "Version": "v1",
-          "Url": "https://transactioncore-959167850798.europe-west4.run.app/swagger/v1/swagger.json"
+          "Url": "https://localhost:44369/swagger/v1/swagger.json"
         }
       ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "https://apigateway-959167850798.europe-west4.run.app"
+    "BaseUrl": "https://apigateway.local"
   }
 }

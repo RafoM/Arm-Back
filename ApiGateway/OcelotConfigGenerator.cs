@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 
 namespace ApiGateway
@@ -9,10 +9,16 @@ namespace ApiGateway
         public static async Task GenerateOcelotConfigAsync()
         {
             var swaggerUrls = Environment.GetEnvironmentVariables()
-                .Cast<DictionaryEntry>()
-                .Where(e => e.Key is string key && key.StartsWith("SWAGGER_URL_"))
-                .ToDictionary(e => ((string)e.Key).Replace("SWAGGER_URL_", "").ToLower(), e => e.Value!.ToString()!);
-
+                              .Cast<DictionaryEntry>()
+                              .Where(e => e.Key is string key && key.StartsWith("SWAGGER_SOURCE_"))
+                              .ToDictionary(
+                                  e => ((string)e.Key).Replace("SWAGGER_SOURCE_", "").ToLowerInvariant(),
+                                  e => e.Value?.ToString() ?? string.Empty
+                              );
+            if (swaggerUrls.Count == 0)
+            {
+                throw new Exception("swagger urls is null");
+            }
             var routes = new JArray();
             var swaggerEndpoints = new JArray();
 
@@ -89,7 +95,7 @@ namespace ApiGateway
                 }
             };
 
-            File.WriteAllText("ocelot.json", JsonConvert.SerializeObject(config, Formatting.Indented));
+            File.WriteAllText("ocelot.Development.json", JsonConvert.SerializeObject(config, Formatting.Indented));
             Console.WriteLine("✅ ocelot.json generated.");
         }
     }
