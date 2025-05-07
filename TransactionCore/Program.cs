@@ -90,7 +90,11 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Transaction Core API",
+        Version = "v1"
+    });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {

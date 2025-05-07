@@ -16,6 +16,11 @@
         "Path": "TransactionCore\\TransactionCore.csproj",
         "Action": "Start",
         "DebugTarget": "IIS Express"
+      },
+      {
+        "Path": "ApiGateway\\ApiGateway.csproj",
+        "Action": "Start",
+        "DebugTarget": "IIS Express"
       }
     ]
   }

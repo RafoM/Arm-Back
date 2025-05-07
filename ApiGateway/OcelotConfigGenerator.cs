@@ -21,13 +21,37 @@ namespace ApiGateway
 
             var routesMap = new Dictionary<string, JObject>();
             var swaggerEndpoints = new JArray();
+            var httpClient = new HttpClient();
 
             foreach (var (key, swaggerUrl) in swaggerUrls)
             {
-                var swaggerJson = await new HttpClient().GetStringAsync(swaggerUrl);
-                var swagger = JObject.Parse(swaggerJson);
-                var paths = swagger["paths"] as JObject;
+                string swaggerJson;
+                try
+                {
+                    swaggerJson = await httpClient.GetStringAsync(swaggerUrl);
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"⚠️ Failed to fetch Swagger from {swaggerUrl}: {ex.Message}");
+                    Console.ResetColor();
+                    continue;
+                }
 
+                JObject swagger;
+                try
+                {
+                    swagger = JObject.Parse(swaggerJson);
+                }
+                catch (JsonException ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"Failed to parse Swagger JSON from {swaggerUrl}: {ex.Message}");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                var paths = swagger["paths"] as JObject;
                 if (paths == null)
                     continue;
 
@@ -57,7 +81,6 @@ namespace ApiGateway
                             ["SwaggerKey"] = key
                         };
 
-                        // Secure route based on path
                         if (path.Contains("/admin", StringComparison.OrdinalIgnoreCase) || path.Contains("/role", StringComparison.OrdinalIgnoreCase))
                         {
                             route["AuthenticationOptions"] = new JObject
@@ -98,19 +121,23 @@ namespace ApiGateway
                 });
             }
 
+            var baseUrl = Environment.GetEnvironmentVariable("API_GATEWAY_URL") ?? "https://apigateway.local";
+
             var config = new JObject
             {
                 ["Routes"] = new JArray(routesMap.Values),
                 ["SwaggerEndPoints"] = swaggerEndpoints,
                 ["GlobalConfiguration"] = new JObject
                 {
-                    ["BaseUrl"] = Environment.GetEnvironmentVariable("API_GATEWAY_URL") ?? "https://apigateway.local"
+                    ["BaseUrl"] = baseUrl
                 }
             };
 
-            var outputPath = "ocelot.Development.json";
+            const string outputPath = "ocelot.json";
             File.WriteAllText(outputPath, JsonConvert.SerializeObject(config, Formatting.Indented));
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"{outputPath} generated successfully.");
+            Console.ResetColor();
         }
     }
 }
