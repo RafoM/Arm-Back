@@ -57,3 +57,4 @@ namespace TransactionCore.Services.Implementation
             //await _storageClient.DeleteObjectAsync(_bucketName, objectKey);
         }
     }
+}

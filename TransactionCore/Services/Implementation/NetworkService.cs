@@ -95,7 +95,7 @@ namespace TransactionCore.Services.Implementation
             var iconUrl = await _fileStorageService.UploadFileAsync(iconFile, "network-icons");
 
             network.IconUrl = iconUrl;
-            _dbContext.Cryptos.Update(network);
+            _dbContext.Networks.Update(network);
             await _dbContext.SaveChangesAsync();
 
             return iconUrl;
