@@ -16,7 +16,8 @@ namespace TransactionCore.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IconUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,7 +29,8 @@ namespace TransactionCore.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IconUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -244,7 +246,9 @@ namespace TransactionCore.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     PromoId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ExpectedFee = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    PayedFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     SubscriptionPackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TxHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -265,27 +269,6 @@ namespace TransactionCore.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Payments_Wallets_WalletId",
-                        column: x => x.WalletId,
-                        principalTable: "Wallets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReferralRewardInfos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    UserInfoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReferrerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Reward = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
-                    WalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReferralRewardInfos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ReferralRewardInfos_Wallets_WalletId",
                         column: x => x.WalletId,
                         principalTable: "Wallets",
                         principalColumn: "Id",
@@ -340,33 +323,6 @@ namespace TransactionCore.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "ReferralPayments",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReferrerUserInfoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Commission = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReferralPayments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ReferralPayments_Payments_PaymentId",
-                        column: x => x.PaymentId,
-                        principalTable: "Payments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ReferralPayments_UserInfos_ReferrerUserInfoId",
-                        column: x => x.ReferrerUserInfoId,
-                        principalTable: "UserInfos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_PaymentMethods_CryptoId",
                 table: "PaymentMethods",
@@ -414,21 +370,6 @@ namespace TransactionCore.Migrations
                 column: "ReferredUserInfoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReferralPayments_PaymentId",
-                table: "ReferralPayments",
-                column: "PaymentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReferralPayments_ReferrerUserInfoId",
-                table: "ReferralPayments",
-                column: "ReferrerUserInfoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReferralRewardInfos_WalletId",
-                table: "ReferralRewardInfos",
-                column: "WalletId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ReferralWithdrawals_ReferrerUserInfoId",
                 table: "ReferralWithdrawals",
                 column: "ReferrerUserInfoId");
@@ -462,12 +403,6 @@ namespace TransactionCore.Migrations
 
             migrationBuilder.DropTable(
                 name: "ReferralActivities");
-
-            migrationBuilder.DropTable(
-                name: "ReferralPayments");
-
-            migrationBuilder.DropTable(
-                name: "ReferralRewardInfos");
 
             migrationBuilder.DropTable(
                 name: "ReferralRoleRewardConfigs");

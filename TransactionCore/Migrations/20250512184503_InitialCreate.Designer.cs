@@ -12,7 +12,7 @@ using TransactionCore.Data;
 namespace TransactionCore.Migrations
 {
     [DbContext(typeof(TransactionCoreDbContext))]
-    [Migration("20250502004033_InitialCreate")]
+    [Migration("20250512184503_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -32,6 +32,10 @@ namespace TransactionCore.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
+                    b.Property<string>("IconUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -47,6 +51,10 @@ namespace TransactionCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
+
+                    b.Property<string>("IconUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -71,6 +79,9 @@ namespace TransactionCore.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<decimal?>("PayedFee")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
 
@@ -82,6 +93,10 @@ namespace TransactionCore.Migrations
 
                     b.Property<Guid>("SubscriptionPackageId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TxHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserInfoId")
                         .HasColumnType("uniqueidentifier");
@@ -225,61 +240,6 @@ namespace TransactionCore.Migrations
                     b.HasIndex("ReferredUserInfoId");
 
                     b.ToTable("ReferralActivities");
-                });
-
-            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralPayment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<decimal>("Commission")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ReferrerUserInfoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PaymentId");
-
-                    b.HasIndex("ReferrerUserInfoId");
-
-                    b.ToTable("ReferralPayments");
-                });
-
-            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralRewardInfo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<Guid>("ReferrerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Reward")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<Guid>("UserInfoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("WalletId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WalletId");
-
-                    b.ToTable("ReferralRewardInfos");
                 });
 
             modelBuilder.Entity("TransactionCore.Data.Entity.ReferralRoleRewardConfig", b =>
@@ -601,36 +561,6 @@ namespace TransactionCore.Migrations
                     b.Navigation("Payment");
 
                     b.Navigation("ReferredUserInfo");
-                });
-
-            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralPayment", b =>
-                {
-                    b.HasOne("TransactionCore.Data.Entity.Payment", "Payment")
-                        .WithMany()
-                        .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TransactionCore.Data.Entity.UserInfo", "ReferrerUserInfo")
-                        .WithMany()
-                        .HasForeignKey("ReferrerUserInfoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Payment");
-
-                    b.Navigation("ReferrerUserInfo");
-                });
-
-            modelBuilder.Entity("TransactionCore.Data.Entity.ReferralRewardInfo", b =>
-                {
-                    b.HasOne("TransactionCore.Data.Entity.Wallet", "Wallet")
-                        .WithMany()
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("TransactionCore.Data.Entity.ReferralWithdrawal", b =>
