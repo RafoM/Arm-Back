@@ -11,5 +11,6 @@ namespace ContentService.Services.Interface
         Task<BlogResponseModel> GetByIdAsync(int blogId);
         Task<IEnumerable<BlogResponseModel>> GetAllAsync();
         Task DeleteAsync(int blogId);
+        Task<string> UploadBlogMediaAsync(IFormFile mediaFile);
     }
 }

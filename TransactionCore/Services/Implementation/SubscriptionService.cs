@@ -34,7 +34,8 @@ namespace TransactionCore.Services.Implementation
                 Duration = p.Duration,
                 Price = p.Price,
                 Discount = p.Discount,
-                Currency = p.Currency
+                Currency = p.Currency,
+                FinalPrice = (decimal)(p.Price * (decimal)p.Discount / 100)
             });
         }
 
@@ -51,7 +52,8 @@ namespace TransactionCore.Services.Implementation
                 Duration = p.Duration,
                 Price = p.Price,
                 Discount = p.Discount,
-                Currency = p.Currency
+                Currency = p.Currency,
+                FinalPrice = (decimal)(p.Price * (decimal)p.Discount / 100)
             };
         }
 

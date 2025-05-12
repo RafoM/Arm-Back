@@ -5,10 +5,11 @@ namespace TransactionCore.Services.Interface
 {
     public interface INetworkService
     {
-        Task<IEnumerable<NetworkUpdateModel>> GetAllAsync();
-        Task<NetworkUpdateModel> GetByIdAsync(Guid id);
-        Task<NetworkUpdateModel> CreateAsync(NetworkRequestModel request);
-        Task UpdateAsync(NetworkResponseModel request);
+        Task<IEnumerable<NetworkResponseModel>> GetAllAsync();
+        Task<NetworkResponseModel> GetByIdAsync(Guid id);
+        Task<NetworkResponseModel> CreateAsync(NetworkRequestModel request);
+        Task UpdateAsync(NetworkUpdateModel request);
         Task DeleteAsync(Guid id);
+        Task<string> UploadIconAsync(int networkId, IFormFile iconFile);
     }
 }

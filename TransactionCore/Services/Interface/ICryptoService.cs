@@ -10,5 +10,6 @@ namespace TransactionCore.Services.Interface
         Task<CryptoResponseModel> CreateAsync(CryptoRequestModel request);
         Task UpdateAsync(CryptoUpdateModel request);
         Task DeleteAsync(Guid id);
+        Task<string> UploadIconAsync(int cryptoId, IFormFile iconFile);
     }
 }

@@ -10,10 +10,12 @@ namespace TransactionCore.Services.Implementation
     public class CryptoService : ICryptoService
     {
         private readonly TransactionCoreDbContext _dbContext;
+        private readonly IFileStorageService _fileStorageService;
 
-        public CryptoService(TransactionCoreDbContext dbContext)
+        public CryptoService(TransactionCoreDbContext dbContext, IFileStorageService fileStorageService)
         {
             _dbContext = dbContext;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<IEnumerable<CryptoResponseModel>> GetAllAsync()
@@ -22,7 +24,8 @@ namespace TransactionCore.Services.Implementation
             return cryptos.Select(c => new CryptoResponseModel
             {
                 Id = c.Id,
-                Name = c.Name
+                Name = c.Name,
+                IconUrl = c.IconUrl
             });
         }
 
@@ -35,7 +38,8 @@ namespace TransactionCore.Services.Implementation
             return new CryptoResponseModel
             {
                 Id = crypto.Id,
-                Name = crypto.Name
+                Name = crypto.Name,
+                IconUrl = crypto.IconUrl
             };
         }
 
@@ -43,7 +47,8 @@ namespace TransactionCore.Services.Implementation
         {
             var crypto = new Crypto
             {
-                Name = request.Name
+                Name = request.Name,
+                IconUrl = request.IconUrl
             };
 
             _dbContext.Cryptos.Add(crypto);
@@ -52,7 +57,8 @@ namespace TransactionCore.Services.Implementation
             return new CryptoResponseModel
             {
                 Id = crypto.Id,
-                Name = crypto.Name
+                Name = crypto.Name,
+                IconUrl = request.IconUrl
             };
         }
 
@@ -75,6 +81,25 @@ namespace TransactionCore.Services.Implementation
 
             _dbContext.Cryptos.Remove(existing);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<string> UploadIconAsync(int cryptoId, IFormFile iconFile)
+        {
+            var crypto = await _dbContext.Cryptos.FindAsync(cryptoId);
+            if (crypto == null)
+                throw new Exception("Crypto not found.");
+
+            if (iconFile == null || iconFile.Length == 0)
+                throw new Exception("Invalid icon file.");
+
+
+            var iconUrl = await _fileStorageService.UploadFileAsync(iconFile, "crypto-icons");
+
+            crypto.IconUrl = iconUrl;
+            _dbContext.Cryptos.Update(crypto);
+            await _dbContext.SaveChangesAsync();
+
+            return iconUrl;
         }
     }
 }

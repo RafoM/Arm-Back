@@ -54,7 +54,7 @@ namespace IdentityService.Controllers
         /// <param name="idToken"></param>
         /// <returns></returns>
         [HttpPost("google-register")]
-        public async Task<IActionResult> GoogleRegister([FromBody] GoogleLoginRequestModel requestModel)
+        public async Task<IActionResult> GoogleRegister([FromBody] GoogleRegistrRequestModel requestModel)
         {
             var (accessToken, refreshToken) = await _authService.GoogleRegistrationAsync(requestModel.IdToken);
             return Ok(new { accessToken, refreshToken });

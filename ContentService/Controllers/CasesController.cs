@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Authorization;
+using ContentService.Services.Implementation;
 
 namespace ContentService.Controllers
 {
@@ -120,6 +121,26 @@ namespace ContentService.Controllers
             {
                 return NotFound(ex.Message);
             }
+        }
+
+
+        /// <summary>
+        /// Uploads a media file for case content.
+        /// </summary>
+        /// <param name="request">The media upload request.</param>
+        /// <returns>The URL of the uploaded media.</returns>
+        [HttpPost("upload-media")]
+        [Authorize(Roles = "Admin")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<string>> UploadMedia([FromForm] UploadMediaRequest request)
+        {
+            if (request.MediaFile == null || request.MediaFile.Length == 0)
+                return BadRequest("Invalid media file.");
+
+            var mediaUrl = await _CaseService.UploadCaseMediaAsync(request.MediaFile);
+            return Ok(mediaUrl);
         }
     }
 }

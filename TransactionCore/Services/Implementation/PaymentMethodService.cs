@@ -28,12 +28,20 @@ namespace TransactionCore.Services.Implementation
             return methods.Select(pm => new PaymentMethodResponseModel
             {
                 Id = pm.Id,
-                CryptoId = pm.CryptoId,
-                CryptoName = pm.Crypto != null ? pm.Crypto.Name : string.Empty,
-                NetworkId = pm.NetworkId,
-                NetworkName = pm.Network != null ? pm.Network.Name : string.Empty,
                 TransactionFee = pm.TransactionFee,
-                Note = pm.Note
+                Note = pm.Note,
+                Crypto = new CryptoResponseModel 
+                {
+                    Id = pm.Crypto.Id,
+                    Name = pm.Crypto.Name,
+                    IconUrl = pm.Crypto.IconUrl
+                },
+                Network = new NetworkResponseModel
+                {
+                    Id = pm.Network.Id,
+                    Name=pm.Network.Name,
+                    IconUrl = pm.Network.IconUrl
+                }
             });
         }
 
@@ -48,12 +56,20 @@ namespace TransactionCore.Services.Implementation
             return methods.Select(pm => new PaymentMethodResponseModel
             {
                 Id = pm.Id,
-                CryptoId = pm.CryptoId,
-                CryptoName = pm.Crypto.Name,
-                NetworkId = pm.NetworkId,
-                NetworkName = pm.Network.Name,
                 TransactionFee = pm.TransactionFee,
-                Note = pm.Note
+                Note = pm.Note,
+                Crypto = new CryptoResponseModel
+                {
+                    Id = pm.Crypto.Id,
+                    Name = pm.Crypto.Name,
+                    IconUrl = pm.Crypto.IconUrl
+                },
+                Network = new NetworkResponseModel
+                {
+                    Id = pm.Network.Id,
+                    Name = pm.Network.Name,
+                    IconUrl = pm.Network.IconUrl
+                }
             }).ToList();
         }
 
@@ -71,12 +87,20 @@ namespace TransactionCore.Services.Implementation
             return new PaymentMethodResponseModel
             {
                 Id = pm.Id,
-                CryptoId = pm.CryptoId,
-                CryptoName = pm.Crypto != null ? pm.Crypto.Name : string.Empty,
-                NetworkId = pm.NetworkId,
-                NetworkName = pm.Network != null ? pm.Network.Name : string.Empty,
                 TransactionFee = pm.TransactionFee,
-                Note = pm.Note
+                Note = pm.Note,
+                Crypto = new CryptoResponseModel
+                {
+                    Id = pm.Crypto.Id,
+                    Name = pm.Crypto.Name,
+                    IconUrl = pm.Crypto.IconUrl
+                },
+                Network = new NetworkResponseModel
+                {
+                    Id = pm.Network.Id,
+                    Name = pm.Network.Name,
+                    IconUrl = pm.Network.IconUrl
+                }
             };
         }
 
@@ -104,12 +128,20 @@ namespace TransactionCore.Services.Implementation
             return new PaymentMethodResponseModel
             {
                 Id = paymentMethod.Id,
-                CryptoId = paymentMethod.CryptoId,
-                CryptoName = paymentMethod.Crypto != null ? paymentMethod.Crypto.Name : string.Empty,
-                NetworkId = paymentMethod.NetworkId,
-                NetworkName = paymentMethod.Network != null ? paymentMethod.Network.Name : string.Empty,
                 TransactionFee = paymentMethod.TransactionFee,
-                Note = paymentMethod.Note
+                Note = paymentMethod.Note,
+                Crypto = new CryptoResponseModel
+                {
+                    Id = paymentMethod.Crypto.Id,
+                    Name = paymentMethod.Crypto.Name,
+                    IconUrl = paymentMethod.Crypto.IconUrl
+                },
+                Network = new NetworkResponseModel
+                {
+                    Id = paymentMethod.Network.Id,
+                    Name = paymentMethod.Network.Name,
+                    IconUrl = paymentMethod.Network.IconUrl
+                }
             };
         }
 

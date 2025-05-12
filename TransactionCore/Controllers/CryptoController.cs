@@ -87,5 +87,25 @@ namespace TransactionCore.Controllers
             await _service.DeleteAsync(id);
             return Ok();
         }
+        /// <summary>
+        /// Uploads a icon for a specific crypto.
+        /// </summary>
+        /// <param name="request">The flag upload request.</param>
+        /// <returns>The URL of the uploaded flag.</returns>
+        [HttpPost("icon")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<string>> UploadIcon([FromForm] UploadIqonRequest request)
+        {
+            if (request.FlagFile == null || request.FlagFile.Length == 0)
+            {
+                return BadRequest("Invalid icon file.");
+            }
+
+            var iconUrl = await _service.UploadIconAsync(request.LanguageId, request.FlagFile);
+            return Ok(iconUrl);
+        }
     }
 }

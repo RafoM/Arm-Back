@@ -42,6 +42,10 @@ builder.Services.AddScoped<ISubscriptionUsageService, SubscriptionUsageService>(
 builder.Services.AddScoped<ITronWebhookService, TronWebhookService>();
 builder.Services.AddScoped<IUserInfoService, UserInfoService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+//builder.Services.AddSingleton(StorageClient.Create());
+
 
 builder.Services.Configure<RabbitMqConfigModel>(builder.Configuration.GetSection("RabbitMQ"));
 

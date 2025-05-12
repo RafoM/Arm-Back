@@ -10,10 +10,12 @@ namespace ContentService.Services.Implementation
     public class CaseService : ICaseService
     {
         private readonly ContentDbContext _dbContext;
+        private readonly IFileStorageService _fileStorageService;
 
-        public CaseService(ContentDbContext dbContext)
+        public CaseService(ContentDbContext dbContext, IFileStorageService fileStorageService)
         {
             _dbContext = dbContext;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<CaseResponseModel> CreateAsync(CaseRequestModel request)
@@ -132,6 +134,17 @@ namespace ContentService.Services.Implementation
                     })
                     .ToList()
             };
+        }
+
+        public async Task<string> UploadCaseMediaAsync(IFormFile mediaFile)
+        {
+
+            if (mediaFile == null || mediaFile.Length == 0)
+                throw new Exception("Invalid media file.");
+
+            var flagUrl = await _fileStorageService.UploadFileAsync(mediaFile, "case-media");
+
+            return flagUrl;
         }
     }
 }

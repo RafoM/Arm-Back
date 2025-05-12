@@ -10,10 +10,12 @@ namespace ContentService.Services.Implementation
     public class BlogService : IBlogService
     {
         private readonly ContentDbContext _dbContext;
+        private readonly IFileStorageService _fileStorageService;
 
-        public BlogService(ContentDbContext dbContext)
+        public BlogService(ContentDbContext dbContext, IFileStorageService fileStorageService)
         {
             _dbContext = dbContext;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<BlogResponseModel> CreateAsync(BlogRequestModel request)
@@ -134,6 +136,17 @@ namespace ContentService.Services.Implementation
                     })
                     .ToList()
             };
+        }
+
+        public async Task<string> UploadBlogMediaAsync(IFormFile mediaFile)
+        {
+
+            if (mediaFile == null || mediaFile.Length == 0)
+                throw new Exception("Invalid media file.");
+
+            var flagUrl = await _fileStorageService.UploadFileAsync(mediaFile, "blog-media");
+
+            return flagUrl;
         }
     }
 }
