@@ -167,7 +167,7 @@ namespace TransactionCore.Services.Implementation
             };
         }
 
-        private async Task<Guid> CreatePayment(Guid userFinanceId, Guid walletId, decimal expectedFee, Guid subscriptionPackageId, Guid? promoId)
+        private async Task<Guid> CreatePayment(Guid userInfoId, Guid walletId, decimal expectedFee, Guid subscriptionPackageId, Guid? promoId)
         {
 
             var payment = new Payment
@@ -176,7 +176,7 @@ namespace TransactionCore.Services.Implementation
                 WalletId = walletId,
                 Status = PaymentStatusEnum.Pending,
                 CreatedDate = DateTime.UtcNow,
-                UserInfoId = userFinanceId,
+                UserInfoId = userInfoId,
                 SubscriptionPackageId = subscriptionPackageId,
                 PromoId = promoId
             };
