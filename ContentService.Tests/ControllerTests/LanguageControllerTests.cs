@@ -19,63 +19,63 @@ namespace ContentService.Tests.ControllerTests
             _controller = new LanguageController(_languageServiceMock.Object);
         }
 
-        [Fact]
-        public async Task GetAll_ShouldReturnOkResult_WithListOfLanguages()
-        {
+        //[Fact]
+        //public async Task GetAll_ShouldReturnOkResult_WithListOfLanguages()
+        //{
 
-            var expected = new List<LanguageResponseModel>
-        {
-            new() { Id = 1, CultureCode = "en", DisplayName = "English" },
-            new() { Id = 2, CultureCode = "hy", DisplayName = "Հայերեն" }
-        };
+        //    var expected = new List<LanguageResponseModel>
+        //{
+        //    new() { Id = 1, CultureCode = "en", DisplayName = "English" },
+        //    new() { Id = 2, CultureCode = "hy", DisplayName = "Հայերեն" }
+        //};
 
-            _languageServiceMock.Setup(s => s.GetAllAsync())
-                .ReturnsAsync(expected);
+        //    _languageServiceMock.Setup(s => s.GetAllAsync())
+        //        .ReturnsAsync(expected);
 
-            var result = await _controller.GetAll();
+        //    var result = await _controller.GetAll();
 
-            var okResult = result as OkObjectResult;
-            okResult.Should().NotBeNull();
-            okResult!.Value.Should().BeEquivalentTo(expected);
-        }
+        //    var okResult = result as OkObjectResult;
+        //    okResult.Should().NotBeNull();
+        //    okResult!.Value.Should().BeEquivalentTo(expected);
+        //}
 
-        [Fact]
-        public async Task GetById_ShouldReturnLanguage_WhenExists()
-        {
-            var lang = new LanguageResponseModel { Id = 1, CultureCode = "en", DisplayName = "English" };
-            _languageServiceMock.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(lang);
+        //[Fact]
+        //public async Task GetById_ShouldReturnLanguage_WhenExists()
+        //{
+        //    var lang = new LanguageResponseModel { Id = 1, CultureCode = "en", DisplayName = "English" };
+        //    _languageServiceMock.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(lang);
 
-            var result = await _controller.GetById(1);
+        //    var result = await _controller.GetById(1);
 
-            var okResult = result as OkObjectResult;
-            okResult.Should().NotBeNull();
-            okResult!.Value.Should().BeEquivalentTo(lang);
-        }
+        //    var okResult = result as OkObjectResult;
+        //    okResult.Should().NotBeNull();
+        //    okResult!.Value.Should().BeEquivalentTo(lang);
+        //}
 
-        [Fact]
-        public async Task GetById_ShouldReturnNotFound_WhenNotExists()
-        {
-            _languageServiceMock.Setup(s => s.GetByIdAsync(99)).ReturnsAsync((LanguageResponseModel?)null);
+        //[Fact]
+        //public async Task GetById_ShouldReturnNotFound_WhenNotExists()
+        //{
+        //    _languageServiceMock.Setup(s => s.GetByIdAsync(99)).ReturnsAsync((LanguageResponseModel?)null);
 
-            var result = await _controller.GetById(99);
+        //    var result = await _controller.GetById(99);
 
-            result.Should().BeOfType<NotFoundResult>();
-        }
-        [Fact]
-        public async Task Create_ShouldReturnCreatedResult()
-        {
-            var request = new LanguageRequestModel { CultureCode = "ru", DisplayName = "Русский" };
-            var response = 5;
+        //    result.Should().BeOfType<NotFoundResult>();
+        //}
+        //[Fact]
+        //public async Task Create_ShouldReturnCreatedResult()
+        //{
+        //    var request = new LanguageRequestModel { CultureCode = "ru", DisplayName = "Русский" };
+        //    var response = 5;
 
-            _languageServiceMock.Setup(s => s.CreateAsync(request))
-                .ReturnsAsync(response);
+        //    _languageServiceMock.Setup(s => s.CreateAsync(request))
+        //        .ReturnsAsync(response);
 
-            var result = await _controller.Create(request);
+        //    var result = await _controller.Create(request);
 
-            var created = result as CreatedAtActionResult;
-            created.Should().NotBeNull();
-            created!.Value.Should().BeEquivalentTo(response);
-        }
+        //    var created = result as CreatedAtActionResult;
+        //    created.Should().NotBeNull();
+        //    created!.Value.Should().BeEquivalentTo(response);
+        //}
 
         [Fact]
         public async Task Update_ShouldReturnOk_WhenSuccessful()

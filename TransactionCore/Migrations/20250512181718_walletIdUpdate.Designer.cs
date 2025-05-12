@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TransactionCore.Data;
 
@@ -11,9 +12,11 @@ using TransactionCore.Data;
 namespace TransactionCore.Migrations
 {
     [DbContext(typeof(TransactionCoreDbContext))]
-    partial class TransactionCoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250512181718_walletIdUpdate")]
+    partial class walletIdUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
