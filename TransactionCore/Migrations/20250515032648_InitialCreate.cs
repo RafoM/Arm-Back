@@ -43,7 +43,7 @@ namespace TransactionCore.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     Code = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DiscountPercent = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
+                    DiscountPercent = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     BonusDays = table.Column<int>(type: "int", nullable: true),
                     ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
@@ -61,7 +61,7 @@ namespace TransactionCore.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FixedPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    FixedPercentage = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     UseReferralLevels = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -192,7 +192,7 @@ namespace TransactionCore.Migrations
                     SubscriptionPackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ActivatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     PromoBonusDays = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -221,8 +221,8 @@ namespace TransactionCore.Migrations
                     PaymentMethodId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    LastEntry = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Balance = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    LastEntry = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     LastTransactionId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -246,7 +246,7 @@ namespace TransactionCore.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     PromoId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ExpectedFee = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
-                    PayedFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    PayedFee = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     SubscriptionPackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TxHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -303,7 +303,7 @@ namespace TransactionCore.Migrations
                     ReferredUserInfoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Action = table.Column<int>(type: "int", nullable: false),
                     PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Commission = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Commission = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     ActionDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>

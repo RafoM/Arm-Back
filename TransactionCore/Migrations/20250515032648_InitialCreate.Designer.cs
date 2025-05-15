@@ -12,7 +12,7 @@ using TransactionCore.Data;
 namespace TransactionCore.Migrations
 {
     [DbContext(typeof(TransactionCoreDbContext))]
-    [Migration("20250515023744_InitialCreate")]
+    [Migration("20250515032648_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -80,7 +80,8 @@ namespace TransactionCore.Migrations
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal?>("PayedFee")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
@@ -163,8 +164,8 @@ namespace TransactionCore.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal?>("DiscountPercent")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime2");
@@ -225,7 +226,8 @@ namespace TransactionCore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("Commission")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<Guid?>("PaymentId")
                         .HasColumnType("uniqueidentifier");
@@ -250,7 +252,8 @@ namespace TransactionCore.Migrations
                         .HasDefaultValueSql("NEWID()");
 
                     b.Property<decimal?>("FixedPercentage")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -387,7 +390,9 @@ namespace TransactionCore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<int?>("PromoBonusDays")
                         .HasColumnType("int");
@@ -464,13 +469,15 @@ namespace TransactionCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("LastEntry")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("LastTransactionId")
                         .IsRequired()
@@ -588,13 +595,13 @@ namespace TransactionCore.Migrations
             modelBuilder.Entity("TransactionCore.Data.Entity.SubscriptionUsage", b =>
                 {
                     b.HasOne("TransactionCore.Data.Entity.SubscriptionPackage", "SubscriptionPackage")
-                        .WithMany()
+                        .WithMany("SubscriptionUsages")
                         .HasForeignKey("SubscriptionPackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TransactionCore.Data.Entity.UserInfo", "UserInfo")
-                        .WithMany()
+                        .WithMany("SubscriptionUsages")
                         .HasForeignKey("UserInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -618,6 +625,16 @@ namespace TransactionCore.Migrations
             modelBuilder.Entity("TransactionCore.Data.Entity.Promo", b =>
                 {
                     b.Navigation("Usages");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.SubscriptionPackage", b =>
+                {
+                    b.Navigation("SubscriptionUsages");
+                });
+
+            modelBuilder.Entity("TransactionCore.Data.Entity.UserInfo", b =>
+                {
+                    b.Navigation("SubscriptionUsages");
                 });
 #pragma warning restore 612, 618
         }
