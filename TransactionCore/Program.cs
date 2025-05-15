@@ -50,7 +50,6 @@ builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
 //builder.Services.AddSingleton(StorageClient.Create());
-//
 
 builder.Services.Configure<RabbitMqConfigModel>(builder.Configuration.GetSection("RabbitMQ"));
 
