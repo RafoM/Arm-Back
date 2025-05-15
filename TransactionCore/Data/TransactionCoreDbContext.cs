@@ -64,7 +64,7 @@ namespace TransactionCore.Data
                 p.Property(p => p.Id).HasDefaultValueSql("NEWID()");
             });
 
-           
+
 
             modelBuilder.Entity<RemainderInfo>(entity =>
             {
@@ -83,7 +83,7 @@ namespace TransactionCore.Data
                 p.HasKey(s => s.Id);
                 p.Property(p => p.Id).HasDefaultValueSql("NEWID()");
             });
-            
+
 
             modelBuilder.Entity<SubscriptionUsage>(p =>
             {
@@ -146,6 +146,19 @@ namespace TransactionCore.Data
                  .HasForeignKey(r => r.UserInfoId)
                  .OnDelete(DeleteBehavior.Cascade);
             });
+
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(decimal) || property.ClrType == typeof(decimal?))
+                    {
+                        property.SetPrecision(18);
+                        property.SetScale(4);
+                    }
+                }
+            }
 
             modelBuilder.Entity<Wallet>(entity =>
             {

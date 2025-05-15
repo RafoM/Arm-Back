@@ -12,7 +12,7 @@ using TransactionCore.Data;
 namespace TransactionCore.Migrations
 {
     [DbContext(typeof(TransactionCoreDbContext))]
-    [Migration("20250512184503_InitialCreate")]
+    [Migration("20250515023744_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
