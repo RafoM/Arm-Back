@@ -27,9 +27,9 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<TransactionCoreDbContext>(options =>
 {
-    options.UseSqlServer(connectionString)
-                  .EnableSensitiveDataLogging()
-                  .EnableDetailedErrors();
+    options.UseSqlServer(connectionString);
+                  //.EnableSensitiveDataLogging()
+                  //.EnableDetailedErrors();
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
