@@ -25,7 +25,12 @@ if (string.IsNullOrEmpty(connectionString))
 //Services
 builder.Services.AddHttpClient();
 
-builder.Services.AddDbContext<TransactionCoreDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<TransactionCoreDbContext>(options =>
+{
+    options.UseSqlServer(connectionString)
+                  .EnableSensitiveDataLogging()
+                  .EnableDetailedErrors();
+});
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICryptoService, CryptoService>();
@@ -63,10 +68,10 @@ var audience = identitySettings["Audience"];
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = authorityUrl; 
+        options.Authority = authorityUrl;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false, 
+            ValidateAudience = false,
             ValidateIssuer = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true
