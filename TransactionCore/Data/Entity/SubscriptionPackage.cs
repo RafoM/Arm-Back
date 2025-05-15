@@ -11,5 +11,6 @@
         public float Discount { get; set; }
         public string Currency { get; set; }
         public int RoleId { get; set; }
+        public ICollection<SubscriptionUsage> SubscriptionUsages { get; set; } = new List<SubscriptionUsage>();
     }
 }

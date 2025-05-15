@@ -13,5 +13,6 @@
         public Guid? ExpectedPaymentId { get; set; }
         public bool IsSubscribed { get; set; }
         public DateTime CreatedAt { get; set; }
+        public ICollection<SubscriptionUsage> SubscriptionUsages { get; set; } = new List<SubscriptionUsage>();
     }
 }

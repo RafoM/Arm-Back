@@ -85,24 +85,26 @@ namespace TransactionCore.Data
             });
 
 
-            modelBuilder.Entity<SubscriptionUsage>(p =>
+            modelBuilder.Entity<SubscriptionUsage>(entity =>
             {
-                p.HasKey(s => s.Id);
-                p.Property(p => p.Id).HasDefaultValueSql("NEWID()");
+                entity.HasKey(e => e.Id);
+                entity.Property(p => p.Id).HasDefaultValueSql("NEWID()");
+
+                entity.HasOne(e => e.UserInfo)
+                      .WithMany(u => u.SubscriptionUsages) 
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.SubscriptionPackage)
+                      .WithMany(sp => sp.SubscriptionUsages) 
+                      .HasForeignKey(e => e.SubscriptionPackageId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(e => e.IsActive)
+                      .HasDefaultValue(true);
+
+                entity.Property(e => e.PromoBonusDays)
+                      .IsRequired(false);
             });
-
-
-            modelBuilder.Entity<SubscriptionUsage>()
-                .HasOne(s => s.UserInfo)
-                .WithMany()
-                .HasForeignKey(s => s.UserInfoId);
-
-            modelBuilder.Entity<SubscriptionUsage>()
-                .HasOne(s => s.SubscriptionPackage)
-                .WithMany()
-                .HasForeignKey(s => s.SubscriptionPackageId);
-
-
             modelBuilder.Entity<Promo>(entity =>
                 {
                     entity.HasKey(p => p.Id);
