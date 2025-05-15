@@ -11,16 +11,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-# Copy the main project and the shared project
-COPY ["TransactionCore/TransactionCore.csproj=TransactionCore.csproj", "TransactionCore/"]
+COPY ["TransactionCore/TransactionCore.csproj", "TransactionCore/"]
 COPY ["Arbito.Shared.Contracts/Arbito.Shared.Contracts.csproj", "Arbito.Shared.Contracts/"]
 RUN dotnet restore "TransactionCore/TransactionCore.csproj"
-COPY TransactionCore/ TransactionCore/
-COPY Arbito.Shared.Contracts/ Arbito.Shared.Contracts/
-WORKDIR "/src/TransactionCore"
-RUN dotnet build "TransactionCore.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
+# Copy the entire project directories
+COPY ["TransactionCore/", "TransactionCore/"]
+COPY ["Arbito.Shared.Contracts/", "Arbito.Shared.Contracts/"]
+WORKDIR "/src/TransactionCore"
+RUN dotnet build "TransactionCore.csproj" -c $BUILD_CONFIGURATION -o /app/build# This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "TransactionCore.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
