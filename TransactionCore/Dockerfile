@@ -19,7 +19,9 @@ RUN dotnet restore "TransactionCore/TransactionCore.csproj"
 COPY ["TransactionCore/", "TransactionCore/"]
 COPY ["Arbito.Shared.Contracts/", "Arbito.Shared.Contracts/"]
 WORKDIR "/src/TransactionCore"
-RUN dotnet build "TransactionCore.csproj" -c $BUILD_CONFIGURATION -o /app/build# This stage is used to publish the service project to be copied to the final stage
+RUN dotnet build "TransactionCore.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "TransactionCore.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
