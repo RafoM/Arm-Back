@@ -6,11 +6,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Authorization;
-using ContentService.Services.Implementation;
 
 namespace ContentService.Controllers
 {
-   
+    /// <summary>
+    /// Controller for managing blog content.
+    /// </summary>
     public class BlogsController : BaseController
     {
         private readonly IBlogService _blogService;
@@ -18,55 +19,64 @@ namespace ContentService.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="BlogsController"/> class.
         /// </summary>
-        /// <param name="blogService">Service handling blog-related operations.</param>
+        /// <param name="blogService">Service for blog operations.</param>
         public BlogsController(IBlogService blogService)
         {
             _blogService = blogService;
         }
 
         /// <summary>
-        /// Creates a new blog using the provided request model.
+        /// Gets the language ID from middleware-inserted HTTP context.
         /// </summary>
-        /// <param name="request">The blog data to create.</param>
-        /// <returns>
-        /// A newly created <see cref="BlogResponseModel"/>, along with a 201 Created response.
-        /// </returns>
+        /// <returns>The language ID.</returns>
+        /// <exception cref="Exception">Thrown if header is missing.</exception>
+        private int GetLanguageId()
+        {
+            return HttpContext.Items.TryGetValue("LanguageId", out var value) && value is int languageId
+                ? languageId
+                : throw new Exception("LanguageId header is required.");
+        }
+
+        /// <summary>
+        /// Creates a new blog.
+        /// </summary>
+        /// <param name="request">The blog creation request model.</param>
+        /// <returns>The created blog response model.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<BlogResponseModel>> CreateBlog([FromBody] BlogRequestModel request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var result = await _blogService.CreateAsync(request);
             return CreatedAtAction(nameof(GetBlogById), new { blogId = result.BlogId }, result);
         }
 
         /// <summary>
-        /// Retrieves a list of all existing blogs.
+        /// Retrieves all blogs for a specific language.
         /// </summary>
-        /// <returns>
-        /// A collection of <see cref="BlogResponseModel"/>.
-        /// </returns>
+        /// <returns>List of blog response models.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BlogResponseModel>>> GetAllBlogs()
         {
-            var blogs = await _blogService.GetAllAsync();
+            var languageId = GetLanguageId();
+            var blogs = await _blogService.GetAllAsync(languageId);
             return Ok(blogs);
         }
 
         /// <summary>
-        /// Retrieves a specific blog by its unique identifier.
+        /// Retrieves a blog by its unique ID and language.
         /// </summary>
-        /// <param name="blogId">The unique identifier for the blog.</param>
-        /// <returns>
-        /// A single <see cref="BlogResponseModel"/> if found; otherwise 404 Not Found.
-        /// </returns>
+        /// <param name="blogId">The blog ID.</param>
+        /// <returns>The blog response model.</returns>
         [HttpGet("{blogId}")]
-        public async Task<ActionResult<BlogResponseModel>> GetBlogById(int blogId)
+        public async Task<ActionResult<BlogResponseModel>> GetBlogById(Guid blogId)
         {
             try
             {
-                var blog = await _blogService.GetByIdAsync(blogId);
+                var languageId = GetLanguageId();
+                var blog = await _blogService.GetByIdAsync(blogId, languageId);
                 return Ok(blog);
             }
             catch (KeyNotFoundException ex)
@@ -76,12 +86,10 @@ namespace ContentService.Controllers
         }
 
         /// <summary>
-        /// Updates an existing blog using the provided update model.
+        /// Updates an existing blog.
         /// </summary>
-        /// <param name="request">The update model containing the new values.</param>
-        /// <returns>
-        /// The updated <see cref="BlogResponseModel"/> if found; otherwise 404 Not Found.
-        /// </returns>
+        /// <param name="request">The update request model.</param>
+        /// <returns>The updated blog response model.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<ActionResult<BlogResponseModel>> UpdateBlog([FromBody] BlogUpdateModel request)
@@ -101,15 +109,13 @@ namespace ContentService.Controllers
         }
 
         /// <summary>
-        /// Deletes an existing blog by its unique identifier.
+        /// Deletes a blog by its ID.
         /// </summary>
-        /// <param name="blogId">The ID of the blog to be deleted.</param>
-        /// <returns>
-        /// A 204 No Content response if the blog was deleted; 404 Not Found if it does not exist.
-        /// </returns>
+        /// <param name="blogId">The blog ID.</param>
+        /// <returns>NoContent if deleted, NotFound if missing.</returns>
         [Authorize(Roles = "Admin")]
         [HttpDelete("{blogId}")]
-        public async Task<IActionResult> DeleteBlog(int blogId)
+        public async Task<IActionResult> DeleteBlog(Guid blogId)
         {
             try
             {
@@ -122,11 +128,10 @@ namespace ContentService.Controllers
             }
         }
 
-
         /// <summary>
-        /// Uploads a media file for vlog content.
+        /// Uploads a media file for blog usage.
         /// </summary>
-        /// <param name="request">The media upload request.</param>
+        /// <param name="request">The upload request containing the media file.</param>
         /// <returns>The URL of the uploaded media.</returns>
         [HttpPost("upload-media")]
         [Authorize(Roles = "Admin")]
@@ -140,6 +145,19 @@ namespace ContentService.Controllers
 
             var mediaUrl = await _blogService.UploadBlogMediaAsync(request.MediaFile);
             return Ok(mediaUrl);
+        }
+
+        /// <summary>
+        /// Retrieves blogs by a list of tag IDs for a given language.
+        /// </summary>
+        /// <param name="tagIds">List of tag IDs.</param>
+        /// <returns>List of matching blog response models.</returns>
+        [HttpPost("by-tags")]
+        public async Task<ActionResult<IEnumerable<BlogResponseModel>>> GetBlogsByTags([FromBody] List<Guid> tagIds)
+        {
+            var languageId = GetLanguageId();
+            var blogs = await _blogService.GetByTagIdsAsync(tagIds, languageId);
+            return Ok(blogs);
         }
     }
 }

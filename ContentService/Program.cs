@@ -1,4 +1,5 @@
 using ContentService.Data;
+using ContentService.Middlewares;
 using ContentService.Services.Implementation;
 using ContentService.Services.Interface;
 using Google.Cloud.Storage.V1;
@@ -104,6 +105,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<LanguageIdMiddleware>();
 
 var supportedCultures = new List<CultureInfo>
 {

@@ -17,9 +17,17 @@ namespace ContentService.Data
         public DbSet<CaseTag> CaseTags { get; set; }
         public DbSet<Tutorial> Tutorials { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
+        public DbSet<ContentTranslation> ContentTranslations { get; set; }
         //rolepermission
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<ContentTranslation>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(x => x.ContentType).HasConversion<string>();
+            });
 
             modelBuilder.Entity<Tutorial>(entity =>
             {
@@ -130,7 +138,7 @@ namespace ContentService.Data
             {
                 entity.ToTable("Translations");
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
 
                 entity.Property(e => e.Value)
                       .IsRequired();

@@ -2,7 +2,7 @@
 {
     public class BlogResponseModel
     {
-        public int BlogId { get; set; }
+        public Guid BlogId { get; set; }
         public string Title { get; set; } = null!;
         public string? Subtitle { get; set; }
         public string? MainImage { get; set; }

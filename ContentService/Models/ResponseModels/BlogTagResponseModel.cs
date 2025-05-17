@@ -2,7 +2,7 @@
 {
     public class BlogTagResponseModel
     {
-        public int TagId { get; set; }
+        public Guid TagId { get; set; }
         public string Tag { get; set; } = null!;
     }
 }

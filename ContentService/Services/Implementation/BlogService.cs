@@ -4,31 +4,34 @@ using ContentService.Services.Interface;
 using ContentService.Models.ResponseModels;
 using Microsoft.EntityFrameworkCore;
 using ContentService.Models.RequestModels;
+using ContentService.Common.Enums;
+using ContentService.Common.Constants;
+using System.Linq;
 
 namespace ContentService.Services.Implementation
 {
     public class BlogService : IBlogService
     {
         private readonly ContentDbContext _dbContext;
+        private readonly IContentTranslationService _translationService;
         private readonly IFileStorageService _fileStorageService;
 
-        public BlogService(ContentDbContext dbContext, IFileStorageService fileStorageService)
+        public BlogService(
+            ContentDbContext dbContext,
+            IContentTranslationService translationService,
+            IFileStorageService fileStorageService)
         {
             _dbContext = dbContext;
+            _translationService = translationService;
             _fileStorageService = fileStorageService;
         }
 
         public async Task<BlogResponseModel> CreateAsync(BlogRequestModel request)
         {
-            var newBlog = new Blog
+            var blog = new Blog
             {
-                Title = request.Title,
-                Subtitle = request.Subtitle,
-                MainImage = request.MainImage,
-                Content = request.Content,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                LanguageId = request.LanguageId,
             };
 
             if (request.TagIds != null && request.TagIds.Count > 0)
@@ -38,37 +41,38 @@ namespace ContentService.Services.Implementation
                     .ToListAsync();
                 foreach (var tag in tags)
                 {
-                    newBlog.BlogTags.Add(tag);
+                    blog.BlogTags.Add(tag);
                 }
             }
 
-            _dbContext.Blogs.Add(newBlog);
+            _dbContext.Blogs.Add(blog);
             await _dbContext.SaveChangesAsync();
 
-            return await GetByIdAsync(newBlog.Id);
-        }
+            var contentId = blog.Id;
 
-        //GetBlogByTagIds
+            await _translationService.SetTranslationAsync(contentId, ContentTranslationKeys.Title, request.Title, request.LanguageId, ContentTypeEnum.Blog);
+            await _translationService.SetTranslationAsync(contentId, ContentTranslationKeys.Subtitle, request.Subtitle, request.LanguageId, ContentTypeEnum.Blog);
+            await _translationService.SetTranslationAsync(contentId, ContentTranslationKeys.Content, request.Content, request.LanguageId, ContentTypeEnum.Blog);
+            await _translationService.SetTranslationAsync(contentId, ContentTranslationKeys.MainImage, request.MainImage, request.LanguageId, ContentTypeEnum.Blog);
+
+
+            return await GetByIdAsync(contentId, request.LanguageId);
+        }
 
         public async Task<BlogResponseModel> UpdateAsync(BlogUpdateModel request)
         {
             var blog = await _dbContext.Blogs
-                .Include(b => b.BlogTags) 
+                .Include(b => b.BlogTags)
                 .FirstOrDefaultAsync(b => b.Id == request.BlogId);
 
             if (blog == null)
                 throw new KeyNotFoundException($"Blog with ID {request.BlogId} not found.");
 
-            blog.Title = request.Title;
-            blog.Subtitle = request.Subtitle;
-            blog.MainImage = request.MainImage;
-            blog.Content = request.Content;
             blog.UpdatedAt = DateTime.UtcNow;
-            blog.LanguageId = request.LanguageId;
+
             if (request.TagIds != null)
             {
                 blog.BlogTags.Clear();
-
                 var newTags = await _dbContext.BlogTags
                     .Where(t => request.TagIds.Contains(t.Id))
                     .ToListAsync();
@@ -79,12 +83,17 @@ namespace ContentService.Services.Implementation
                 }
             }
 
+            await _translationService.SetTranslationAsync(request.BlogId, ContentTranslationKeys.Title, request.Title, request.LanguageId, ContentTypeEnum.Blog);
+            await _translationService.SetTranslationAsync(request.BlogId, ContentTranslationKeys.Subtitle, request.Subtitle, request.LanguageId, ContentTypeEnum.Blog);
+            await _translationService.SetTranslationAsync(request.BlogId, ContentTranslationKeys.Content, request.Content, request.LanguageId, ContentTypeEnum.Blog);
+            await _translationService.SetTranslationAsync(request.BlogId, ContentTranslationKeys.MainImage, request.MainImage, request.LanguageId, ContentTypeEnum.Blog);
+
             await _dbContext.SaveChangesAsync();
 
-            return await GetByIdAsync(blog.Id);
+            return await GetByIdAsync(blog.Id, request.LanguageId);
         }
 
-        public async Task<BlogResponseModel> GetByIdAsync(int blogId)
+        public async Task<BlogResponseModel> GetByIdAsync(Guid blogId, int languageId)
         {
             var blog = await _dbContext.Blogs
                 .Include(b => b.BlogTags)
@@ -93,20 +102,43 @@ namespace ContentService.Services.Implementation
             if (blog == null)
                 throw new KeyNotFoundException($"Blog with ID {blogId} not found.");
 
-            return ToBlogResponse(blog);
+            return await ToBlogResponse(blog, languageId);
         }
 
-        public async Task<IEnumerable<BlogResponseModel>> GetAllAsync()
+        public async Task<IEnumerable<BlogResponseModel>> GetAllAsync(int languageId)
         {
             var blogs = await _dbContext.Blogs
                 .Include(b => b.BlogTags)
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();
 
-            return blogs.Select(ToBlogResponse);
+            var responseList = new List<BlogResponseModel>();
+            foreach (var blog in blogs)
+            {
+                responseList.Add(await ToBlogResponse(blog, languageId));
+            }
+
+            return responseList;
         }
 
-        public async Task DeleteAsync(int blogId)
+        public async Task<IEnumerable<BlogResponseModel>> GetByTagIdsAsync(List<Guid> tagIds, int languageId)
+        {
+            var blogs = await _dbContext.Blogs
+                .Include(b => b.BlogTags)
+                .Where(b => b.BlogTags.Any(tag => tagIds.Contains(tag.Id)))
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+
+            var responseList = new List<BlogResponseModel>();
+            foreach (var blog in blogs)
+            {
+                responseList.Add(await ToBlogResponse(blog, languageId));
+            }
+
+            return responseList;
+        }
+
+        public async Task DeleteAsync(Guid blogId)
         {
             var blog = await _dbContext.Blogs.FindAsync(blogId);
             if (blog == null)
@@ -116,37 +148,41 @@ namespace ContentService.Services.Implementation
             await _dbContext.SaveChangesAsync();
         }
 
-        private BlogResponseModel ToBlogResponse(Blog blog)
+        private async Task<BlogResponseModel> ToBlogResponse(Blog blog, int languageId)
         {
+            var tagResponses = new List<BlogTagResponseModel>();
+
+            foreach (var tag in blog.BlogTags)
+            {
+                var translatedTag = await _translationService.GetTranslationAsync(tag.Id,  ContentTranslationKeys.Tag, languageId, ContentTypeEnum.BlogTag);
+                tagResponses.Add(new BlogTagResponseModel
+                {
+                    TagId = tag.Id,
+                    Tag = translatedTag
+                });
+            }
+
             return new BlogResponseModel
             {
                 BlogId = blog.Id,
-                Title = blog.Title,
-                Subtitle = blog.Subtitle,
-                MainImage = blog.MainImage,
-                Content = blog.Content,
+                Title = await _translationService.GetTranslationAsync(blog.Id, ContentTranslationKeys.Title, languageId, ContentTypeEnum.Blog) ?? string.Empty,
+                Subtitle = await _translationService.GetTranslationAsync(blog.Id, ContentTranslationKeys.Subtitle, languageId, ContentTypeEnum.Blog),
+                MainImage = await _translationService.GetTranslationAsync(blog.Id, ContentTranslationKeys.MainImage, languageId, ContentTypeEnum.Blog),
+                Content = await _translationService.GetTranslationAsync(blog.Id, ContentTranslationKeys.Content, languageId, ContentTypeEnum.Blog) ?? string.Empty,
                 CreatedAt = blog.CreatedAt,
                 UpdatedAt = blog.UpdatedAt,
-                LanguageId = blog.LanguageId,
-                Tags = blog.BlogTags
-                    .Select(t => new BlogTagResponseModel
-                    {
-                        TagId = t.Id,
-                        Tag = t.Tag
-                    })
-                    .ToList()
+                LanguageId = languageId,
+                Tags = tagResponses
             };
         }
 
         public async Task<string> UploadBlogMediaAsync(IFormFile mediaFile)
         {
-
             if (mediaFile == null || mediaFile.Length == 0)
                 throw new Exception("Invalid media file.");
 
-            var flagUrl = await _fileStorageService.UploadFileAsync(mediaFile, "blog-media");
-
-            return flagUrl;
+            var fileUrl = await _fileStorageService.UploadFileAsync(mediaFile, "blog-media");
+            return fileUrl;
         }
     }
 }
