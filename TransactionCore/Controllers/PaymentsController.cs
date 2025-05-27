@@ -46,13 +46,11 @@ namespace TransactionCore.Controllers
         [ProducesResponseType(typeof(PaymentDetailsResponseModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PaymentDetailsResponseModel>> GetPaymentDetails(
-            Guid userId,
-            [FromBody] PaymentDetailsRequestModel requestModel)
+        public async Task<ActionResult<PaymentDetailsResponseModel>> GetPaymentDetails([FromBody] PaymentDetailsRequestModel requestModel)
         {
             try
             {
-                var result = await _paymentService.GetPaymentDetails(userId, requestModel);
+                var result = await _paymentService.GetPaymentDetails(UserId, requestModel);
                 return Ok(result);
             }
             catch (Exception ex)

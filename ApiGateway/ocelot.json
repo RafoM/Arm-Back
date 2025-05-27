@@ -49,6 +49,21 @@
       "SwaggerKey": "content"
     },
     {
+      "DownstreamPathTemplate": "/api/Blogs/by-tags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Blogs/by-tags",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
       "DownstreamPathTemplate": "/api/BlogTags",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -124,6 +139,21 @@
         }
       ],
       "UpstreamPathTemplate": "/content/api/Cases/upload-media",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/Cases/by-tags",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Cases/by-tags",
       "UpstreamHttpMethod": [
         "POST"
       ],
@@ -227,6 +257,38 @@
       "SwaggerKey": "content"
     },
     {
+      "DownstreamPathTemplate": "/api/Lessons/{tutorialId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Lessons/{tutorialId}",
+      "UpstreamHttpMethod": [
+        "POST",
+        "GET"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/Lessons/{tutorialId}/lesson/{lessonNumber}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/Lessons/{tutorialId}/lesson/{lessonNumber}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
       "DownstreamPathTemplate": "/api/Lessons",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -237,25 +299,7 @@
       ],
       "UpstreamPathTemplate": "/content/api/Lessons",
       "UpstreamHttpMethod": [
-        "POST",
-        "GET",
         "PUT"
-      ],
-      "SwaggerKey": "content"
-    },
-    {
-      "DownstreamPathTemplate": "/api/Lessons/{lessonNumber}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/content/api/Lessons/{lessonNumber}",
-      "UpstreamHttpMethod": [
-        "GET",
-        "DELETE"
       ],
       "SwaggerKey": "content"
     },
@@ -922,6 +966,21 @@
       "UpstreamPathTemplate": "/transaction/api/Payments/all",
       "UpstreamHttpMethod": [
         "GET"
+      ],
+      "SwaggerKey": "transaction"
+    },
+    {
+      "DownstreamPathTemplate": "/api/Payments",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction/api/Payments",
+      "UpstreamHttpMethod": [
+        "POST"
       ],
       "SwaggerKey": "transaction"
     },
