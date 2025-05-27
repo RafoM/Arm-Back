@@ -18,9 +18,14 @@ namespace ContentService.Data
         public DbSet<Tutorial> Tutorials { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<ContentTranslation> ContentTranslations { get; set; }
+        public DbSet<TutorialDifficultyLevel> TutorialDifficultyLevels { get; set; }
         //rolepermission
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<ContentTranslation>()
+                        .HasIndex(ct => new { ct.ContentId, ct.Key, ct.LanguageId, ct.ContentType })
+                        .IsUnique();
 
             modelBuilder.Entity<ContentTranslation>(entity =>
             {
@@ -29,27 +34,51 @@ namespace ContentService.Data
                 entity.Property(x => x.ContentType).HasConversion<string>();
             });
 
+
+            modelBuilder.Entity<Blog>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            });
+
+            modelBuilder.Entity<Case>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            });
+            modelBuilder.Entity<BlogTag>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            });
+            modelBuilder.Entity<CaseTag>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            });
             modelBuilder.Entity<Tutorial>(entity =>
             {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasKey(t => t.Id);
+                entity.Property(t => t.Id).HasDefaultValueSql("NEWID()");
+
+                entity.Property(t => t.CreatedAt).IsRequired();
+                entity.Property(t => t.UpdatedAt).IsRequired();
+
+                entity.HasMany(t => t.Lessons)
+                      .WithOne(l => l.Tutorial)
+                      .HasForeignKey(l => l.TutorialId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
+
 
             modelBuilder.Entity<Lesson>(entity =>
             {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-            });
+                entity.HasKey(l => l.Id);
+                entity.Property(l => l.Id).HasDefaultValueSql("NEWID()");
 
-            modelBuilder.Entity<Lesson>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Content).IsRequired();
-                entity.Property(e => e.LessonNumber).IsRequired();
-                entity.HasIndex(e => new { e.TutorialId, e.LessonNumber }).IsUnique();
-
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(l => l.LessonNumber).IsRequired();
+                entity.Property(l => l.CreatedAt).IsRequired();
+                entity.Property(l => l.UpdatedAt).IsRequired();
             });
 
 

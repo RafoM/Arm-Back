@@ -17,7 +17,8 @@ namespace TransactionCore.Services.Implementation
         private readonly IReferralRoleRewardSerice _referralRoleReward;
         private readonly IRemainderInfoService _remainderInfoService;
         private readonly IReferralService _referralService;
-        public PaymentService(TransactionCoreDbContext dbContext, IUserInfoService userFinance, IPromoService promoService, ISubscriptionUsageService subscriptionUsageService, IReferralRoleRewardSerice referralRoleReward, IRemainderInfoService remainderInfoService, IReferralService referralService)
+        private readonly ISubscriptionService _subscriptionService;
+        public PaymentService(TransactionCoreDbContext dbContext, IUserInfoService userFinance, IPromoService promoService, ISubscriptionUsageService subscriptionUsageService, IReferralRoleRewardSerice referralRoleReward, IRemainderInfoService remainderInfoService, IReferralService referralService, ISubscriptionService subscriptionService)
         {
             _dbContext = dbContext;
             _userInfoService = userFinance;
@@ -26,6 +27,7 @@ namespace TransactionCore.Services.Implementation
             _referralRoleReward = referralRoleReward;
             _remainderInfoService = remainderInfoService;
             _referralService = referralService;
+            _subscriptionService = subscriptionService;
         }
 
         public async Task ApprovePayment(Guid userInfoId, decimal amount, string txHash)
@@ -133,29 +135,44 @@ namespace TransactionCore.Services.Implementation
             return paymentDetails;
         }
 
-        public async Task<PageResultModel<UserPaymentResponseModel>> GetUserPaymentsAsync(Guid userId, int pageNumber = 1, int pageSize = 10)
+        public async Task<PageResultModel<UserPaymentResponseModel>> GetUserPaymentsAsync(Guid userId, int languageId, int pageNumber = 1, int pageSize = 10)
         {
-            var query = _dbContext.Payments
+            var paymentsQuery = _dbContext.Payments
+                .Include(p => p.Wallet)
+                    .ThenInclude(w => w.PaymentMethod)
+                        .ThenInclude(pm => pm.Crypto)
+                .Include(p => p.Wallet)
+                    .ThenInclude(w => w.PaymentMethod)
+                        .ThenInclude(pm => pm.Network)
+                .Include(p => p.SubscriptionPackage)
                 .Where(p => p.UserInfo.UserId == userId)
-                .OrderByDescending(p => p.CreatedDate)
-                .Select(p => new UserPaymentResponseModel
-                {
-                    Amount = p.PayedFee ?? 0,
-                    Currency = p.Wallet.PaymentMethod.Crypto.Name,
-                    Network = p.Wallet.PaymentMethod.Network.Name,
-                    Plan = p.SubscriptionPackage.Name,
-                    Status = p.Status.ToString(),
-                    CreatedAt = p.CreatedDate,
-                    PaidAt = p.PaymentDate
-                });
+                .OrderByDescending(p => p.CreatedDate);
 
-            var totalCount = await query.CountAsync();
+            var totalCount = await paymentsQuery.CountAsync();
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            var data = await query
+            var payments = await paymentsQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            var responseData = new List<UserPaymentResponseModel>();
+
+            foreach (var payment in payments)
+            {
+                var (translatedName, _) = await _subscriptionService.GetTranslationAsync(payment.SubscriptionPackage.Id, languageId);
+
+                responseData.Add(new UserPaymentResponseModel
+                {
+                    Amount = payment.PayedFee ?? 0,
+                    Currency = payment.Wallet?.PaymentMethod?.Crypto?.Name ?? string.Empty,
+                    Network = payment.Wallet?.PaymentMethod?.Network?.Name ?? string.Empty,
+                    Plan = translatedName ?? "Unknown plan",
+                    Status = payment.Status.ToString(),
+                    CreatedAt = payment.CreatedDate,
+                    PaidAt = payment.PaymentDate
+                });
+            }
 
             return new PageResultModel<UserPaymentResponseModel>
             {
@@ -163,7 +180,7 @@ namespace TransactionCore.Services.Implementation
                 PageSize = pageSize,
                 TotalCount = totalCount,
                 TotalPages = totalPages,
-                Data = data
+                Data = responseData
             };
         }
 

@@ -44,7 +44,7 @@ namespace IdentityService.Migrations
 
                     b.HasIndex("ReferrerUserId");
 
-                    b.ToTable("Referrals");
+                    b.ToTable("Referrals", (string)null);
                 });
 
             modelBuilder.Entity("IdentityService.Data.Entity.RefreshToken", b =>
@@ -74,7 +74,7 @@ namespace IdentityService.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("IdentityService.Data.Entity.Role", b =>
@@ -94,7 +94,7 @@ namespace IdentityService.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -185,7 +185,7 @@ namespace IdentityService.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("IdentityService.Data.Entity.Referral", b =>

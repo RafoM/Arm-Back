@@ -5,6 +5,8 @@ namespace ContentService.Models.RequestModels
     public class TutorialRequestModel
     {
         public string Subject { get; set; }
-        public DifficultyLevelEnum Difficulty { get; set; }
+        public Guid DifficultyId { get; set; }
+        public int LanguageId { get; set; }
+
     }
 }

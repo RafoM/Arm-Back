@@ -4,6 +4,8 @@ using ContentService.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using ContentService.Models.ResponseModels;
 using ContentService.Models.RequestModels;
+using ContentService.Common.Constants;
+using ContentService.Common.Enums;
 
 namespace ContentService.Services.Implementation
 {
@@ -11,20 +13,22 @@ namespace ContentService.Services.Implementation
     {
         private readonly ContentDbContext _context;
         private readonly IFileStorageService _fileStorageService;
-        public LessonService(ContentDbContext context, IFileStorageService fileStorageService)
+        private readonly IContentTranslationService _translationService;
+
+        public LessonService(ContentDbContext context, IFileStorageService fileStorageService, IContentTranslationService translationService)
         {
             _context = context;
             _fileStorageService = fileStorageService;
+            _translationService = translationService;
         }
 
-        public async Task<LessonResponseModel> CreateLessonAsync(int tutorialId, LessonRequestModel request)
+        public async Task<LessonResponseModel> CreateLessonAsync(Guid tutorialId, LessonRequestModel request)
         {
             var lesson = new Lesson
             {
+                Id = Guid.NewGuid(),
                 TutorialId = tutorialId,
                 LessonNumber = request.LessonNumber,
-                Title = request.Title,
-                Content = request.Content,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -32,34 +36,40 @@ namespace ContentService.Services.Implementation
             _context.Lessons.Add(lesson);
             await _context.SaveChangesAsync();
 
-            return MapLesson(lesson);
+            await SaveTranslations(lesson.Id, request.Title, request.Title, request.LanguageId);
+            await SaveTranslations(lesson.Id, request.Content, request.Content, request.LanguageId);
+            return await MapLesson(lesson, request.LanguageId);
         }
+
         public async Task<string> UploadMediaAsync(IFormFile mediaFile)
         {
             if (mediaFile == null || mediaFile.Length == 0)
                 throw new Exception("Invalid media file.");
 
-            var flagUrl = await _fileStorageService.UploadFileAsync(mediaFile, "lesson-medias");
-
-            return flagUrl;
+            return await _fileStorageService.UploadFileAsync(mediaFile, "lesson-medias");
         }
-        public async Task<List<LessonResponseModel>> GetLessonsAsync(int tutorialId)
+
+        public async Task<List<LessonResponseModel>> GetLessonsAsync(Guid tutorialId, int languageId)
         {
-            return await _context.Lessons
+            var lessons = await _context.Lessons
                 .Where(l => l.TutorialId == tutorialId)
                 .OrderBy(l => l.LessonNumber)
-                .Select(l => MapLesson(l))
                 .ToListAsync();
+
+            var results = new List<LessonResponseModel>();
+            foreach (var lesson in lessons)
+                results.Add(await MapLesson(lesson, languageId));
+
+            return results;
         }
 
-        public async Task<LessonResponseModel> GetLessonByNumberAsync(int tutorialId, int lessonNumber)
+        public async Task<LessonResponseModel> GetLessonByNumberAsync(Guid tutorialId, int lessonNumber, int languageId)
         {
             var lesson = await _context.Lessons
                 .FirstOrDefaultAsync(l => l.TutorialId == tutorialId && l.LessonNumber == lessonNumber);
 
             if (lesson == null) throw new KeyNotFoundException("Lesson not found.");
-
-            return MapLesson(lesson);
+            return await MapLesson(lesson, languageId);
         }
 
         public async Task UpdateLessonAsync(LessonUpdateModel request)
@@ -69,14 +79,14 @@ namespace ContentService.Services.Implementation
 
             if (lesson == null) throw new KeyNotFoundException("Lesson not found.");
 
-            lesson.Title = request.Title;
-            lesson.Content = request.Content;
             lesson.UpdatedAt = DateTime.UtcNow;
-
             await _context.SaveChangesAsync();
+
+            await SaveTranslations(lesson.Id, request.Title, request.Title, request.LanguageId);
+            await SaveTranslations(lesson.Id, request.Content, request.Content, request.LanguageId);
         }
 
-        public async Task DeleteLessonAsync(int tutorialId, int lessonNumber)
+        public async Task DeleteLessonAsync(Guid tutorialId, int lessonNumber)
         {
             var lesson = await _context.Lessons
                 .FirstOrDefaultAsync(l => l.TutorialId == tutorialId && l.LessonNumber == lessonNumber);
@@ -85,16 +95,30 @@ namespace ContentService.Services.Implementation
 
             _context.Lessons.Remove(lesson);
             await _context.SaveChangesAsync();
+
+            await _translationService.DeleteTranslationsAsync(lesson.Id, ContentTypeEnum.Lesson);
         }
 
-        private static LessonResponseModel MapLesson(Lesson lesson) => new LessonResponseModel
+        private async Task SaveTranslations(Guid lessonId, string title, string content, int languageId)
         {
-            Id = lesson.Id,
-            LessonNumber = lesson.LessonNumber,
-            Title = lesson.Title,
-            Content = lesson.Content,
-            CreatedAt = lesson.CreatedAt,
-            UpdatedAt = lesson.UpdatedAt
-        };
+            await _translationService.SetTranslationAsync(lessonId, ContentTranslationKeys.Title, title, languageId, ContentTypeEnum.Lesson);
+            await _translationService.SetTranslationAsync(lessonId, ContentTranslationKeys.Content, content, languageId, ContentTypeEnum.Lesson);
+        }
+
+        private async Task<LessonResponseModel> MapLesson(Lesson lesson, int languageId)
+        {
+            var title = await _translationService.GetTranslationAsync(lesson.Id, ContentTranslationKeys.Title, languageId, ContentTypeEnum.Lesson);
+            var content = await _translationService.GetTranslationAsync(lesson.Id, ContentTranslationKeys.Content, languageId, ContentTypeEnum.Lesson);
+
+            return new LessonResponseModel
+            {
+                Id = lesson.Id,
+                LessonNumber = lesson.LessonNumber,
+                Title = title ?? string.Empty,
+                Content = content ?? string.Empty,
+                CreatedAt = lesson.CreatedAt,
+                UpdatedAt = lesson.UpdatedAt
+            };
+        }
     }
 }

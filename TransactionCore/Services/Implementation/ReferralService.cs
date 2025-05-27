@@ -12,10 +12,12 @@ namespace TransactionCore.Services.Implementation
     {
         private readonly TransactionCoreDbContext _dbContext;
         private readonly IReferralRoleRewardSerice _referralRoleReward;
-        public ReferralService(TransactionCoreDbContext dbContext, IReferralRoleRewardSerice referralRoleReward)
+        private readonly ISubscriptionService _subscriptionService;
+        public ReferralService(TransactionCoreDbContext dbContext, IReferralRoleRewardSerice referralRoleReward, ISubscriptionService subscriptionService)
         {
             _dbContext = dbContext;
             _referralRoleReward = referralRoleReward;
+            _subscriptionService = subscriptionService;
         }
 
 
@@ -46,7 +48,7 @@ namespace TransactionCore.Services.Implementation
         }
 
 
-        public async Task<ReferralConversionStatsResponseModel> GetReferralConversionStatsAsync(Guid userId)
+        public async Task<ReferralConversionStatsResponseModel> GetReferralConversionStatsAsync(Guid userId, string role)
         {
             var userInfo = await GetCurrentUserInfoAsync(userId);
 
@@ -72,15 +74,20 @@ namespace TransactionCore.Services.Implementation
             var reward = await _referralRoleReward.GetReferralRewardPercentageAsync(userInfo.Id, userInfo.ReferralPurchaseCount) * 100;
             var currentLevel = new ReferralLevelResponseModel
             {
-                Label = (reward / 5).ToString(),
+                Label = userInfo.IsSubscribed ? role : (reward / 5).ToString(),
                 Percentage = (int)reward
             };
 
-            var nextLevel = new ReferralLevelResponseModel
+            ReferralLevelResponseModel nextLevel = null;
+
+            if (!userInfo.IsSubscribed)
             {
-                Label = "EarlyAccess",
-                Percentage = 40
-            };
+                nextLevel = new ReferralLevelResponseModel
+                {
+                    Label = currentLevel.Label == "5" ? "EarlyAccess" : (reward / 5 + 1).ToString(),
+                    Percentage = 40
+                };
+            }
 
             return new ReferralConversionStatsResponseModel
             {
@@ -143,7 +150,7 @@ namespace TransactionCore.Services.Implementation
         }
 
         public async Task<PageResultModel<ReferralActivityResponseModel>> GetReferralActivityAsync(
-     Guid userId, int pageNumber = 1, int pageSize = 10)
+      Guid userId, int languageId, int pageNumber = 1, int pageSize = 10)
         {
             var userInfo = await GetCurrentUserInfoAsync(userId);
 
@@ -161,13 +168,27 @@ namespace TransactionCore.Services.Implementation
                 .Take(pageSize)
                 .ToListAsync();
 
-            var data = items.Select(a => new ReferralActivityResponseModel
+            var data = new List<ReferralActivityResponseModel>();
+
+            foreach (var activity in items)
             {
-                ReferredUser = a.ReferredUserInfo.UserId.ToString(),
-                Commission = a.Commission,
-                Action = a.Action.ToString() + (a.Payment?.SubscriptionPackage?.Name != null ? $" – {a.Payment.SubscriptionPackage.Name}" : string.Empty),
-                ActionDate = a.ActionDate
-            });
+                string? planName = null;
+
+                if (activity.Payment?.SubscriptionPackage != null)
+                {
+                    var (translatedName, _) = await _subscriptionService
+                        .GetTranslationAsync(activity.Payment.SubscriptionPackage.Id, languageId);
+                    planName = translatedName;
+                }
+
+                data.Add(new ReferralActivityResponseModel
+                {
+                    ReferredUser = activity.ReferredUserInfo.UserId.ToString(),
+                    Commission = activity.Commission,
+                    Action = activity.Action.ToString() + (planName != null ? $" – {planName}" : string.Empty),
+                    ActionDate = activity.ActionDate
+                });
+            }
 
             return new PageResultModel<ReferralActivityResponseModel>
             {
@@ -175,12 +196,13 @@ namespace TransactionCore.Services.Implementation
                 PageSize = pageSize,
                 TotalPages = totalPages,
                 TotalCount = totalCount,
-                Data = data.ToList()
+                Data = data
             };
         }
 
+
         public async Task<PageResultModel<ReferralPaymentResponseModel>> GetReferralPaymentsAsync(
-     Guid userId, int pageNumber = 1, int pageSize = 10)
+          Guid userId, int languageId, int pageNumber = 1, int pageSize = 10)
         {
             var userInfo = await GetCurrentUserInfoAsync(userId);
 
@@ -197,21 +219,37 @@ namespace TransactionCore.Services.Implementation
             var totalCount = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            var data = await query
+            var items = await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(r => new ReferralPaymentResponseModel
+                .ToListAsync();
+
+            var data = new List<ReferralPaymentResponseModel>();
+
+            foreach (var r in items)
+            {
+                string? planName = "-";
+                if (r.Payment?.SubscriptionPackage != null)
+                {
+                    var (translatedName, _) = await _subscriptionService.GetTranslationAsync(
+                        r.Payment.SubscriptionPackage.Id,
+                        languageId
+                    );
+                    planName = translatedName ?? "-";
+                }
+
+                data.Add(new ReferralPaymentResponseModel
                 {
                     Email = r.Payment.UserInfo.DenormalizedEmail,
                     Amount = r.Payment.ExpectedFee,
-                    Currency = r.Payment.Wallet.PaymentMethod.Crypto.Name ?? "USDT",
-                    Network = r.Payment.Wallet.PaymentMethod.Network.Name ?? "TRON",
-                    Plan = r.Payment.SubscriptionPackage.Name ?? "-",
+                    Currency = r.Payment.Wallet?.PaymentMethod?.Crypto?.Name,
+                    Network = r.Payment.Wallet?.PaymentMethod?.Network?.Name,
+                    Plan = planName,
                     Status = r.Payment.Status.ToString(),
                     CreatedAt = r.Payment.CreatedDate,
                     PaidAt = r.Payment.PaymentDate
-                })
-                .ToListAsync();
+                });
+            }
 
             return new PageResultModel<ReferralPaymentResponseModel>
             {

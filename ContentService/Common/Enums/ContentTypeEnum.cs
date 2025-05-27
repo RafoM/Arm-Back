@@ -9,6 +9,7 @@
         CaseTag,
         Tutorial,
         Lesson,
-        SubscriptionPackage
+        SubscriptionPackage,
+        DifficultyLevel
     }
 }

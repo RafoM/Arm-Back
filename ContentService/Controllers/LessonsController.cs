@@ -16,46 +16,55 @@ namespace ContentService.Controllers
             _lessonService = lessonService;
         }
 
+        private int GetLanguageId()
+        {
+            return HttpContext.Items.TryGetValue("LanguageId", out var value) && value is int id
+                ? id
+                : throw new Exception("LanguageId header is missing or invalid.");
+        }
+
         /// <summary>
         /// Creates a new lesson for a tutorial.
         /// </summary>
-        /// <param name="tutorialId">Tutorial ID.</param>
-        /// <param name="request">Lesson creation data.</param>
-        /// <returns>The created lesson.</returns>
         [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<ActionResult<LessonResponseModel>> CreateLesson(int tutorialId, [FromBody] LessonRequestModel request)
-            => Ok(await _lessonService.CreateLessonAsync(tutorialId, request));
+        [HttpPost("{tutorialId}")]
+        public async Task<ActionResult<LessonResponseModel>> CreateLesson(Guid tutorialId, [FromBody] LessonRequestModel request)
+        {
+            request.LanguageId = GetLanguageId();
+            var createdLesson = await _lessonService.CreateLessonAsync(tutorialId, request);
+            return CreatedAtAction(nameof(GetLessonByNumber), new { tutorialId, lessonNumber = createdLesson.LessonNumber }, createdLesson);
+        }
 
         /// <summary>
         /// Retrieves all lessons for a tutorial.
         /// </summary>
-        /// <param name="tutorialId">Tutorial ID.</param>
-        /// <returns>List of lessons.</returns>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<LessonResponseModel>>> GetLessons(int tutorialId)
-            => Ok(await _lessonService.GetLessonsAsync(tutorialId));
+        [HttpGet("{tutorialId}")]
+        public async Task<ActionResult<IEnumerable<LessonResponseModel>>> GetLessons(Guid tutorialId)
+        {
+            var languageId = GetLanguageId();
+            var lessons = await _lessonService.GetLessonsAsync(tutorialId, languageId);
+            return Ok(lessons);
+        }
 
         /// <summary>
         /// Retrieves a specific lesson by lesson number.
         /// </summary>
-        /// <param name="tutorialId">Tutorial ID.</param>
-        /// <param name="lessonNumber">Lesson number.</param>
-        /// <returns>The requested lesson.</returns>
-        [HttpGet("{lessonNumber}")]
-        public async Task<ActionResult<LessonResponseModel>> GetLessonByNumber(int tutorialId, int lessonNumber)
-            => Ok(await _lessonService.GetLessonByNumberAsync(tutorialId, lessonNumber));
+        [HttpGet("{tutorialId}/lesson/{lessonNumber}")]
+        public async Task<ActionResult<LessonResponseModel>> GetLessonByNumber(Guid tutorialId, int lessonNumber)
+        {
+            var languageId = GetLanguageId();
+            var lesson = await _lessonService.GetLessonByNumberAsync(tutorialId, lessonNumber, languageId);
+            return Ok(lesson);
+        }
 
         /// <summary>
         /// Updates a specific lesson.
         /// </summary>
-        /// <param name="tutorialId">Tutorial ID.</param>
-        /// <param name="lessonNumber">Lesson number.</param>
-        /// <param name="request">Updated lesson data.</param>
         [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> UpdateLesson([FromBody] LessonUpdateModel request)
         {
+            request.LanguageId = GetLanguageId();
             await _lessonService.UpdateLessonAsync(request);
             return NoContent();
         }
@@ -63,23 +72,19 @@ namespace ContentService.Controllers
         /// <summary>
         /// Deletes a specific lesson.
         /// </summary>
-        /// <param name="tutorialId">Tutorial ID.</param>
-        /// <param name="lessonNumber">Lesson number.</param>
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{lessonNumber}")]
-        public async Task<IActionResult> DeleteLesson(int tutorialId, int lessonNumber)
+        [HttpDelete("{tutorialId}/lesson/{lessonNumber}")]
+        public async Task<IActionResult> DeleteLesson(Guid tutorialId, int lessonNumber)
         {
             await _lessonService.DeleteLessonAsync(tutorialId, lessonNumber);
             return NoContent();
         }
 
         /// <summary>
-        /// Uploads a media file for lesson content (e.g., image or video).
+        /// Uploads a media file for lesson content.
         /// </summary>
-        /// <param name="request">The media upload request.</param>
-        /// <returns>The URL of the uploaded media.</returns>
-        [HttpPost("upload-media")]
         [Authorize(Roles = "Admin")]
+        [HttpPost("upload-media")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -91,6 +96,5 @@ namespace ContentService.Controllers
             var mediaUrl = await _lessonService.UploadMediaAsync(request.MediaFile);
             return Ok(mediaUrl);
         }
-
     }
 }

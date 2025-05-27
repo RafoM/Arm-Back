@@ -177,8 +177,7 @@ namespace TransactionCore.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
                 entity.Property(p => p.Price).HasPrecision(18, 4);
-                entity.Property(e => e.Name)
-                      .IsRequired();
+               
             });
             modelBuilder.Entity<Crypto>(entity =>
             {

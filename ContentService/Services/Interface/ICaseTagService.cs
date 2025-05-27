@@ -7,8 +7,8 @@ namespace ContentService.Services.Interface
     {
         Task<CaseTagResponseModel> CreateAsync(CaseTagRequestModel request);
         Task<CaseTagResponseModel> UpdateAsync(CaseTagUpdateModel request);
-        Task<CaseTagResponseModel> GetByIdAsync(int tagId);
-        Task<IEnumerable<CaseTagResponseModel>> GetAllAsync();
-        Task DeleteAsync(int tagId);
+        Task<CaseTagResponseModel> GetByIdAsync(Guid tagId, int languageId);
+        Task<IEnumerable<CaseTagResponseModel>> GetAllAsync(int languageId);
+        Task DeleteAsync(Guid tagId);
     }
 }

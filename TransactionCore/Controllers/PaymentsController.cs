@@ -22,15 +22,15 @@ namespace TransactionCore.Controllers
         /// </summary>
         /// <param name="pageNumber">Page number (default is 1)</param>
         /// <param name="pageSize">Page size (default is 10)</param>
+        /// <param name="languageId">Language ID from headers</param>
         /// <returns>Paginated list of user payments</returns>
         [HttpGet("all")]
         public async Task<ActionResult<PageResultModel<UserPaymentResponseModel>>> GetUserPayments(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            [FromHeader(Name = "LanguageId")] int languageId = 1)
         {
-          
-            var result = await _paymentService.GetUserPaymentsAsync(UserId, pageNumber, pageSize);
-
+            var result = await _paymentService.GetUserPaymentsAsync(UserId, languageId, pageNumber, pageSize);
             return Ok(result);
         }
     }

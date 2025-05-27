@@ -6,9 +6,9 @@ namespace ContentService.Services.Interface
     public interface ITutorialService
     {
         Task<TutorialResponseModel> CreateTutorialAsync(TutorialRequestModel request);
-        Task<List<TutorialResponseModel>> GetAllTutorialsAsync();
-        Task<TutorialResponseModel> GetTutorialByIdAsync(int id);
+        Task<List<TutorialResponseModel>> GetAllTutorialsAsync(int languageId);
+        Task<TutorialResponseModel> GetTutorialByIdAsync(Guid id, int languageId);
         Task UpdateTutorialAsync(TutorialUpdateModel request);
-        Task DeleteTutorialAsync(int id);
+        Task DeleteTutorialAsync(Guid id);
     }
 }

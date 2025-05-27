@@ -3,9 +3,15 @@ using ContentService.Models.ResponseModels;
 using ContentService.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
 
 namespace ContentService.Controllers
 {
+    /// <summary>
+    /// Controller for managing Case tags.
+    /// </summary>
     public class CaseTagsController : BaseController
     {
         private readonly ICaseTagService _tagService;
@@ -13,19 +19,29 @@ namespace ContentService.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="CaseTagsController"/> class.
         /// </summary>
-        /// <param name="tagService">The service handling Case tag operations.</param>
+        /// <param name="tagService">Service for Case tag operations.</param>
         public CaseTagsController(ICaseTagService tagService)
         {
             _tagService = tagService;
         }
 
         /// <summary>
-        /// Creates a new CaseTag record based on the provided request.
+        /// Retrieves the language ID from the request headers (set by middleware).
         /// </summary>
-        /// <param name="request">Request model containing Case tag data.</param>
-        /// <returns>
-        /// The newly created <see cref="CaseTagResponseModel"/> with its assigned ID.
-        /// </returns>
+        /// <returns>Language ID as an integer.</returns>
+        /// <exception cref="Exception">Thrown when language ID is missing.</exception>
+        private int GetLanguageId()
+        {
+            return HttpContext.Items.TryGetValue("LanguageId", out var value) && value is int id
+                ? id
+                : throw new Exception("LanguageId header is missing or invalid.");
+        }
+
+        /// <summary>
+        /// Creates a new Case tag.
+        /// </summary>
+        /// <param name="request">The tag creation request model.</param>
+        /// <returns>The created tag.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<CaseTagResponseModel>> CreateTag([FromBody] CaseTagRequestModel request)
@@ -38,29 +54,29 @@ namespace ContentService.Controllers
         }
 
         /// <summary>
-        /// Retrieves all existing tags.
+        /// Retrieves all Case tags in the requested language.
         /// </summary>
-        /// <returns>A list of <see cref="CaseTagResponseModel"/> objects.</returns>
+        /// <returns>List of Case tags.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CaseTagResponseModel>>> GetAllTags()
         {
-            var tags = await _tagService.GetAllAsync();
+            var languageId = GetLanguageId();
+            var tags = await _tagService.GetAllAsync(languageId);
             return Ok(tags);
         }
 
         /// <summary>
-        /// Retrieves a specific CaseTag by its unique identifier.
+        /// Retrieves a single Case tag by ID in the requested language.
         /// </summary>
-        /// <param name="tagId">ID of the tag to be retrieved.</param>
-        /// <returns>
-        /// The requested <see cref="CaseTagResponseModel"/> if found; otherwise 404 Not Found.
-        /// </returns>
+        /// <param name="tagId">The ID of the Case tag.</param>
+        /// <returns>The requested Case tag.</returns>
         [HttpGet("{tagId}")]
-        public async Task<ActionResult<CaseTagResponseModel>> GetTagById(int tagId)
+        public async Task<ActionResult<CaseTagResponseModel>> GetTagById(Guid tagId)
         {
             try
             {
-                var tag = await _tagService.GetByIdAsync(tagId);
+                var languageId = GetLanguageId();
+                var tag = await _tagService.GetByIdAsync(tagId, languageId);
                 return Ok(tag);
             }
             catch (KeyNotFoundException ex)
@@ -70,12 +86,10 @@ namespace ContentService.Controllers
         }
 
         /// <summary>
-        /// Updates an existing CaseTag with new data.
+        /// Updates an existing Case tag.
         /// </summary>
-        /// <param name="request">The update model containing new tag data and its ID.</param>
-        /// <returns>
-        /// The updated <see cref="CaseTagResponseModel"/> if successful; otherwise 404 Not Found.
-        /// </returns>
+        /// <param name="request">The tag update model.</param>
+        /// <returns>The updated tag.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<ActionResult<CaseTagResponseModel>> UpdateTag([FromBody] CaseTagUpdateModel request)
@@ -95,13 +109,13 @@ namespace ContentService.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific CaseTag by its unique identifier.
+        /// Deletes a Case tag by ID.
         /// </summary>
-        /// <param name="tagId">ID of the tag to be deleted.</param>
-        /// <returns>No content if successful, or 404 Not Found if the tag does not exist.</returns>
+        /// <param name="tagId">The ID of the tag to delete.</param>
+        /// <returns>HTTP 204 No Content if successful.</returns>
         [Authorize(Roles = "Admin")]
         [HttpDelete("{tagId}")]
-        public async Task<IActionResult> DeleteTag(int tagId)
+        public async Task<IActionResult> DeleteTag(Guid tagId)
         {
             try
             {

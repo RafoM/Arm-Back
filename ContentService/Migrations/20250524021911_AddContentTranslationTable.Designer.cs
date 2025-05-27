@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContentService.Migrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20250428221040_AddTutorialsAndLessons")]
-    partial class AddTutorialsAndLessons
+    [Migration("20250524021911_AddContentTranslationTable")]
+    partial class AddContentTranslationTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,11 @@ namespace ContentService.Migrations
 
             modelBuilder.Entity("BlogTagMap", b =>
                 {
-                    b.Property<int>("BlogId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("BlogId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("BlogTagId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("BlogTagId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("BlogId", "BlogTagId");
 
@@ -42,31 +42,13 @@ namespace ContentService.Migrations
 
             modelBuilder.Entity("ContentService.Data.Entity.Blog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MainImage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Subtitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -78,15 +60,10 @@ namespace ContentService.Migrations
 
             modelBuilder.Entity("ContentService.Data.Entity.BlogTag", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Tag")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.HasKey("Id");
 
@@ -95,31 +72,13 @@ namespace ContentService.Migrations
 
             modelBuilder.Entity("ContentService.Data.Entity.Case", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MainImage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Subtitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -131,19 +90,47 @@ namespace ContentService.Migrations
 
             modelBuilder.Entity("ContentService.Data.Entity.CaseTag", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CaseTags");
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.ContentTranslation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<Guid>("ContentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Tag")
+                    b.Property<string>("Value")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("CaseTags");
+                    b.HasIndex("ContentId", "Key", "LanguageId", "ContentType")
+                        .IsUnique();
+
+                    b.ToTable("ContentTranslations");
                 });
 
             modelBuilder.Entity("ContentService.Data.Entity.Language", b =>
@@ -177,40 +164,26 @@ namespace ContentService.Migrations
 
             modelBuilder.Entity("ContentService.Data.Entity.Lesson", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("LessonNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TutorialId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TutorialId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TutorialId", "LessonNumber")
-                        .IsUnique();
+                    b.HasIndex("TutorialId");
 
                     b.ToTable("Lessons");
                 });
@@ -228,50 +201,17 @@ namespace ContentService.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("PageId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("PageId", "Key")
-                        .IsUnique();
 
                     b.ToTable("LocalizationKeys", (string)null);
-                });
-
-            modelBuilder.Entity("ContentService.Data.Entity.Page", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Pages", (string)null);
                 });
 
             modelBuilder.Entity("ContentService.Data.Entity.Translation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<int>("LanguageId")
                         .HasColumnType("int");
@@ -295,37 +235,58 @@ namespace ContentService.Migrations
 
             modelBuilder.Entity("ContentService.Data.Entity.Tutorial", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Difficulty")
-                        .HasColumnType("int");
+                    b.Property<Guid>("DifficultyId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("DifficultyLevelId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DifficultyLevelId");
+
                     b.ToTable("Tutorials");
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.TutorialDifficultyLevel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TutorialDifficultyLevels");
                 });
 
             modelBuilder.Entity("caseTagMap", b =>
                 {
-                    b.Property<int>("CaseId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CaseId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("CaseTagId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CaseTagId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CaseId", "CaseTagId");
 
@@ -362,17 +323,6 @@ namespace ContentService.Migrations
                     b.Navigation("Tutorial");
                 });
 
-            modelBuilder.Entity("ContentService.Data.Entity.Localization", b =>
-                {
-                    b.HasOne("ContentService.Data.Entity.Page", "Page")
-                        .WithMany("LocalizationKeys")
-                        .HasForeignKey("PageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Page");
-                });
-
             modelBuilder.Entity("ContentService.Data.Entity.Translation", b =>
                 {
                     b.HasOne("ContentService.Data.Entity.Language", "Language")
@@ -390,6 +340,17 @@ namespace ContentService.Migrations
                     b.Navigation("Language");
 
                     b.Navigation("Localization");
+                });
+
+            modelBuilder.Entity("ContentService.Data.Entity.Tutorial", b =>
+                {
+                    b.HasOne("ContentService.Data.Entity.TutorialDifficultyLevel", "DifficultyLevel")
+                        .WithMany()
+                        .HasForeignKey("DifficultyLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DifficultyLevel");
                 });
 
             modelBuilder.Entity("caseTagMap", b =>
@@ -417,11 +378,6 @@ namespace ContentService.Migrations
             modelBuilder.Entity("ContentService.Data.Entity.Localization", b =>
                 {
                     b.Navigation("Translations");
-                });
-
-            modelBuilder.Entity("ContentService.Data.Entity.Page", b =>
-                {
-                    b.Navigation("LocalizationKeys");
                 });
 
             modelBuilder.Entity("ContentService.Data.Entity.Tutorial", b =>

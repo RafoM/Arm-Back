@@ -6,7 +6,7 @@ namespace ContentService.Models.RequestModels
     {
 
         [Required]
-        public int CaseId { get; set; }  
+        public Guid CaseId { get; set; }  
 
         [Required]
         public string Title { get; set; } = null!;
@@ -18,7 +18,7 @@ namespace ContentService.Models.RequestModels
         [Required]
         public string Content { get; set; } = null!;
 
-        public List<int>? TagIds { get; set; }
+        public List<Guid>? TagIds { get; set; }
         public int LanguageId { get; set; }
 
     }

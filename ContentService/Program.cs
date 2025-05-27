@@ -1,5 +1,8 @@
+using ContentService;
+using ContentService.Consumers;
 using ContentService.Data;
 using ContentService.Middlewares;
+using ContentService.Models.ConfigModels;
 using ContentService.Services.Implementation;
 using ContentService.Services.Interface;
 using Google.Cloud.Storage.V1;
@@ -47,7 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
-builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<IContentTranslationService, ContentTranslationService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IBlogTagService, BlogTagService>();
@@ -59,6 +62,11 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 //builder.Services.AddSingleton(StorageClient.Create());
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.Configure<RabbitMqConfigModel>(builder.Configuration.GetSection("RabbitMQ"));
+builder.Services.AddMessaging(
+    builder.Configuration,
+    typeof(GetTranslationsConsumer),
+    typeof(SetTranslationConsumer));
 
 
 builder.Services.AddControllers();
@@ -105,21 +113,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-app.UseMiddleware<LanguageIdMiddleware>();
+//app.UseMiddleware<LanguageIdMiddleware>();
 
-var supportedCultures = new List<CultureInfo>
-{
-    new CultureInfo("en-US"),
-    new CultureInfo("es-ES"),
-    new CultureInfo("fr-FR")
-};
+//var supportedCultures = new List<CultureInfo>
+//{
+//    new CultureInfo("en-US"),
+//    new CultureInfo("es-ES"),
+//    new CultureInfo("fr-FR")
+//};
 
-app.UseRequestLocalization(new RequestLocalizationOptions
-{
-    DefaultRequestCulture = new RequestCulture("en-US"),
-    SupportedCultures = supportedCultures,
-    SupportedUICultures = supportedCultures
-});
+//app.UseRequestLocalization(new RequestLocalizationOptions
+//{
+//    DefaultRequestCulture = new RequestCulture("en-US"),
+//    SupportedCultures = supportedCultures,
+//    SupportedUICultures = supportedCultures
+//});
 
 
 if (builder.Configuration.GetValue<bool>("ApplyMigrations"))

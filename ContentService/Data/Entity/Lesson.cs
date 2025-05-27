@@ -2,13 +2,13 @@
 {
     public class Lesson
     {
-        public int Id { get; set; }
-        public int TutorialId { get; set; }
-        public Tutorial Tutorial { get; set; }
+        public Guid Id { get; set; }
+
+        public Guid TutorialId { get; set; }
+        public Tutorial Tutorial { get; set; } = null!;
 
         public int LessonNumber { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; } 
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

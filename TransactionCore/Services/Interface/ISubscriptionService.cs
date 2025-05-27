@@ -10,5 +10,6 @@ namespace TransactionCore.Services.Interface
         Task<SubscriptionResponseModel> CreateAsync(SubscriptionRequestModel request);
         Task UpdateAsync(SubscriptionUpdateModel request);
         Task DeleteAsync(int id);
+        Task<(string? Name, string? Description)> GetTranslationAsync(Guid packageId, int languageId);
     }
 }

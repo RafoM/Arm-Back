@@ -25,7 +25,8 @@ namespace ContentService.Services.Implementation
                 {
                     Id = l.Id,
                     CultureCode = l.CultureCode,
-                    DisplayName = l.DisplayName
+                    DisplayName = l.DisplayName,
+                    FlagUrl = l.FlagUrl
                 }).ToListAsync();
         }
 
@@ -38,7 +39,8 @@ namespace ContentService.Services.Implementation
             {
                 Id = lang.Id,
                 CultureCode = lang.CultureCode,
-                DisplayName = lang.DisplayName
+                DisplayName = lang.DisplayName,
+                FlagUrl = lang.FlagUrl
             };
         }
 
@@ -87,9 +89,9 @@ namespace ContentService.Services.Implementation
             if (flagFile == null || flagFile.Length == 0)
                 throw new Exception("Invalid flag file.");
 
-           
-            var flagUrl = await _fileStorageService.UploadFileAsync(flagFile, "language-flags");
+            await _fileStorageService.DeleteFileAsync(language.FlagUrl);
 
+            var flagUrl = await _fileStorageService.UploadFileAsync(flagFile, "language-flags");
             language.FlagUrl = flagUrl;
             _dbContext.Languages.Update(language);
             await _dbContext.SaveChangesAsync();

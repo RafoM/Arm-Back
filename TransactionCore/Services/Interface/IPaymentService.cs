@@ -7,6 +7,6 @@ namespace TransactionCore.Services.Interface
     {
         Task ApprovePayment(Guid userInfoId, decimal amount, string txHash);
         Task<PaymentDetailsResponseModel> GetPaymentDetails(Guid userId, PaymentDetailsRequestModel requestModel);
-        Task<PageResultModel<UserPaymentResponseModel>> GetUserPaymentsAsync(Guid userId, int pageNumber = 1, int pageSize = 10);
+        Task<PageResultModel<UserPaymentResponseModel>> GetUserPaymentsAsync(Guid userId, int languageId, int pageNumber = 1, int pageSize = 10);
     }
 }

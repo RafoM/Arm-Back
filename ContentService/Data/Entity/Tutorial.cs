@@ -4,12 +4,14 @@ namespace ContentService.Data.Entity
 {
     public class Tutorial
     {
-        public int Id { get; set; }
-        public string Subject { get; set; }
-        public DifficultyLevelEnum Difficulty { get; set; }
+
+        public Guid Id { get; set; }
+
+        public Guid DifficultyId { get; set; }
+        public TutorialDifficultyLevel DifficultyLevel { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public ICollection<Lesson> Lessons { get; set; }
+        public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
     }
 }

@@ -7,9 +7,10 @@ namespace ContentService.Services.Interface
     {
         Task<CaseResponseModel> CreateAsync(CaseRequestModel request);
         Task<CaseResponseModel> UpdateAsync(CaseUpdateModel request);
-        Task<CaseResponseModel> GetByIdAsync(int CaseId);
-        Task<IEnumerable<CaseResponseModel>> GetAllAsync();
+        Task<CaseResponseModel> GetByIdAsync(Guid CaseId, int languageId);
+        Task<IEnumerable<CaseResponseModel>> GetAllAsync(int languageId);
+        Task DeleteAsync(Guid CaseId);
         Task<string> UploadCaseMediaAsync(IFormFile mediaFile);
-        Task DeleteAsync(int CaseId);
+        Task<IEnumerable<CaseResponseModel>> GetByTagIdsAsync(List<Guid> tagIds, int languageId);
     }
 }

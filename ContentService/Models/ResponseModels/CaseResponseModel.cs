@@ -2,7 +2,7 @@
 {
     public class CaseResponseModel
     {
-        public int CaseId { get; set; }
+        public Guid CaseId { get; set; }
         public string Title { get; set; } = null!;
         public string? Subtitle { get; set; }
         public string? MainImage { get; set; }

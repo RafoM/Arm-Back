@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TransactionCore.Models.RequestModels;
 using TransactionCore.Models.ResponseModels;
@@ -6,10 +7,13 @@ using TransactionCore.Services.Interface;
 
 namespace TransactionCore.Controllers
 {
+    [Authorize]
     public class ReferralController : BaseController
     {
         private readonly IReferralService _referralService;
-        private Guid UserId => Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
+
+        private Guid UserId => Guid.Parse(User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+        private string Role => User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value ?? "User";
 
         public ReferralController(IReferralService referralService)
         {
@@ -32,7 +36,7 @@ namespace TransactionCore.Controllers
         [HttpGet("conversion-stats")]
         public async Task<ActionResult<ReferralConversionStatsResponseModel>> GetConversionStats()
         {
-            var stats = await _referralService.GetReferralConversionStatsAsync(UserId);
+            var stats = await _referralService.GetReferralConversionStatsAsync(UserId, Role);
             return Ok(stats);
         }
 
@@ -62,9 +66,10 @@ namespace TransactionCore.Controllers
         [HttpGet("activity")]
         public async Task<ActionResult<PageResultModel<ReferralActivityResponseModel>>> GetReferralActivity(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            [FromHeader(Name = "LanguageId")] int languageId = 1)
         {
-            var result = await _referralService.GetReferralActivityAsync(UserId, pageNumber, pageSize);
+            var result = await _referralService.GetReferralActivityAsync(UserId, languageId, pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -74,12 +79,12 @@ namespace TransactionCore.Controllers
         [HttpGet("payments")]
         public async Task<ActionResult<PageResultModel<ReferralPaymentResponseModel>>> GetReferralPayments(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            [FromHeader(Name = "LanguageId")] int languageId = 1)
         {
-            var result = await _referralService.GetReferralPaymentsAsync(UserId, pageNumber, pageSize);
+            var result = await _referralService.GetReferralPaymentsAsync(UserId, languageId, pageNumber, pageSize);
             return Ok(result);
         }
-
 
         /// <summary>
         /// Returns paginated referral withdrawal requests made by the current user.
@@ -92,7 +97,6 @@ namespace TransactionCore.Controllers
             var result = await _referralService.GetReferralWithdrawalsAsync(UserId, pageNumber, pageSize);
             return Ok(result);
         }
-
 
         /// <summary>
         /// Creates a withdrawal request.

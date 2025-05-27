@@ -9,5 +9,6 @@ namespace ContentService.Models.RequestModels
 
         [Required]
         public string Tag { get; set; } = null!;
+        public int LanguageId { get; set; }
     }
 }

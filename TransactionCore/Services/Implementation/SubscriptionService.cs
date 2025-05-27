@@ -4,39 +4,49 @@ using TransactionCore.Models.RequestModels;
 using TransactionCore.Models.ResponseModels;
 using Microsoft.EntityFrameworkCore;
 using TransactionCore.Services.Interface;
+using Arbito.Shared.Contracts.ContentTranslation;
+using MassTransit;
+using TransactionCore.Common.Constants;
 
 namespace TransactionCore.Services.Implementation
 {
+
     public class SubscriptionService : ISubscriptionService
     {
         private readonly TransactionCoreDbContext _dbContext;
+        private readonly IRequestClient<GetTranslationsRequest> _translationClient;
 
-        public SubscriptionService(TransactionCoreDbContext dbContext)
+        public SubscriptionService(TransactionCoreDbContext dbContext, IRequestClient<GetTranslationsRequest> translationClient)
         {
             _dbContext = dbContext;
+            _translationClient = translationClient;
         }
-
-        //public async Task<> GetSubscriptionPrice() 
-        //{
-            
-        //}
-
 
         public async Task<IEnumerable<SubscriptionResponseModel>> GetAllAsync(int? languageId)
         {
             if (languageId == null) languageId = 1;
-            var packages = await _dbContext.SubscriptionPackages.Where(x => x.LanguageId == languageId).ToListAsync();
-            return packages.Select(p => new SubscriptionResponseModel
+            var packages = await _dbContext.SubscriptionPackages.ToListAsync();
+
+            var response = new List<SubscriptionResponseModel>();
+
+            foreach (var p in packages)
             {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                Duration = p.Duration,
-                Price = p.Price,
-                Discount = p.Discount,
-                Currency = p.Currency,
-                FinalPrice = (decimal)(p.Price * (decimal)p.Discount / 100)
-            });
+                var (name, description) = await GetTranslationAsync(p.Id, languageId.Value);
+
+                response.Add(new SubscriptionResponseModel
+                {
+                    Id = p.Id,
+                    Name = name,
+                    Description = description,
+                    Duration = p.Duration,
+                    Price = p.Price,
+                    Discount = p.Discount,
+                    Currency = p.Currency,
+                    FinalPrice = (decimal)(p.Price * (decimal)p.Discount / 100)
+                });
+            }
+
+            return response;
         }
 
         public async Task<SubscriptionResponseModel> GetByIdAsync(int id)
@@ -44,11 +54,13 @@ namespace TransactionCore.Services.Implementation
             var p = await _dbContext.SubscriptionPackages.FindAsync(id);
             if (p == null) return null;
 
+            var (name, description) = await GetTranslationAsync(p.Id, p.LanguageId);
+
             return new SubscriptionResponseModel
             {
                 Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
+                Name = name,
+                Description = description,
                 Duration = p.Duration,
                 Price = p.Price,
                 Discount = p.Discount,
@@ -62,8 +74,6 @@ namespace TransactionCore.Services.Implementation
             var package = new SubscriptionPackage
             {
                 LanguageId = request.LanguageId,
-                Name = request.Name,
-                Description = request.Description,
                 Duration = request.Duration,
                 Price = request.Price,
                 Discount = request.Discount,
@@ -77,12 +87,13 @@ namespace TransactionCore.Services.Implementation
             return new SubscriptionResponseModel
             {
                 Id = package.Id,
-                Name = package.Name,
-                Description = package.Description,
+                Name = null,
+                Description = null,
                 Duration = package.Duration,
                 Price = package.Price,
                 Discount = package.Discount,
-                Currency = package.Currency
+                Currency = package.Currency,
+                FinalPrice = (decimal)(package.Price * (decimal)package.Discount / 100)
             };
         }
 
@@ -92,8 +103,6 @@ namespace TransactionCore.Services.Implementation
             if (existing == null)
                 throw new Exception("Subscription package not found");
 
-            existing.Name = request.Name;
-            existing.Description = request.Description;
             existing.Duration = request.Duration;
             existing.Price = request.Price;
             existing.Discount = request.Discount;
@@ -112,6 +121,23 @@ namespace TransactionCore.Services.Implementation
 
             _dbContext.SubscriptionPackages.Remove(existing);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<(string? Name, string? Description)> GetTranslationAsync(Guid packageId, int languageId)
+        {
+            var translations = await _translationClient.GetResponse<GetTranslationsResponse>(new GetTranslationsRequest
+            {
+                ContentId = packageId,
+                ContentType = "SubscriptionPackage"
+            });
+
+            var name = translations.Message.Translations
+                .FirstOrDefault(t => t.Key == TranslationKeys.Name && t.LanguageId == languageId)?.Value;
+
+            var description = translations.Message.Translations
+                .FirstOrDefault(t => t.Key == TranslationKeys.Description && t.LanguageId == languageId)?.Value;
+
+            return (name, description);
         }
     }
 }
