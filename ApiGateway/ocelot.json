@@ -415,6 +415,39 @@
       "SwaggerKey": "content"
     },
     {
+      "DownstreamPathTemplate": "/api/TutorialDifficulties",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/TutorialDifficulties",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/TutorialDifficulties/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/TutorialDifficulties/{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
       "DownstreamPathTemplate": "/api/Tutorials",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -441,6 +474,39 @@
         }
       ],
       "UpstreamPathTemplate": "/content/api/Tutorials/{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/TutorialSubject",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/TutorialSubject",
+      "UpstreamHttpMethod": [
+        "POST",
+        "GET",
+        "PUT"
+      ],
+      "SwaggerKey": "content"
+    },
+    {
+      "DownstreamPathTemplate": "/api/TutorialSubject/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/content/api/TutorialSubject/{id}",
       "UpstreamHttpMethod": [
         "GET",
         "DELETE"

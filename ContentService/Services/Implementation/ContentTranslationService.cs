@@ -15,6 +15,13 @@ namespace ContentService.Services.Implementation
             _context = context;
         }
 
+        public async Task<List<ContentTranslation>> GetAllTranslationsAsync(Guid contentId, string key, ContentTypeEnum contentType)
+        {
+            return await _context.ContentTranslations
+                .Where(t => t.ContentId == contentId && t.Key == key && t.ContentType == contentType)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<ContentTranslation>> GetTranslationsAsync(Guid contentId, ContentTypeEnum contentType)
         {
             return await _context.ContentTranslations

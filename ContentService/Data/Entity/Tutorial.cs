@@ -13,5 +13,6 @@ namespace ContentService.Data.Entity
         public DateTime UpdatedAt { get; set; }
 
         public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+        public ICollection<TutorialSubject> Subjects { get; set; } = new List<TutorialSubject>();
     }
 }

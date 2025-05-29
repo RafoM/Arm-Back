@@ -4,8 +4,8 @@ namespace ContentService.Models.RequestModels
 {
     public class TutorialUpdateModel
     {
-        public int Id { get; set; }
-        public string Subject { get; set; }
+        public Guid Id { get; set; }
+        public List<Guid> SubjectIds { get; set; }
         public Guid DifficultyId { get; set; }
         public int LanguageId { get; set; }
     }

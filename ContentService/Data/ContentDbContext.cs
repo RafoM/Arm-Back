@@ -19,9 +19,32 @@ namespace ContentService.Data
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<ContentTranslation> ContentTranslations { get; set; }
         public DbSet<TutorialDifficultyLevel> TutorialDifficultyLevels { get; set; }
+        public DbSet<TutorialSubject> TutorialSubjects { get; set; }
+
         //rolepermission
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Tutorial>()
+                        .HasMany(t => t.Subjects)
+                        .WithMany(s => s.Tutorials)
+                        .UsingEntity<Dictionary<string, object>>(
+                            "TutorialTutorialSubject", 
+                            j => j.HasOne<TutorialSubject>()
+                                  .WithMany()
+                                  .HasForeignKey("TutorialSubjectId")
+                                  .OnDelete(DeleteBehavior.Cascade),
+                            j => j.HasOne<Tutorial>()
+                                  .WithMany()
+                                  .HasForeignKey("TutorialId")
+                                  .OnDelete(DeleteBehavior.Cascade),
+                            j =>
+                            {
+                                j.HasKey("TutorialId", "TutorialSubjectId");
+                                j.ToTable("TutorialTutorialSubject"); 
+                                j.Property<DateTime>("CreatedAt").HasDefaultValueSql("GETUTCDATE()");
+                            }
+                        );
 
             modelBuilder.Entity<ContentTranslation>()
                         .HasIndex(ct => new { ct.ContentId, ct.Key, ct.LanguageId, ct.ContentType })

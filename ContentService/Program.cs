@@ -58,6 +58,8 @@ builder.Services.AddScoped<ICaseService, CaseService>();
 builder.Services.AddScoped<ICaseTagService, CaseTagService>();
 builder.Services.AddScoped<ITutorialService, TutorialService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<TutorialDifficultyService, TutorialDifficultyService>();
+builder.Services.AddScoped<ITutorialSubjectService,  TutorialSubjectService>();
 
 //builder.Services.AddSingleton(StorageClient.Create());
 

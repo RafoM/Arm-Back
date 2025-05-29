@@ -18,18 +18,17 @@ namespace ContentService.Controllers
 
         private int GetLanguageId()
         {
-            return HttpContext.Items.TryGetValue("LanguageId", out var value) && value is int id
-                ? id
-                : throw new Exception("LanguageId header is missing or invalid.");
+            if (HttpContext.Items.TryGetValue("LanguageId", out var value) && value is int id)
+                return id;
+
+            throw new Exception("LanguageId header is missing or invalid.");
         }
 
         /// <summary>
         /// Creates a new tutorial.
         /// </summary>
-        /// <param name="request">Tutorial creation data.</param>
-        /// <returns>The created tutorial.</returns>
-        [Authorize(Roles = "Admin")]
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<TutorialResponseModel>> CreateTutorial([FromBody] TutorialRequestModel request)
         {
             request.LanguageId = GetLanguageId();
@@ -38,22 +37,21 @@ namespace ContentService.Controllers
         }
 
         /// <summary>
-        /// Retrieves all tutorials.
+        /// Retrieves all tutorials with optional filters.
         /// </summary>
-        /// <returns>List of tutorials.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TutorialResponseModel>>> GetAllTutorials()
+        public async Task<ActionResult<IEnumerable<TutorialResponseModel>>> GetAllTutorials(
+            [FromQuery] Guid? difficultyId = null,
+            [FromQuery] List<Guid>? subjectIds = null)
         {
             var languageId = GetLanguageId();
-            var tutorials = await _tutorialService.GetAllTutorialsAsync(languageId);
+            var tutorials = await _tutorialService.GetAllTutorialsAsync(languageId, difficultyId, subjectIds);
             return Ok(tutorials);
         }
 
         /// <summary>
         /// Retrieves a tutorial by its ID.
         /// </summary>
-        /// <param name="id">Tutorial ID.</param>
-        /// <returns>The requested tutorial.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<TutorialResponseModel>> GetTutorialById(Guid id)
         {
@@ -72,9 +70,8 @@ namespace ContentService.Controllers
         /// <summary>
         /// Updates a tutorial.
         /// </summary>
-        /// <param name="request">Updated tutorial data.</param>
-        [Authorize(Roles = "Admin")]
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateTutorial([FromBody] TutorialUpdateModel request)
         {
             try
@@ -92,9 +89,8 @@ namespace ContentService.Controllers
         /// <summary>
         /// Deletes a tutorial.
         /// </summary>
-        /// <param name="id">Tutorial ID.</param>
-        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTutorial(Guid id)
         {
             try

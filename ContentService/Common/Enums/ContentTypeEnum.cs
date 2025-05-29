@@ -10,6 +10,7 @@
         Tutorial,
         Lesson,
         SubscriptionPackage,
-        DifficultyLevel
+        DifficultyLevel,
+        TutorialSubject
     }
 }
