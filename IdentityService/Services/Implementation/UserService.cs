@@ -66,9 +66,9 @@ namespace IdentityService.Services.Implementation
             });
         }
 
-        public async Task UpdateUserInfoAsync(UserInfoUpdateRequestModel request)
+        public async Task UpdateUserInfoAsync(Guid userId, UserInfoUpdateRequestModel request)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == request.UserId);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null) throw new Exception("User not found.");
 
             user.FirstName = request.FirstName;
@@ -103,7 +103,8 @@ namespace IdentityService.Services.Implementation
             await _dbContext.SaveChangesAsync();
 
             var baseUrl = _configuration["BaseUrl"];
-            var verificationUrl = $"{baseUrl}/api/user/verify?token={token}";
+            ///api/User/verify?token=
+            var verificationUrl = $"{baseUrl}+{token}";
 
             var subject = "Please verify your email address";
             var htmlContent = $"<p>Please verify your email by clicking <a href='{verificationUrl}'>here</a>.</p>";

@@ -47,7 +47,7 @@ namespace IdentityService.Controllers
         {
             try
             {
-                await _userService.UpdateUserInfoAsync(requestModel);
+                await _userService.UpdateUserInfoAsync(UserId, requestModel);
                 return Ok(new { message = "User info successfully updated" });
             }
             catch (Exception ex)
