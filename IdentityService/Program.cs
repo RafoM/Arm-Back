@@ -129,8 +129,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-//if(builder.Configuration.GetValue<bool>("ApplyMigrations"))
-if (true) 
+if (builder.Configuration.GetValue<bool>("ApplyMigrations"))
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
@@ -140,10 +139,7 @@ if (true)
     }
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     await DatabaseSeeder.SeedAsync(dbContext, configuration);
-
 }
-
-
 
 if (app.Environment.IsDevelopment())
 {
