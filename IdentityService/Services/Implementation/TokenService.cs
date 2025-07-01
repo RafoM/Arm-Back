@@ -24,12 +24,17 @@ public class TokenService : ITokenService
 
         var roleName = user.Role?.Name ?? "User";
 
-        var claims = new[]
+        var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim(ClaimTypes.Role, roleName),
+    };
+
+        foreach (var aud in _jwtSettings.Audiences)
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.Role, roleName)
-        };
+            claims.Add(new Claim(JwtRegisteredClaimNames.Aud, aud));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
