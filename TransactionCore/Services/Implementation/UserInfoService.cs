@@ -15,14 +15,16 @@ namespace TransactionCore.Services.Implementation
         private readonly IConfiguration _config;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IReferralService _referralService;
+        private readonly ILogger<UserInfoService> _logger;
 
-        public UserInfoService(TransactionCoreDbContext dbContext, IAuthService authService, IConfiguration config, IHttpClientFactory clientFactory, IReferralService referralService)
+        public UserInfoService(TransactionCoreDbContext dbContext, IAuthService authService, IConfiguration config, IHttpClientFactory clientFactory, IReferralService referralService, ILogger<UserInfoService> logger)
         {
             _dbContext = dbContext;
             _authService = authService;
             _config = config;
             _clientFactory = clientFactory;
             _referralService = referralService;
+            _logger = logger;
         }
 
         public async Task AddReward(Guid userInfoId, decimal reward, Guid walletId)
@@ -42,6 +44,8 @@ namespace TransactionCore.Services.Implementation
         }
         public async Task<UserInfo> CreateUserinfoAsync(Guid userId, string email, string? promoCode = null, Guid? referrerId = null)
         {
+            _logger.LogInformation("Create user info");
+
             var userInfo = new UserInfo 
             {
                 UserId = userId,
@@ -67,6 +71,7 @@ namespace TransactionCore.Services.Implementation
             }
             await _dbContext.AddAsync(userInfo);
             await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("User info created");
 
             if (referrerId != null)
             {

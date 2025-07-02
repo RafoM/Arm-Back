@@ -25,8 +25,10 @@ namespace IdentityService.Services.Implementation
         private readonly JwtSettingsConfigModel _jwtSettings;
         private readonly IEmailService _emailService;
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration, IEmailService emailService, IPublishEndpoint publishEndpoint = null)
+
+        public AuthService(IdentityDbContext dbContext, IOptions<JwtSettingsConfigModel> jwtSettings, ITokenService tokenService, IConfiguration configuration, IEmailService emailService, IPublishEndpoint publishEndpoint = null, ILogger<AuthService> logger = null)
         {
             _dbContext = dbContext;
             _tokenService = tokenService;
@@ -34,6 +36,7 @@ namespace IdentityService.Services.Implementation
             _jwtSettings = jwtSettings.Value;
             _emailService = emailService;
             _publishEndpoint = publishEndpoint;
+            _logger = logger;
         }
 
         public async Task<(string accessToken, string refreshToken)> RegisterAsync(RegisterRequestModel request)
@@ -90,6 +93,8 @@ namespace IdentityService.Services.Implementation
             }
 
             await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("Sending user info to ContentService");
+
             await _publishEndpoint.Publish<ICreateUserInfoRequest>(new
             {
                 UserId = newUser.Id,
@@ -97,6 +102,8 @@ namespace IdentityService.Services.Implementation
                 PromoCode = request.PromoCode,
                 Email = request.Email
             });
+            _logger.LogInformation("User info sent to ContentService");
+
             var refreshToken = _tokenService.GenerateRefreshToken();
             _dbContext.RefreshTokens.Add(new RefreshToken
             {
