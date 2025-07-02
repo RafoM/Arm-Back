@@ -102,6 +102,7 @@ namespace IdentityService.Services.Implementation
                 PromoCode = request.PromoCode,
                 Email = request.Email
             });
+            //log
             _logger.LogInformation("User info sent to ContentService");
 
             var refreshToken = _tokenService.GenerateRefreshToken();
