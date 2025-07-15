@@ -17,6 +17,21 @@ if (string.IsNullOrEmpty(jwtSecret))
 }
 var keyBytes = Encoding.UTF8.GetBytes(jwtSecret);
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OcelotCorsPolicy", policy =>
+    {
+        policy.WithOrigins(allowedOrigins!) 
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -40,6 +55,7 @@ builder.Services.AddOcelot(builder.Configuration);
 builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
 var app = builder.Build();
+app.UseCors("OcelotCorsPolicy");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
