@@ -43,49 +43,40 @@ builder.Services.AddMessaging(builder.Configuration, typeof(UpdateUserRoleConsum
 
 //builder.Services.AddSingleton(StorageClient.Create());
 
-var jwtSecretKey = builder.Configuration["JwtSettings:SecretKey"] ?? "placeholder-secret";
-var keyBytes = Encoding.UTF8.GetBytes(jwtSecretKey);
-var signingKey = new SymmetricSecurityKey(keyBytes);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsConfigModel>();
-builder.Services.Configure<SmtpSettingsConfigModel>(builder.Configuration.GetSection("SmtpSettings"));
+var audiences = builder.Configuration.GetSection("IdentitySettings:Audiences").Get<string[]>();
 
-//builder.Services.AddIdentityServer()
-//    .AddInMemoryClients(IdentityServerDefinitions.GetClients(builder.Configuration))
-//    .AddInMemoryApiScopes(IdentityServerDefinitions.GetApiScopes())
-//    .AddInMemoryApiResources(IdentityServerDefinitions.GetApiResources())
-//    .AddInMemoryIdentityResources(IdentityServerDefinitions.GetIdentityResources())
-//    .AddDeveloperSigningCredential();
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
-    };
-});
+        options.RequireHttpsMetadata = false; 
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOrMicroservice", policy =>
-    {
-        policy.RequireAssertion(context =>
-            context.User.IsInRole("Admin") ||
-            context.User.HasClaim("client_id", "TransactionCore")
-        );
+            ValidateAudience = true,
+            ValidAudiences = audiences,
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(2),
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings.SecretKey)
+            )
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = ctx =>
+            {
+                Console.WriteLine($"JWT auth failed: {ctx.Exception.Message}");
+                return Task.CompletedTask;
+            }
+        };
     });
-});
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

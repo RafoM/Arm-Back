@@ -29,12 +29,11 @@ public class TokenService : ITokenService
         new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
         new Claim(JwtRegisteredClaimNames.Email, user.Email),
         new Claim(ClaimTypes.Role, roleName),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) 
     };
 
-        foreach (var aud in _jwtSettings.Audiences)
-        {
-            claims.Add(new Claim(JwtRegisteredClaimNames.Aud, aud));
-        }
+        var audienceClaims = _jwtSettings.Audiences.Select(aud => new Claim(JwtRegisteredClaimNames.Aud, aud));
+        claims.AddRange(audienceClaims);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

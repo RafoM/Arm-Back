@@ -60,23 +60,31 @@ builder.Services.AddMessaging(
     builder.Configuration,
     typeof(CreateUserInfoConsumer),
     typeof(IncrementReferralVisitsConsumer));
-var identitySettings = builder.Configuration.GetSection("IdentitySettings");
-var authorityUrl = identitySettings["Authority"];
-var audience = identitySettings["Audience"];
+var identitySettingsSection = builder.Configuration.GetSection("IdentitySettings");
+var authority = identitySettingsSection["Authority"];
+var validAudience = identitySettingsSection["Audience"];
+var validIssuer = identitySettingsSection["Issuer"];
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = authorityUrl;
+        options.RequireHttpsMetadata = false; 
+        options.SaveToken = true;
+        options.Authority = authority; 
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false,
             ValidateIssuer = true,
+            ValidIssuer = validIssuer,
+
+            ValidateAudience = true,
+            ValidAudience = validAudience,
+
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"])) 
         };
     });
-
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
