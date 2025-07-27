@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ContentService/ContentService.csproj", "./ContentService"]
+COPY ["ContentService/ContentService.csproj", "./ContentService/"]
 COPY ["Arbito.Shared.Contracts/Arbito.Shared.Contracts.csproj", "Arbito.Shared.Contracts/"]
 RUN dotnet restore "./ContentService/ContentService.csproj"
 COPY . .
