@@ -28,4 +28,4 @@ RUN dotnet publish "./ContentService/ContentService.csproj" -c $BUILD_CONFIGURAT
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ContentService/ContentService.dll"]
+ENTRYPOINT ["dotnet", "ContentService.dll"]
