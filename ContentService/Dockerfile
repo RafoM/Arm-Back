@@ -12,20 +12,20 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ContentService/ContentService.csproj", "."]
+COPY ["ContentService/ContentService.csproj", "./ContentService"]
 COPY ["Arbito.Shared.Contracts/Arbito.Shared.Contracts.csproj", "Arbito.Shared.Contracts/"]
-RUN dotnet restore "./ContentService.csproj"
+RUN dotnet restore "./ContentService/ContentService.csproj"
 COPY . .
 # COPY ["Arbito.Shared.Contracts/", "Arbito.Shared.Contracts/"]
-RUN dotnet build "./ContentService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./ContentService/ContentService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ContentService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./ContentService/ContentService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ContentService.dll"]
+ENTRYPOINT ["dotnet", "ContentService/ContentService.dll"]
