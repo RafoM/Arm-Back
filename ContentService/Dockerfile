@@ -13,11 +13,11 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ContentService.csproj", "."]
-COPY ["Arbito.Shared.Contracts/Arbito.Shared.Contracts.csproj", "Arbito.Shared.Contracts/"]
+COPY ["../Arbito.Shared.Contracts/Arbito.Shared.Contracts.csproj", "/Arbito.Shared.Contracts/"]
 RUN dotnet restore "./ContentService.csproj"
 COPY . .
 WORKDIR "/src/."
-COPY ["Arbito.Shared.Contracts/", "Arbito.Shared.Contracts/"]
+# COPY ["Arbito.Shared.Contracts/", "Arbito.Shared.Contracts/"]
 RUN dotnet build "./ContentService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
