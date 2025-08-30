@@ -277,6 +277,47 @@ namespace ContentService.Migrations
                     b.ToTable("TutorialDifficultyLevels");
                 });
 
+            modelBuilder.Entity("ContentService.Data.Entity.TutorialSubject", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TutorialSubjects");
+                });
+
+            modelBuilder.Entity("TutorialTutorialSubject", b =>
+                {
+                    b.Property<Guid>("TutorialId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TutorialSubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("TutorialId", "TutorialSubjectId");
+
+                    b.HasIndex("TutorialSubjectId");
+
+                    b.ToTable("TutorialTutorialSubject", (string)null);
+                });
+
             modelBuilder.Entity("caseTagMap", b =>
                 {
                     b.Property<Guid>("CaseId")
@@ -348,6 +389,21 @@ namespace ContentService.Migrations
                         .IsRequired();
 
                     b.Navigation("DifficultyLevel");
+                });
+
+            modelBuilder.Entity("TutorialTutorialSubject", b =>
+                {
+                    b.HasOne("ContentService.Data.Entity.Tutorial", null)
+                        .WithMany()
+                        .HasForeignKey("TutorialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ContentService.Data.Entity.TutorialSubject", null)
+                        .WithMany()
+                        .HasForeignKey("TutorialSubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("caseTagMap", b =>

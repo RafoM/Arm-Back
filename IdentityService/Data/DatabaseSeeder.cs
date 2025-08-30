@@ -24,7 +24,18 @@ namespace IdentityService.Data
                     Email = adminEmail,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
                     RoleId = 1, 
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow,
+                    Id = Guid.NewGuid(),
+                    
+                    Country = "AM",                  // <-- REQUIRED
+                    PhoneNumber = "+37400000000",    // <-- REQUIRED
+                    TelegramUserName = "admin_bot",  // <-- REQUIRED
+                    ProfileImageUrl = null,
+                    IsGmailAccount = false,
+                    IsEmailVerified = true,
+                    UpdatedDate = null,
+                    VerificationToken = null,
+                    VerificationTokenExpiry = null
                 };
                 context.Users.Add(adminUser);
             }
