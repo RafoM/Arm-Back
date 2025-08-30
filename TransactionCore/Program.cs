@@ -15,22 +15,35 @@ using TransactionCore.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString))
-{
-    throw new Exception("Connection string 'DefaultConnection' is missing.");
-}
+var useDatabase = builder.Configuration.GetValue<bool>("UseDatabase", true);
 
 //Services
 builder.Services.AddHttpClient();
 
-builder.Services.AddDbContext<TransactionCoreDbContext>(options =>
+if (useDatabase)
 {
-    options.UseSqlServer(connectionString);
-                  //.EnableSensitiveDataLogging()
-                  //.EnableDetailedErrors();
-});
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        throw new Exception("Connection string 'DefaultConnection' is missing.");
+    }
+
+    builder.Services.AddDbContext<TransactionCoreDbContext>(options =>
+    {
+        options.UseSqlServer(connectionString);
+                    //.EnableSensitiveDataLogging()
+                    //.EnableDetailedErrors();
+    });
+
+    builder.Services.AddHostedService<PaymentMonitoringService>();
+    builder.Services.AddHostedService<PromoExpirationService>();
+    builder.Services.AddHostedService<SubscriptionCleanupJob>();
+}
+else
+{
+    builder.Services.AddDbContext<TransactionCoreDbContext>(options =>
+        options.UseInMemoryDatabase("TransactionCore"));
+}
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICryptoService, CryptoService>();
@@ -53,9 +66,6 @@ builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
 builder.Services.Configure<RabbitMqConfigModel>(builder.Configuration.GetSection("RabbitMQ"));
 
-builder.Services.AddHostedService<PaymentMonitoringService>();
-builder.Services.AddHostedService<PromoExpirationService>();
-builder.Services.AddHostedService<SubscriptionCleanupJob>();
 builder.Services.AddMessaging(
     builder.Configuration,
     typeof(CreateUserInfoConsumer),
@@ -135,7 +145,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-if (builder.Configuration.GetValue<bool>("ApplyMigrations"))
+if (useDatabase && builder.Configuration.GetValue<bool>("ApplyMigrations"))
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<TransactionCoreDbContext>();
