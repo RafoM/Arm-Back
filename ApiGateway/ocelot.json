@@ -1245,7 +1245,7 @@
         {
           "Name": "ContentService",
           "Version": "v1",
-          "Url": "https://localhost:44369/swagger/v1/swagger.json"
+          "Url": "http://localhost:44369/swagger/v1/swagger.json"
         }
       ]
     },
@@ -1255,7 +1255,7 @@
         {
           "Name": "IdentityService",
           "Version": "v1",
-          "Url": "https://localhost:44350/swagger/v1/swagger.json"
+          "Url": "http://localhost:44350/swagger/v1/swagger.json"
         }
       ]
     },
@@ -1265,7 +1265,7 @@
         {
           "Name": "TransactionService",
           "Version": "v1",
-          "Url": "https://localhost:44351/swagger/v1/swagger.json"
+          "Url": "http://localhost:44351/swagger/v1/swagger.json"
         }
       ]
     }
